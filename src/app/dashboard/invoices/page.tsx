@@ -94,7 +94,10 @@ export default function InvoicesPage() {
                       <DropdownMenuItem>Ver detalle</DropdownMenuItem>
                       <DropdownMenuItem>Descargar PDF</DropdownMenuItem>
                        <DropdownMenuItem>Descargar XML</DropdownMenuItem>
-                       <DropdownMenuItem>Enviar por correo</DropdownMenuItem>
+                       <DropdownMenuItem>
+                          <Mail className="mr-2 h-4 w-4" />
+                          <span>Enviar por correo</span>
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   FileText,
   LayoutDashboard,
@@ -6,7 +9,10 @@ import {
   PanelLeft,
   Settings,
   Users,
+  BarChart3,
 } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,11 +27,41 @@ import { UserNav } from "@/components/user-nav";
 import { OrigonLogo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 
+const mainNavLinks = [
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    href: "/dashboard/invoices",
+    label: "Facturas",
+    icon: FileText,
+  },
+  {
+    href: "/dashboard/products",
+    label: "Productos",
+    icon: Package,
+  },
+  {
+    href: "/dashboard/clients",
+    label: "Clientes",
+    icon: Users,
+  },
+  {
+    href: "/dashboard/reports",
+    label: "Reportes",
+    icon: BarChart3,
+  },
+];
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
@@ -38,45 +74,33 @@ export default function DashboardLayout({
           </div>
           <div className="flex-1">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-              >
-                <LayoutDashboard className="h-4 w-4" />
-                Dashboard
-              </Link>
-              <Link
-                href="/dashboard/invoices"
-                className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
-              >
-                <FileText className="h-4 w-4" />
-                Facturas
-              </Link>
-              <Link
-                href="/dashboard/products"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-              >
-                <Package className="h-4 w-4" />
-                Productos
-              </Link>
-              <Link
-                href="/dashboard/clients"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-              >
-                <Users className="h-4 w-4" />
-                Clientes
-              </Link>
+              {mainNavLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                    pathname === link.href && "bg-muted text-primary"
+                  )}
+                >
+                  <link.icon className="h-4 w-4" />
+                  {link.label}
+                </Link>
+              ))}
             </nav>
           </div>
           <div className="mt-auto p-4">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-                 <Link
-                    href="/dashboard/settings"
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-                    >
-                    <Settings className="h-4 w-4" />
-                    Configuración
-                </Link>
+              <Link
+                href="/dashboard/settings"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                  pathname === "/dashboard/settings" && "bg-muted text-primary"
+                )}
+              >
+                <Settings className="h-4 w-4" />
+                Configuración
+              </Link>
             </nav>
           </div>
         </div>
@@ -103,37 +127,22 @@ export default function DashboardLayout({
                   <OrigonLogo className="h-6 w-6 text-primary" />
                   <span className="sr-only">Origon CFDI</span>
                 </Link>
-                <Link
-                  href="/dashboard"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                >
-                  <LayoutDashboard className="h-5 w-5" />
-                  Dashboard
-                </Link>
-                <Link
-                  href="/dashboard/invoices"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground"
-                >
-                  <FileText className="h-5 w-5" />
-                  Facturas
-                </Link>
-                <Link
-                  href="/dashboard/products"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                >
-                  <Package className="h-5 w-5" />
-                  Productos
-                </Link>
-                <Link
-                  href="/dashboard/clients"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                >
-                  <Users className="h-5 w-5" />
-                  Clientes
-                </Link>
+                {mainNavLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
+                      pathname === link.href && "bg-muted text-foreground"
+                    )}
+                  >
+                    <link.icon className="h-5 w-5" />
+                    {link.label}
+                  </Link>
+                ))}
                 <Link
                   href="/dashboard/settings"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                  className={cn("mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground", pathname === "/dashboard/settings" && "bg-muted text-foreground")}
                 >
                   <Settings className="h-5 w-5" />
                   Configuración
