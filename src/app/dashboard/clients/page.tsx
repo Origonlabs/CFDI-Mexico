@@ -1,15 +1,15 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { PlusCircle, MoreHorizontal } from "lucide-react";
 import { User } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
-import { supabase, supabaseEnabled } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,6 +61,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getClients, addClient, type ClientFormValues } from "@/app/actions/clients";
 
 const clientSchema = z.object({
   name: z.string().min(1, { message: "La razón social es obligatoria." }),
@@ -72,8 +73,6 @@ const clientSchema = z.object({
   taxRegime: z.string().min(1, { message: "El régimen fiscal es obligatorio." }),
 });
 
-type ClientFormValues = z.infer<typeof clientSchema>;
-
 interface Client extends ClientFormValues {
   id: string;
   createdAt: string;
@@ -81,10 +80,12 @@ interface Client extends ClientFormValues {
 
 export default function ClientsPage() {
   const { toast } = useToast();
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientSchema),
@@ -112,55 +113,37 @@ export default function ClientsPage() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (user && supabase) {
-      const fetchClients = async () => {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('clients')
-          .select('*')
-          .eq('user_id', user.uid)
-          .order('created_at', { ascending: false });
+  const fetchClients = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    const response = await getClients(user.uid);
 
-        if (error) {
-          console.error("Error fetching clients:", error);
-          toast({
-            title: "Error",
-            description: "No se pudieron cargar los clientes.",
-            variant: "destructive",
-          });
-        } else {
-          const clientsData = data.map(client => ({
-            ...client,
-            createdAt: new Date(client.created_at).toLocaleDateString(),
-          })) as Client[];
-          setClients(clientsData);
-        }
-        setLoading(false);
-      };
-
-      fetchClients();
-
-      const channel = supabase.channel('clients-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'clients', filter: `user_id=eq.${user.uid}` }, (payload) => {
-          fetchClients();
-        })
-        .subscribe();
-        
-      return () => {
-        supabase.removeChannel(channel);
-      };
+    if (response.success && response.data) {
+      const clientsData = response.data.map((client: any) => ({
+        ...client,
+        id: client.id.toString(),
+        createdAt: new Date(client.created_at).toLocaleDateString(),
+      })) as Client[];
+      setClients(clientsData);
     } else {
-      if (!user) {
-        setClients([]);
-      }
-      setLoading(false);
+      toast({
+        title: "Error",
+        description: response.message || "No se pudieron cargar los clientes.",
+        variant: "destructive",
+      });
     }
+    setLoading(false);
   }, [user, toast]);
+
+  useEffect(() => {
+    if (user) {
+      fetchClients();
+    }
+  }, [user, fetchClients]);
   
 
   async function onSubmit(data: ClientFormValues) {
-    if (!user || !supabase) {
+    if (!user) {
       toast({
         title: "Error",
         description: "Debes iniciar sesión para agregar un cliente.",
@@ -168,28 +151,22 @@ export default function ClientsPage() {
       });
       return;
     }
+    setIsSubmitting(true);
+    const result = await addClient(data, user.uid);
+    setIsSubmitting(false);
 
-    try {
-      const { error } = await supabase
-        .from('clients')
-        .insert({
-          ...data,
-          user_id: user.uid,
-        });
-
-      if (error) throw error;
-      
+    if (result.success) {
       toast({
         title: "Éxito",
         description: "El cliente se ha guardado correctamente.",
       });
       form.reset();
       setIsDialogOpen(false);
-    } catch (error) {
-      console.error("Error adding client:", error);
-      toast({
+      router.refresh(); // Refreshes server components and refetches data
+    } else {
+       toast({
         title: "Error al guardar",
-        description: "No se pudo guardar la información del cliente.",
+        description: result.message || "No se pudo guardar la información del cliente.",
         variant: "destructive",
       });
     }
@@ -202,7 +179,7 @@ export default function ClientsPage() {
         <h1 className="text-2xl font-bold font-headline">Clientes</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="h-8 gap-1" disabled={!firebaseEnabled || !supabaseEnabled}>
+            <Button size="sm" className="h-8 gap-1" disabled={!firebaseEnabled}>
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Nuevo Cliente
@@ -309,8 +286,8 @@ export default function ClientsPage() {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit" disabled={form.formState.isSubmitting}>
-                    {form.formState.isSubmitting ? "Guardando..." : "Guardar Cliente"}
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Guardando..." : "Guardar Cliente"}
                   </Button>
                 </DialogFooter>
               </form>

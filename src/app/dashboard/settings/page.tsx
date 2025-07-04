@@ -4,13 +4,14 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { UploadCloud, PlusCircle, Building, Workflow } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
-import { supabase, supabaseEnabled } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getCompanyProfile, saveCompanyProfile, type ProfileFormValues } from "@/app/actions/companies";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -66,13 +67,12 @@ const profileFormSchema = z.object({
   address: z.string().min(1, { message: "La dirección fiscal es obligatoria." }),
 });
 
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
-
 
 export default function SettingsPage() {
   const { toast } = useToast();
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingAuth, setLoadingAuth] = useState(true);
   const [loadingProfile, setLoadingProfile] = useState(true);
 
   const form = useForm<ProfileFormValues>({
@@ -86,42 +86,45 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (!firebaseEnabled || !auth) {
-      setLoading(false);
+      setLoadingAuth(false);
       setLoadingProfile(false);
       return;
     }
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      setLoading(false);
+      setLoadingAuth(false);
     });
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    async function fetchProfile() {
-      if (user && supabase) {
-        setLoadingProfile(true);
-        const { data, error } = await supabase
-          .from("companies")
-          .select("*")
-          .eq("id", user.uid)
-          .single();
+  const fetchProfile = useCallback(async (uid: string) => {
+      setLoadingProfile(true);
+      const response = await getCompanyProfile(uid);
 
-        if (error && error.code !== 'PGRST116') { // PGRST116: no rows found, which is ok
-          console.error("Error fetching company profile:", error);
-        } else if (data) {
-          form.reset(data as ProfileFormValues);
-        }
-        setLoadingProfile(false);
-      } else if (!loading) {
-        setLoadingProfile(false);
+      if (response.success && response.data) {
+        form.reset(response.data as ProfileFormValues);
+      } else if (!response.success) {
+        toast({
+          title: "Error",
+          description: response.message,
+          variant: "destructive"
+        });
       }
+      setLoadingProfile(false);
+  }, [form, toast]);
+
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile(user.uid);
+    } else if (!loadingAuth) {
+      // User is not logged in, finished loading
+      setLoadingProfile(false);
     }
-    fetchProfile();
-  }, [user, form, loading]);
+  }, [user, loadingAuth, fetchProfile]);
 
   async function onSubmit(data: ProfileFormValues) {
-    if (!user || !supabase) {
+    if (!user) {
       toast({
         title: "Error",
         description: "Debes iniciar sesión para guardar los cambios.",
@@ -130,23 +133,18 @@ export default function SettingsPage() {
       return;
     }
 
-    try {
-      const { error } = await supabase.from("companies").upsert({
-        id: user.uid,
-        ...data
-      });
+    const result = await saveCompanyProfile(data, user.uid);
 
-      if (error) throw error;
-
+    if (result.success) {
       toast({
         title: "Éxito",
-        description: "El perfil de la empresa se ha guardado correctamente.",
+        description: result.message || "El perfil de la empresa se ha guardado correctamente.",
       });
-    } catch (error) {
-      console.error("Error saving company profile:", error);
+      router.refresh();
+    } else {
       toast({
         title: "Error al guardar",
-        description: "No se pudo guardar la información de la empresa.",
+        description: result.message || "No se pudo guardar la información de la empresa.",
         variant: "destructive",
       });
     }
@@ -175,7 +173,7 @@ export default function SettingsPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                   {loadingProfile ? (
+                   {loadingProfile || loadingAuth ? (
                     <div className="space-y-6">
                       <div className="space-y-2">
                         <Skeleton className="h-4 w-1/4" />
@@ -245,7 +243,7 @@ export default function SettingsPage() {
                   )}
                 </CardContent>
                 <CardFooter>
-                   <Button type="submit" disabled={loadingProfile || form.formState.isSubmitting || !supabaseEnabled}>
+                   <Button type="submit" disabled={loadingProfile || form.formState.isSubmitting || !firebaseEnabled}>
                     {form.formState.isSubmitting ? "Guardando..." : "Guardar Cambios"}
                   </Button>
                 </CardFooter>

@@ -1,14 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
+// This file is no longer used because the database has been migrated from Supabase to Neon.
+// You can safely delete this file.
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-const supabaseEnabled = !!(supabaseUrl && supabaseAnonKey);
-
-const supabase = supabaseEnabled ? createClient(supabaseUrl!, supabaseAnonKey!) : null;
-
-if (!supabaseEnabled) {
-  console.warn("Supabase is not configured. Database features will be disabled. Please update your .env.local file.");
-}
-
-export { supabase, supabaseEnabled };
+export const supabase = null;
+export const supabaseEnabled = false;
