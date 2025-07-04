@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -81,14 +82,35 @@ export default function NewInvoicePage() {
                 <div className="grid grid-cols-2 gap-4">
                      <div className="grid gap-3">
                         <Label htmlFor="uso-cfdi">Uso CFDI</Label>
-                        <Select defaultValue="G03">
+                        <Select>
                             <SelectTrigger id="uso-cfdi" aria-label="Uso CFDI">
-                                <SelectValue placeholder="Uso CFDI" />
+                                <SelectValue placeholder="Seleccionar Uso CFDI" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="G01">Adquisición de mercancías</SelectItem>
-                                <SelectItem value="G03">Gastos en general</SelectItem>
-                                <SelectItem value="I04">Equipo de computo y accesorios</SelectItem>
+                                <SelectItem value="G01">G01 - Adquisición de mercancías</SelectItem>
+                                <SelectItem value="G02">G02 - Devoluciones, descuentos o bonificaciones</SelectItem>
+                                <SelectItem value="G03">G03 - Gastos en general</SelectItem>
+                                <SelectItem value="I01">I01 - Construcciones</SelectItem>
+                                <SelectItem value="I02">I02 - Mobiliario y equipo de oficina por inversiones</SelectItem>
+                                <SelectItem value="I03">I03 - Equipo de transporte</SelectItem>
+                                <SelectItem value="I04">I04 - Equipo de cómputo y accesorios</SelectItem>
+                                <SelectItem value="I05">I05 - Dados, troqueles, moldes, matrices y herramental</SelectItem>
+                                <SelectItem value="I06">I06 - Comunicaciones telefónicas</SelectItem>
+                                <SelectItem value="I07">I07 - Comunicaciones satelitales</SelectItem>
+                                <SelectItem value="I08">I08 - Otra maquinaria y equipo</SelectItem>
+                                <SelectItem value="D01">D01 - Honorarios médicos, dentales y gastos hospitalarios.</SelectItem>
+                                <SelectItem value="D02">D02 - Gastos médicos por incapacidad o discapacidad</SelectItem>
+                                <SelectItem value="D03">D03 - Gastos funerales</SelectItem>
+                                <SelectItem value="D04">D04 - Donativos</SelectItem>
+                                <SelectItem value="D05">D05 - Intereses reales efectivamente pagados por créditos hipotecarios</SelectItem>
+                                <SelectItem value="D06">D06 - Aportaciones voluntarias al SAR</SelectItem>
+                                <SelectItem value="D07">D07 - Primas por seguros de gastos médicos</SelectItem>
+                                <SelectItem value="D08">D08 - Gastos de transportación escolar obligatoria</SelectItem>
+                                <SelectItem value="D09">D09 - Depósitos en cuentas para el ahorro, primas que tengan como base planes de pensiones</SelectItem>
+                                <SelectItem value="D10">D10 - Pagos por servicios educativos (colegiaturas)</SelectItem>
+                                <SelectItem value="S01">S01 - Sin efectos fiscales</SelectItem>
+                                <SelectItem value="CP01">CP01 - Pagos</SelectItem>
+                                <SelectItem value="CN01">CN01 - Nómina</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
