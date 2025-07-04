@@ -6,10 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
 import { UploadCloud, PlusCircle, Building, Workflow } from "lucide-react";
 
-import { auth, db, firebaseEnabled } from "@/lib/firebase/client";
+import { auth, firebaseEnabled } from "@/lib/firebase/client";
+import { supabase, supabaseEnabled } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -99,24 +99,29 @@ export default function SettingsPage() {
 
   useEffect(() => {
     async function fetchProfile() {
-      if (user && db) {
+      if (user && supabase) {
         setLoadingProfile(true);
-        const docRef = doc(db, "companies", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          form.reset(docSnap.data() as ProfileFormValues);
+        const { data, error } = await supabase
+          .from("companies")
+          .select("*")
+          .eq("id", user.uid)
+          .single();
+
+        if (error && error.code !== 'PGRST116') { // PGRST116: no rows found, which is ok
+          console.error("Error fetching company profile:", error);
+        } else if (data) {
+          form.reset(data as ProfileFormValues);
         }
         setLoadingProfile(false);
       } else if (!loading) {
-        // This handles the case where there is no user logged in
         setLoadingProfile(false);
       }
     }
     fetchProfile();
-  }, [user, form, db, loading]);
+  }, [user, form, loading]);
 
   async function onSubmit(data: ProfileFormValues) {
-    if (!user || !db) {
+    if (!user || !supabase) {
       toast({
         title: "Error",
         description: "Debes iniciar sesión para guardar los cambios.",
@@ -126,7 +131,13 @@ export default function SettingsPage() {
     }
 
     try {
-      await setDoc(doc(db, "companies", user.uid), data);
+      const { error } = await supabase.from("companies").upsert({
+        id: user.uid,
+        ...data
+      });
+
+      if (error) throw error;
+
       toast({
         title: "Éxito",
         description: "El perfil de la empresa se ha guardado correctamente.",
@@ -234,7 +245,7 @@ export default function SettingsPage() {
                   )}
                 </CardContent>
                 <CardFooter>
-                   <Button type="submit" disabled={loadingProfile || form.formState.isSubmitting}>
+                   <Button type="submit" disabled={loadingProfile || form.formState.isSubmitting || !supabaseEnabled}>
                     {form.formState.isSubmitting ? "Guardando..." : "Guardar Cambios"}
                   </Button>
                 </CardFooter>
@@ -421,5 +432,3 @@ export default function SettingsPage() {
     </div>
   )
 }
-
-    

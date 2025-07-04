@@ -7,9 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { PlusCircle, MoreHorizontal } from "lucide-react";
 import { User } from "firebase/auth";
-import { collection, addDoc, getDocs, onSnapshot, QuerySnapshot, DocumentData } from "firebase/firestore";
 
-import { db, auth, firebaseEnabled } from "@/lib/firebase/client";
+import { auth, firebaseEnabled } from "@/lib/firebase/client";
+import { supabase, supabaseEnabled } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
@@ -106,39 +106,61 @@ export default function ClientsPage() {
       setUser(currentUser);
       if (!currentUser) {
         setLoading(false);
+        setClients([]);
       }
     });
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    if (user && db) {
-      const clientsCollection = collection(db, "companies", user.uid, "clients");
-      const unsubscribe = onSnapshot(clientsCollection, (snapshot: QuerySnapshot<DocumentData>) => {
-        const clientsData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt?.toDate().toLocaleDateString() || new Date().toLocaleDateString(),
-        })) as Client[];
-        setClients(clientsData);
-        setLoading(false);
-      }, (error) => {
-        console.error("Error fetching clients:", error);
-        toast({
-          title: "Error",
-          description: "No se pudieron cargar los clientes.",
-          variant: "destructive",
-        });
-        setLoading(false);
-      });
+    if (user && supabase) {
+      const fetchClients = async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('clients')
+          .select('*')
+          .eq('user_id', user.uid)
+          .order('created_at', { ascending: false });
 
-      return () => unsubscribe();
+        if (error) {
+          console.error("Error fetching clients:", error);
+          toast({
+            title: "Error",
+            description: "No se pudieron cargar los clientes.",
+            variant: "destructive",
+          });
+        } else {
+          const clientsData = data.map(client => ({
+            ...client,
+            createdAt: new Date(client.created_at).toLocaleDateString(),
+          })) as Client[];
+          setClients(clientsData);
+        }
+        setLoading(false);
+      };
+
+      fetchClients();
+
+      const channel = supabase.channel('clients-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'clients', filter: `user_id=eq.${user.uid}` }, (payload) => {
+          fetchClients();
+        })
+        .subscribe();
+        
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    } else {
+      if (!user) {
+        setClients([]);
+      }
+      setLoading(false);
     }
   }, [user, toast]);
   
 
   async function onSubmit(data: ClientFormValues) {
-    if (!user || !db) {
+    if (!user || !supabase) {
       toast({
         title: "Error",
         description: "Debes iniciar sesión para agregar un cliente.",
@@ -148,11 +170,15 @@ export default function ClientsPage() {
     }
 
     try {
-      const clientsCollection = collection(db, "companies", user.uid, "clients");
-      await addDoc(clientsCollection, {
-        ...data,
-        createdAt: new Date(),
-      });
+      const { error } = await supabase
+        .from('clients')
+        .insert({
+          ...data,
+          user_id: user.uid,
+        });
+
+      if (error) throw error;
+      
       toast({
         title: "Éxito",
         description: "El cliente se ha guardado correctamente.",
@@ -176,7 +202,7 @@ export default function ClientsPage() {
         <h1 className="text-2xl font-bold font-headline">Clientes</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="h-8 gap-1" disabled={!firebaseEnabled}>
+            <Button size="sm" className="h-8 gap-1" disabled={!firebaseEnabled || !supabaseEnabled}>
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Nuevo Cliente
