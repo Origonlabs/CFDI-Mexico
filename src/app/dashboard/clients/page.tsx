@@ -1,13 +1,24 @@
-import { PlusCircle, MoreHorizontal } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+"use client";
+
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { PlusCircle, MoreHorizontal } from "lucide-react";
+import { User } from "firebase/auth";
+import { collection, addDoc, getDocs, onSnapshot, QuerySnapshot, DocumentData } from "firebase/firestore";
+
+import { db, auth, firebaseEnabled } from "@/lib/firebase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -15,14 +26,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -31,103 +42,260 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 
+const clientSchema = z.object({
+  name: z.string().min(1, { message: "La razón social es obligatoria." }),
+  rfc: z.string()
+    .min(12, { message: "El RFC debe tener 12 o 13 caracteres." })
+    .max(13, { message: "El RFC debe tener 12 o 13 caracteres." }),
+  email: z.string().email({ message: "El correo electrónico no es válido." }),
+  zip: z.string().length(5, { message: "El código postal debe tener 5 dígitos." }),
+  taxRegime: z.string().min(1, { message: "El régimen fiscal es obligatorio." }),
+});
+
+type ClientFormValues = z.infer<typeof clientSchema>;
+
+interface Client extends ClientFormValues {
+  id: string;
+  createdAt: string;
+}
 
 export default function ClientsPage() {
+  const { toast } = useToast();
+  const [user, setUser] = useState<User | null>(null);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const form = useForm<ClientFormValues>({
+    resolver: zodResolver(clientSchema),
+    defaultValues: {
+      name: "",
+      rfc: "",
+      email: "",
+      zip: "",
+      taxRegime: "",
+    },
+  });
+
+  useEffect(() => {
+    if (!firebaseEnabled || !auth) {
+      setLoading(false);
+      return;
+    }
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+      if (!currentUser) {
+        setLoading(false);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (user && db) {
+      const clientsCollection = collection(db, "companies", user.uid, "clients");
+      const unsubscribe = onSnapshot(clientsCollection, (snapshot: QuerySnapshot<DocumentData>) => {
+        const clientsData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate().toLocaleDateString() || new Date().toLocaleDateString(),
+        })) as Client[];
+        setClients(clientsData);
+        setLoading(false);
+      }, (error) => {
+        console.error("Error fetching clients:", error);
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar los clientes.",
+          variant: "destructive",
+        });
+        setLoading(false);
+      });
+
+      return () => unsubscribe();
+    }
+  }, [user, toast]);
+  
+
+  async function onSubmit(data: ClientFormValues) {
+    if (!user || !db) {
+      toast({
+        title: "Error",
+        description: "Debes iniciar sesión para agregar un cliente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const clientsCollection = collection(db, "companies", user.uid, "clients");
+      await addDoc(clientsCollection, {
+        ...data,
+        createdAt: new Date(),
+      });
+      toast({
+        title: "Éxito",
+        description: "El cliente se ha guardado correctamente.",
+      });
+      form.reset();
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error("Error adding client:", error);
+      toast({
+        title: "Error al guardar",
+        description: "No se pudo guardar la información del cliente.",
+        variant: "destructive",
+      });
+    }
+  }
+
+
   return (
     <div className="flex flex-col sm:gap-4 sm:py-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold font-headline">Clientes</h1>
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button size="sm" className="h-8 gap-1">
-                    <PlusCircle className="h-3.5 w-3.5" />
-                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Nuevo Cliente
-                    </span>
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" className="h-8 gap-1" disabled={!firebaseEnabled}>
+              <PlusCircle className="h-3.5 w-3.5" />
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                Nuevo Cliente
+              </span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-xl">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
                 <DialogHeader>
-                <DialogTitle className="font-headline">Agregar Nuevo Cliente</DialogTitle>
-                <DialogDescription>
+                  <DialogTitle className="font-headline">Agregar Nuevo Cliente</DialogTitle>
+                  <DialogDescription>
                     Completa los datos fiscales para registrar un nuevo cliente. La constancia es opcional.
-                </DialogDescription>
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                    Razón Social
-                    </Label>
-                    <Input id="name" placeholder="Empresa Ejemplo S.A. de C.V." className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="rfc" className="text-right">
-                    RFC
-                    </Label>
-                    <Input id="rfc" placeholder="XAXX010101000" className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="email" className="text-right">
-                    Email
-                    </Label>
-                    <Input id="email" type="email" placeholder="contacto@empresa.com" className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="zip" className="text-right">
-                    C.P. Fiscal
-                    </Label>
-                    <Input id="zip" placeholder="11520" className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="tax-regime" className="text-right">
-                        Régimen Fiscal
-                    </Label>
-                    <div className="col-span-3">
-                        <Select>
-                            <SelectTrigger id="tax-regime">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-4 items-center gap-4">
+                        <FormLabel className="text-right">Razón Social</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Empresa Ejemplo S.A. de C.V." className="col-span-3" {...field} />
+                        </FormControl>
+                         <FormMessage className="col-span-4 pl-[25%]" />
+                      </FormItem>
+                    )}
+                  />
+                   <FormField
+                    control={form.control}
+                    name="rfc"
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-4 items-center gap-4">
+                        <FormLabel className="text-right">RFC</FormLabel>
+                        <FormControl>
+                          <Input placeholder="XAXX010101000" className="col-span-3" {...field} />
+                        </FormControl>
+                        <FormMessage className="col-span-4 pl-[25%]" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-4 items-center gap-4">
+                        <FormLabel className="text-right">Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="contacto@empresa.com" className="col-span-3" {...field} />
+                        </FormControl>
+                         <FormMessage className="col-span-4 pl-[25%]" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="zip"
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-4 items-center gap-4">
+                        <FormLabel className="text-right">C.P. Fiscal</FormLabel>
+                        <FormControl>
+                          <Input placeholder="11520" className="col-span-3" {...field} />
+                        </FormControl>
+                         <FormMessage className="col-span-4 pl-[25%]" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="taxRegime"
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-4 items-center gap-4">
+                        <FormLabel className="text-right">Régimen Fiscal</FormLabel>
+                        <div className="col-span-3">
+                           <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                               <SelectTrigger>
                                 <SelectValue placeholder="Seleccionar régimen..." />
-                            </SelectTrigger>
+                              </SelectTrigger>
+                            </FormControl>
                             <SelectContent>
-                                <SelectItem value="601">601 - General de Ley Personas Morales</SelectItem>
-                                <SelectItem value="603">603 - Personas Morales con Fines no Lucrativos</SelectItem>
-                                <SelectItem value="605">605 - Sueldos y Salarios e Ingresos Asimilados a Salarios</SelectItem>
-                                <SelectItem value="606">606 - Arrendamiento</SelectItem>
-                                <SelectItem value="612">612 - Personas Físicas con Actividades Empresariales y Profesionales</SelectItem>
-                                <SelectItem value="616">616 - Sin obligaciones fiscales</SelectItem>
-                                <SelectItem value="621">621 - Incorporación Fiscal</SelectItem>
-                                <SelectItem value="626">626 - Régimen Simplificado de Confianza</SelectItem>
+                              <SelectItem value="601">601 - General de Ley Personas Morales</SelectItem>
+                              <SelectItem value="603">603 - Personas Morales con Fines no Lucrativos</SelectItem>
+                              <SelectItem value="605">605 - Sueldos y Salarios e Ingresos Asimilados a Salarios</SelectItem>
+                              <SelectItem value="606">606 - Arrendamiento</SelectItem>
+                              <SelectItem value="612">612 - Personas Físicas con Actividades Empresariales y Profesionales</SelectItem>
+                              <SelectItem value="616">616 - Sin obligaciones fiscales</SelectItem>
+                              <SelectItem value="621">621 - Incorporación Fiscal</SelectItem>
+                              <SelectItem value="626">626 - Régimen Simplificado de Confianza</SelectItem>
                             </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="tax-constancy" className="text-right">
-                    Constancia
-                    </Label>
+                          </Select>
+                        </div>
+                         <FormMessage className="col-span-4 pl-[25%]" />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="tax-constancy" className="text-right">Constancia</Label>
                     <div className="col-span-3">
-                       <Input id="tax-constancy" type="file" />
-                       <p className="text-xs text-muted-foreground mt-1">Sube la constancia para autocompletar los datos.</p>
+                      <Input id="tax-constancy" type="file" disabled />
+                      <p className="text-xs text-muted-foreground mt-1">Próximamente: Sube la constancia para autocompletar.</p>
                     </div>
-                </div>
+                  </div>
                 </div>
                 <DialogFooter>
-                <Button type="submit">Guardar Cliente</Button>
+                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                    {form.formState.isSubmitting ? "Guardando..." : "Guardar Cliente"}
+                  </Button>
                 </DialogFooter>
-            </DialogContent>
+              </form>
+            </Form>
+          </DialogContent>
         </Dialog>
-
       </div>
-       <Card>
+      <Card>
         <CardHeader>
           <CardTitle className="font-headline">Lista de Clientes</CardTitle>
-          <CardDescription>
-            Administra tus clientes y su información fiscal.
-          </CardDescription>
+          <CardDescription>Administra tus clientes y su información fiscal.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -143,94 +311,51 @@ export default function ClientsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">Liam Johnson</TableCell>
-                <TableCell>LJI850101NN1</TableCell>
-                <TableCell className="hidden md:table-cell">liam@example.com</TableCell>
-                <TableCell className="hidden md:table-cell">2023-07-12</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                      <DropdownMenuItem>Editar</DropdownMenuItem>
-                      <DropdownMenuItem>Eliminar</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-               <TableRow>
-                <TableCell className="font-medium">Olivia Smith</TableCell>
-                <TableCell>OSI020304MM2</TableCell>
-                <TableCell className="hidden md:table-cell">olivia@example.com</TableCell>
-                <TableCell className="hidden md:table-cell">2023-10-18</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                      <DropdownMenuItem>Editar</DropdownMenuItem>
-                      <DropdownMenuItem>Eliminar</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Noah Williams</TableCell>
-                <TableCell>NWI991122PP3</TableCell>
-                <TableCell className="hidden md:table-cell">noah@example.com</TableCell>
-                <TableCell className="hidden md:table-cell">2023-04-26</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                      <DropdownMenuItem>Editar</DropdownMenuItem>
-                      <DropdownMenuItem>Eliminar</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-               <TableRow>
-                <TableCell className="font-medium">Emma Brown</TableCell>
-                <TableCell>EBR880506RR4</TableCell>
-                <TableCell className="hidden md:table-cell">emma@example.com</TableCell>
-                <TableCell className="hidden md:table-cell">2023-11-29</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                      <DropdownMenuItem>Editar</DropdownMenuItem>
-                      <DropdownMenuItem>Eliminar</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
+              {loading ? (
+                Array.from({ length: 4 }).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-40" /></TableCell>
+                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-8 rounded-full" /></TableCell>
+                  </TableRow>
+                ))
+              ) : clients.length > 0 ? (
+                clients.map((client) => (
+                  <TableRow key={client.id}>
+                    <TableCell className="font-medium">{client.name}</TableCell>
+                    <TableCell>{client.rfc}</TableCell>
+                    <TableCell className="hidden md:table-cell">{client.email}</TableCell>
+                    <TableCell className="hidden md:table-cell">{client.createdAt}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button aria-haspopup="true" size="icon" variant="ghost">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                          <DropdownMenuItem>Editar</DropdownMenuItem>
+                          <DropdownMenuItem>Eliminar</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center h-24">
+                    No has agregado ningún cliente.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
