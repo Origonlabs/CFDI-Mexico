@@ -1,11 +1,57 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { OrigonLogo } from '@/components/logo';
+import { auth, firebaseEnabled } from '@/lib/firebase/client';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleEmailSignIn = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!firebaseEnabled) {
+      toast({
+        title: "Error de Configuración",
+        description: "Firebase no está configurado. Revisa tus variables de entorno.",
+        variant: "destructive",
+      });
+      return;
+    }
+    // This is a placeholder since email/password sign-in isn't fully implemented.
+    router.push('/dashboard');
+  }
+
+  const handleGoogleSignIn = async () => {
+    if (!firebaseEnabled || !auth) {
+       toast({
+        title: "Error de Configuración",
+        description: "Firebase no está configurado. Revisa tus variables de entorno.",
+        variant: "destructive",
+      });
+      return;
+    }
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      router.push('/dashboard');
+    } catch (error) {
+      console.error("Error al iniciar sesión con Google", error);
+      toast({
+        title: "Error de Autenticación",
+        description: "No se pudo iniciar sesión con Google. Revisa la consola para más detalles.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="w-full h-screen lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
       <div className="flex items-center justify-center py-12">
@@ -26,34 +72,42 @@ export default function LoginPage() {
                     Bienvenido de nuevo.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Correo electrónico</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Contraseña</Label>
-                  <Link
-                    href="#"
-                    className="ml-auto inline-block text-sm underline"
-                  >
-                    ¿Olvidaste tu contraseña?
-                  </Link>
+            <CardContent>
+              <form onSubmit={handleEmailSignIn} className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Correo electrónico</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="m@example.com"
+                    required
+                    disabled={!firebaseEnabled}
+                  />
                 </div>
-                <Input id="password" type="password" required />
-              </div>
-              <Button type="submit" className="w-full" asChild>
-                <Link href="/dashboard">Iniciar Sesión</Link>
-              </Button>
-              <Button variant="outline" className="w-full">
-                Iniciar con Google
-              </Button>
+                <div className="grid gap-2">
+                  <div className="flex items-center">
+                    <Label htmlFor="password">Contraseña</Label>
+                    <Link
+                      href="#"
+                      className="ml-auto inline-block text-sm underline"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </Link>
+                  </div>
+                  <Input id="password" type="password" required disabled={!firebaseEnabled} />
+                </div>
+                <Button type="submit" className="w-full" disabled={!firebaseEnabled}>
+                  Iniciar Sesión
+                </Button>
+                <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignIn} disabled={!firebaseEnabled}>
+                  Iniciar con Google
+                </Button>
+              </form>
+              {!firebaseEnabled && (
+                <p className="text-center text-xs text-destructive pt-4">
+                  La configuración de Firebase está incompleta. La autenticación está deshabilitada.
+                </p>
+              )}
             </CardContent>
           </Card>
           <div className="mt-4 text-center text-sm">
