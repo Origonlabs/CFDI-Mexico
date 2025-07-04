@@ -1,3 +1,18 @@
+
+"use client";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { UploadCloud, PlusCircle, Building, Workflow } from "lucide-react";
+
+import { auth, db, firebaseEnabled } from "@/lib/firebase/client";
+import { useToast } from "@/hooks/use-toast";
+
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -5,16 +20,23 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/components/ui/tabs"
+} from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +45,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -31,12 +53,95 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { UploadCloud, PlusCircle, Building, Workflow } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { Switch } from "@/components/ui/switch"
+} from "@/components/ui/table";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Switch } from "@/components/ui/switch";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const profileFormSchema = z.object({
+  companyName: z.string().min(1, { message: "La razón social es obligatoria." }),
+  rfc: z.string()
+    .min(12, { message: "El RFC debe tener 12 o 13 caracteres." })
+    .max(13, { message: "El RFC debe tener 12 o 13 caracteres." }),
+  address: z.string().min(1, { message: "La dirección fiscal es obligatoria." }),
+});
+
+type ProfileFormValues = z.infer<typeof profileFormSchema>;
+
 
 export default function SettingsPage() {
+  const { toast } = useToast();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      companyName: "",
+      rfc: "",
+      address: "",
+    },
+  });
+
+  useEffect(() => {
+    if (!firebaseEnabled || !auth) {
+      setLoading(false);
+      setLoadingProfile(false);
+      return;
+    }
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      if (user && db) {
+        setLoadingProfile(true);
+        const docRef = doc(db, "companies", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          form.reset(docSnap.data() as ProfileFormValues);
+        }
+        setLoadingProfile(false);
+      } else if (!loading) {
+        // This handles the case where there is no user logged in
+        setLoadingProfile(false);
+      }
+    }
+    fetchProfile();
+  }, [user, form, db, loading]);
+
+  async function onSubmit(data: ProfileFormValues) {
+    if (!user || !db) {
+      toast({
+        title: "Error",
+        description: "Debes iniciar sesión para guardar los cambios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await setDoc(doc(db, "companies", user.uid), data);
+      toast({
+        title: "Éxito",
+        description: "El perfil de la empresa se ha guardado correctamente.",
+      });
+    } catch (error) {
+      console.error("Error saving company profile:", error);
+      toast({
+        title: "Error al guardar",
+        description: "No se pudo guardar la información de la empresa.",
+        variant: "destructive",
+      });
+    }
+  }
+
+
   return (
     <div className="mx-auto w-full max-w-4xl">
       <h1 className="text-3xl font-bold font-headline mb-6">Configuración</h1>
@@ -49,40 +154,93 @@ export default function SettingsPage() {
           <TabsTrigger value="appearance">Apariencia</TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-headline">Perfil de Empresa</CardTitle>
-              <CardDescription>
-                Actualiza la información fiscal y el logo de tu empresa.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="company-name">Razón Social</Label>
-                <Input id="company-name" defaultValue="Mi Empresa S.A. de C.V." />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="rfc">RFC</Label>
-                <Input id="rfc" defaultValue="MEI920101ABC" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="address">Dirección Fiscal</Label>
-                <Input id="address" defaultValue="Av. Siempreviva 742, Springfield" />
-              </div>
-               <div className="grid w-full max-w-sm items-center gap-1.5">
-                  <Label>Logo de la Empresa</Label>
-                   <div className="flex items-center gap-4">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-md border border-dashed">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="font-headline">Perfil de Empresa</CardTitle>
+                  <CardDescription>
+                    Actualiza la información fiscal y el logo de tu empresa.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                   {loadingProfile ? (
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-1/4" />
+                        <Skeleton className="h-10 w-full" />
+                      </div>
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-1/4" />
+                        <Skeleton className="h-10 w-full" />
+                      </div>
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-1/4" />
+                        <Skeleton className="h-10 w-full" />
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <FormField
+                        control={form.control}
+                        name="companyName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Razón Social</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Mi Empresa S.A. de C.V." {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="rfc"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>RFC</FormLabel>
+                            <FormControl>
+                              <Input placeholder="MEI920101ABC" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Dirección Fiscal</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Av. Siempreviva 742, Springfield" {...field} />
+                            </FormControl>
+                             <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="grid w-full max-w-sm items-center gap-1.5 pt-2">
+                        <Label>Logo de la Empresa</Label>
+                        <div className="flex items-center gap-4">
+                          <div className="flex h-16 w-16 items-center justify-center rounded-md border border-dashed">
                             <UploadCloud className="h-8 w-8 text-muted-foreground" />
+                          </div>
+                          <Button variant="outline" type="button" disabled>Cambiar Logo</Button>
                         </div>
-                        <Button variant="outline">Cambiar Logo</Button>
-                   </div>
-                </div>
-            </CardContent>
-            <CardFooter>
-              <Button>Guardar Cambios</Button>
-            </CardFooter>
-          </Card>
+                        <p className="text-xs text-muted-foreground">Próximamente.</p>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+                <CardFooter>
+                   <Button type="submit" disabled={loadingProfile || form.formState.isSubmitting}>
+                    {form.formState.isSubmitting ? "Guardando..." : "Guardar Cambios"}
+                  </Button>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form>
         </TabsContent>
         <TabsContent value="signature">
           <Card>
@@ -263,3 +421,5 @@ export default function SettingsPage() {
     </div>
   )
 }
+
+    
