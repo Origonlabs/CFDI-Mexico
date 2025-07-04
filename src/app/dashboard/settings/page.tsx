@@ -32,18 +32,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { UploadCloud, PlusCircle } from "lucide-react"
+import { UploadCloud, PlusCircle, Building, Workflow } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { Switch } from "@/components/ui/switch"
 
 export default function SettingsPage() {
   return (
     <div className="mx-auto w-full max-w-4xl">
       <h1 className="text-3xl font-bold font-headline mb-6">Configuración</h1>
       <Tabs defaultValue="profile">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="profile">Perfil de Empresa</TabsTrigger>
           <TabsTrigger value="signature">Firma Electrónica</TabsTrigger>
           <TabsTrigger value="folios">Series y Folios</TabsTrigger>
+          <TabsTrigger value="integrations">Integraciones</TabsTrigger>
           <TabsTrigger value="appearance">Apariencia</TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
@@ -177,6 +179,66 @@ export default function SettingsPage() {
                             </TableRow>
                         </TableBody>
                     </Table>
+                </CardContent>
+            </Card>
+        </TabsContent>
+        <TabsContent value="integrations">
+            <Card>
+                <CardHeader>
+                <CardTitle className="font-headline">Integraciones</CardTitle>
+                <CardDescription>
+                    Conecta tus servicios favoritos para automatizar tu facturación.
+                </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="flex items-center gap-4">
+                            <Workflow className="h-8 w-8 text-indigo-500" />
+                            <div className="grid gap-0.5">
+                                <h3 className="font-medium">Stripe</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Sincroniza pagos y genera facturas automáticamente.
+                                </p>
+                            </div>
+                        </div>
+                        <Switch id="stripe-switch" aria-label="Stripe" defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="flex items-center gap-4">
+                            <Workflow className="h-8 w-8 text-green-500" />
+                            <div className="grid gap-0.5">
+                                <h3 className="font-medium">Shopify</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Crea facturas para cada venta en tu tienda.
+                                </p>
+                            </div>
+                        </div>
+                        <Switch id="shopify-switch" aria-label="Shopify" />
+                    </div>
+                     <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="flex items-center gap-4">
+                            <Workflow className="h-8 w-8 text-purple-500" />
+                            <div className="grid gap-0.5">
+                                <h3 className="font-medium">WooCommerce</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Conecta tu tienda de WordPress para facturar.
+                                </p>
+                            </div>
+                        </div>
+                        <Switch id="woocommerce-switch" aria-label="WooCommerce" />
+                    </div>
+                     <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="flex items-center gap-4">
+                            <Building className="h-8 w-8 text-red-700" />
+                            <div className="grid gap-0.5">
+                                <h3 className="font-medium">SAT Directo</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Consulta CFDI emitidos por terceros directamente.
+                                </p>
+                            </div>
+                        </div>
+                        <Switch id="sat-switch" aria-label="SAT Directo" defaultChecked />
+                    </div>
                 </CardContent>
             </Card>
         </TabsContent>
