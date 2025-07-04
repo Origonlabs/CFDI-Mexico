@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 
 export default function ClientsPage() {
@@ -50,11 +51,11 @@ export default function ClientsPage() {
                     </span>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-xl">
                 <DialogHeader>
                 <DialogTitle className="font-headline">Agregar Nuevo Cliente</DialogTitle>
                 <DialogDescription>
-                    Completa los datos para registrar un nuevo cliente.
+                    Completa los datos fiscales para registrar un nuevo cliente. La constancia es opcional.
                 </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -75,6 +76,43 @@ export default function ClientsPage() {
                     Email
                     </Label>
                     <Input id="email" type="email" placeholder="contacto@empresa.com" className="col-span-3" />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="zip" className="text-right">
+                    C.P. Fiscal
+                    </Label>
+                    <Input id="zip" placeholder="11520" className="col-span-3" />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="tax-regime" className="text-right">
+                        Régimen Fiscal
+                    </Label>
+                    <div className="col-span-3">
+                        <Select>
+                            <SelectTrigger id="tax-regime">
+                                <SelectValue placeholder="Seleccionar régimen..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="601">601 - General de Ley Personas Morales</SelectItem>
+                                <SelectItem value="603">603 - Personas Morales con Fines no Lucrativos</SelectItem>
+                                <SelectItem value="605">605 - Sueldos y Salarios e Ingresos Asimilados a Salarios</SelectItem>
+                                <SelectItem value="606">606 - Arrendamiento</SelectItem>
+                                <SelectItem value="612">612 - Personas Físicas con Actividades Empresariales y Profesionales</SelectItem>
+                                <SelectItem value="616">616 - Sin obligaciones fiscales</SelectItem>
+                                <SelectItem value="621">621 - Incorporación Fiscal</SelectItem>
+                                <SelectItem value="626">626 - Régimen Simplificado de Confianza</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                 <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="tax-constancy" className="text-right">
+                    Constancia
+                    </Label>
+                    <div className="col-span-3">
+                       <Input id="tax-constancy" type="file" />
+                       <p className="text-xs text-muted-foreground mt-1">Sube la constancia para autocompletar los datos.</p>
+                    </div>
                 </div>
                 </div>
                 <DialogFooter>
