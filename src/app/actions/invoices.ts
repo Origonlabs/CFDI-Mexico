@@ -18,7 +18,7 @@ const conceptSchema = z.object({
 });
 
 const invoiceSchema = z.object({
-  clientId: z.string().min(1, "Debes seleccionar un cliente."),
+  clientId: z.coerce.number().min(1, "Debes seleccionar un cliente."),
   usoCfdi: z.string().min(1, "Debes seleccionar un uso de CFDI."),
   metodoPago: z.string().default("PUE"),
   serie: z.string().default("A"),
@@ -76,7 +76,7 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
     const data = await db.transaction(async (tx) => {
       const [newInvoice] = await tx.insert(invoices).values({
         userId,
-        clientId: parseInt(validatedData.clientId),
+        clientId: validatedData.clientId,
         serie: validatedData.serie,
         folio: validatedData.folio,
         usoCfdi: validatedData.usoCfdi,
