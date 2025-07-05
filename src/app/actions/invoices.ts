@@ -29,6 +29,9 @@ const invoiceSchema = z.object({
 export type InvoiceFormValues = z.infer<typeof invoiceSchema>;
 
 export const getInvoices = async (userId: string) => {
+  if (!process.env.DATABASE_URL) {
+    return { success: false, message: "La URL de la base de datos no está configurada." };
+  }
   try {
     if (!userId) {
       return { success: false, message: "Usuario no autenticado." };
@@ -54,6 +57,9 @@ export const getInvoices = async (userId: string) => {
 };
 
 export const saveInvoice = async (formData: InvoiceFormValues, userId: string) => {
+  if (!process.env.DATABASE_URL) {
+    return { success: false, message: "La URL de la base de datos no está configurada." };
+  }
   try {
     if (!userId) {
       return { success: false, message: "Usuario no autenticado." };
