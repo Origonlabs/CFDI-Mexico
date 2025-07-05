@@ -53,7 +53,8 @@ export const getInvoices = async (userId: string) => {
     return { success: true, data };
   } catch (error) {
     console.error("Database Error (getInvoices):", error);
-    return { success: false, message: "Error al obtener las facturas. Verifique la consola del servidor para más detalles." };
+    const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
+    return { success: false, message: `Error al obtener las facturas. Verifique la consola del servidor para más detalles: ${errorMessage}` };
   }
 };
 
@@ -73,43 +74,42 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
     const iva = subtotal * 0.16;
     const total = subtotal + iva;
 
-    const data = await db.transaction(async (tx) => {
-      const [newInvoice] = await tx.insert(invoices).values({
-        userId,
-        clientId: validatedData.clientId,
-        serie: validatedData.serie,
-        folio: validatedData.folio,
-        usoCfdi: validatedData.usoCfdi,
-        metodoPago: validatedData.metodoPago,
-        condicionesPago: validatedData.condicionesPago ?? null,
-        subtotal: subtotal.toString(),
-        iva: iva.toString(),
-        total: total.toString(),
-        status: 'draft',
-      }).returning({ id: invoices.id });
+    // The neon-http driver does not support transactions. We must perform inserts sequentially.
+    // Step 1: Insert the main invoice record.
+    const [newInvoice] = await db.insert(invoices).values({
+      userId,
+      clientId: validatedData.clientId,
+      serie: validatedData.serie,
+      folio: validatedData.folio,
+      usoCfdi: validatedData.usoCfdi,
+      metodoPago: validatedData.metodoPago,
+      condicionesPago: validatedData.condicionesPago ?? null,
+      subtotal: subtotal.toString(),
+      iva: iva.toString(),
+      total: total.toString(),
+      status: 'draft',
+    }).returning({ id: invoices.id });
 
-      if (!validatedData.concepts || validatedData.concepts.length === 0) {
-        throw new Error("La factura debe tener al menos un concepto.");
-      }
-      
-      const conceptsToInsert = validatedData.concepts.map(concept => ({
-        invoiceId: newInvoice.id,
-        description: concept.description,
-        satKey: concept.satKey,
-        unitKey: concept.unitKey,
-        unitPrice: concept.unitPrice.toString(),
-        quantity: concept.quantity,
-        amount: concept.amount.toString(),
-      }));
+    if (!validatedData.concepts || validatedData.concepts.length === 0) {
+      throw new Error("La factura debe tener al menos un concepto.");
+    }
+    
+    // Step 2: Prepare and insert the invoice items.
+    const conceptsToInsert = validatedData.concepts.map(concept => ({
+      invoiceId: newInvoice.id,
+      description: concept.description,
+      satKey: concept.satKey,
+      unitKey: concept.unitKey,
+      unitPrice: concept.unitPrice.toString(),
+      quantity: concept.quantity,
+      amount: concept.amount.toString(),
+    }));
 
-      await tx.insert(invoiceItems).values(conceptsToInsert);
-
-      return newInvoice;
-    });
+    await db.insert(invoiceItems).values(conceptsToInsert);
 
     revalidatePath("/dashboard/invoices");
     
-    return { success: true, data };
+    return { success: true, data: newInvoice };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false, message: "Datos del formulario no válidos.", errors: error.flatten().fieldErrors };
