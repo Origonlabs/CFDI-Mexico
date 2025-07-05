@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import { ChevronLeft, PlusCircle, Trash2 } from "lucide-react"
+import { ChevronLeft, PlusCircle, Trash2, Download } from "lucide-react"
 import { useForm, useFieldArray, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -14,7 +14,7 @@ import { auth, firebaseEnabled } from "@/lib/firebase/client"
 import { useToast } from "@/hooks/use-toast"
 import { getClients, type ClientFormValues } from "@/app/actions/clients"
 import { getProducts, type ProductFormValues } from "@/app/actions/products"
-import { saveInvoice } from "@/app/actions/invoices";
+import { saveInvoice, generateInvoicePdf, generateInvoiceXml } from "@/app/actions/invoices";
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -67,7 +67,7 @@ const conceptSchema = z.object({
 });
 
 const invoiceSchema = z.object({
-  clientId: z.string().min(1, "Debes seleccionar un cliente."),
+  clientId: z.coerce.number().min(1, "Debes seleccionar un cliente."),
   usoCfdi: z.string().min(1, "Debes seleccionar un uso de CFDI."),
   metodoPago: z.string().default("PUE"),
   serie: z.string().default("A"),
@@ -86,11 +86,13 @@ export default function NewInvoicePage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [savedInvoice, setSavedInvoice] = useState<{ id: number; serie: string; folio: number; } | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: {
-      clientId: "",
+      clientId: 0,
       usoCfdi: "",
       metodoPago: "PUE",
       serie: "A",
@@ -202,12 +204,12 @@ export default function NewInvoicePage() {
     
     const result = await saveInvoice(data, user.uid);
 
-    if (result.success) {
+    if (result.success && result.data) {
       toast({
         title: "Éxito",
         description: "La factura se ha guardado como borrador.",
       });
-      router.push("/dashboard/invoices");
+      setSavedInvoice(result.data);
     } else {
        toast({
         title: "Error al guardar",
@@ -220,6 +222,96 @@ export default function NewInvoicePage() {
   const handleDiscard = () => {
     form.reset();
     router.push("/dashboard/invoices");
+  }
+
+  const handleDownload = async (type: 'pdf' | 'xml') => {
+    if (!user || !savedInvoice) return;
+    setIsDownloading(true);
+    toast({ title: `Generando ${type.toUpperCase()}...` });
+    try {
+        if (type === 'pdf') {
+            const result = await generateInvoicePdf(savedInvoice.id, user.uid);
+            if (result.success && result.pdf) {
+                const byteCharacters = atob(result.pdf);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: "application/pdf" });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `factura-${savedInvoice.serie}-${savedInvoice.folio}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+                toast({ title: "Éxito", description: "PDF descargado correctamente." });
+            } else if (!result.success) {
+                toast({ title: "Error", description: result.message, variant: "destructive" });
+            }
+        } else { // type is 'xml'
+            const result = await generateInvoiceXml(savedInvoice.id, user.uid);
+            if (result.success && result.xml) {
+                const blob = new Blob([result.xml], { type: "application/xml" });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `factura-${savedInvoice.serie}-${savedInvoice.folio}.xml`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+                toast({ title: "Éxito", description: "XML descargado correctamente." });
+            } else if (!result.success) {
+                toast({ title: "Error", description: result.message, variant: "destructive" });
+            }
+        }
+    } catch (error) {
+        toast({ title: "Error", description: `No se pudo generar el ${type.toUpperCase()}.`, variant: "destructive" });
+    } finally {
+        setIsDownloading(false);
+    }
+};
+
+  if (savedInvoice) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-6 flex-1 py-12">
+        <Card className="w-full max-w-lg">
+          <CardHeader>
+            <CardTitle className="text-center font-headline text-2xl">¡Factura Guardada!</CardTitle>
+            <CardDescription className="text-center">
+              La factura borrador con folio <strong>{savedInvoice.serie}-{savedInvoice.folio}</strong> ha sido creada exitosamente.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+             <p className="text-sm text-muted-foreground text-center">Ahora puedes descargar los archivos correspondientes o crear una nueva factura.</p>
+             <div className="flex justify-center gap-4">
+                <Button onClick={() => handleDownload('pdf')} disabled={isDownloading}>
+                    <Download className="mr-2 h-4 w-4" />
+                    {isDownloading ? 'Generando...' : 'Descargar PDF'}
+                </Button>
+                <Button onClick={() => handleDownload('xml')} disabled={isDownloading}>
+                    <Download className="mr-2 h-4 w-4" />
+                    {isDownloading ? 'Generando...' : 'Descargar XML'}
+                </Button>
+            </div>
+          </CardContent>
+          <CardFooter className="flex-col gap-4 pt-6">
+            <Button variant="outline" className="w-full" onClick={() => { form.reset(); setSavedInvoice(null); }}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Crear Nueva Factura
+            </Button>
+            <Button variant="ghost" asChild>
+                <Link href="/dashboard/invoices">
+                    Volver al listado de facturas
+                </Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -262,7 +354,7 @@ export default function NewInvoicePage() {
                     render={({ field }) => (
                       <FormItem>
                         <Label htmlFor="customer">Cliente</Label>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
                           <FormControl>
                             <SelectTrigger id="customer" aria-label="Seleccionar cliente" disabled={loading}>
                               <SelectValue placeholder={loading ? "Cargando clientes..." : "Seleccionar cliente"} />

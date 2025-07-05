@@ -1,3 +1,4 @@
+
 "use server";
 
 import * as z from "zod";
@@ -87,7 +88,7 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
       iva: iva.toString(),
       total: total.toString(),
       status: 'draft',
-    }).returning({ id: invoices.id });
+    }).returning({ id: invoices.id, serie: invoices.serie, folio: invoices.folio });
 
     if (!validatedData.concepts || validatedData.concepts.length === 0) {
       throw new Error("La factura debe tener al menos un concepto.");
@@ -295,15 +296,15 @@ export const generateInvoicePdf = async (invoiceId: number, userId: string) => {
         y -= 15;
         
         items.forEach(item => {
+            if (y < margin + 100) {
+                page = pdfDoc.addPage();
+                y = height - margin;
+            }
             drawText(item.description, margin, y, font, fontSize);
             drawText(item.quantity.toString(), width / 2, y, font, fontSize);
             drawText(`$${parseFloat(item.unitPrice).toFixed(2)}`, width / 2 + 80, y, font, fontSize);
             drawText(`$${parseFloat(item.amount).toFixed(2)}`, width - margin - 50, y, font, fontSize);
             y -= 20;
-            if (y < margin + 100) {
-                page = pdfDoc.addPage();
-                y = height - margin;
-            }
         });
 
         const totalX = width - margin - 150;
