@@ -62,6 +62,17 @@ export default function SignupPage() {
       });
       return;
     }
+
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone)) {
+        toast({
+            title: "Número de Teléfono Inválido",
+            description: "Por favor, ingresa un número de teléfono mexicano de 10 dígitos.",
+            variant: "destructive",
+        });
+        return;
+    }
+
     setIsSubmitting(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
