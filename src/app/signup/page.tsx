@@ -178,15 +178,21 @@ export default function SignupPage() {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="phone">Número de teléfono</Label>
-                    <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="5512345678"
-                        required
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        disabled={!firebaseEnabled || isSubmitting}
-                    />
+                    <div className="relative">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                        <span className="text-muted-foreground sm:text-sm">+52</span>
+                      </div>
+                      <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="5512345678"
+                          required
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          disabled={!firebaseEnabled || isSubmitting}
+                          className="pl-10"
+                      />
+                    </div>
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="password">Contraseña</Label>
