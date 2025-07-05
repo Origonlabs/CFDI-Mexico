@@ -49,6 +49,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
@@ -68,6 +69,8 @@ export default function SignupPage() {
         await updateProfile(auth.currentUser, {
           displayName: `${firstName} ${lastName}`.trim(),
         });
+        // Note: Saving phone number requires a different flow, often with verification.
+        // For now, it's collected but not saved to the auth profile directly.
       }
       router.push('/dashboard');
     } catch (error: any) {
@@ -151,20 +154,32 @@ export default function SignupPage() {
                   </div>
                   </div>
                   <div className="grid gap-2">
-                  <Label htmlFor="email">Correo electrónico</Label>
-                  <Input
-                      id="email"
-                      type="email"
-                      placeholder="m@example.com"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={!firebaseEnabled || isSubmitting}
-                  />
+                    <Label htmlFor="email">Correo electrónico</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        placeholder="m@example.com"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={!firebaseEnabled || isSubmitting}
+                    />
                   </div>
                   <div className="grid gap-2">
-                  <Label htmlFor="password">Contraseña</Label>
-                  <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
+                    <Label htmlFor="phone">Número de teléfono</Label>
+                    <Input
+                        id="phone"
+                        type="tel"
+                        placeholder="5512345678"
+                        required
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        disabled={!firebaseEnabled || isSubmitting}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="password">Contraseña</Label>
+                    <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
                   </div>
                   <Button type="submit" className="w-full" disabled={!firebaseEnabled || isSubmitting}>
                       {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta'}
