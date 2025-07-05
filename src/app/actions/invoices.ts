@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 const conceptSchema = z.object({
   productId: z.number(),
   satKey: z.string(),
+  unitKey: z.string(),
   description: z.string(),
   quantity: z.coerce.number().min(1, "La cantidad debe ser mayor a 0."),
   unitPrice: z.coerce.number(),
@@ -95,7 +96,7 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
         invoiceId: newInvoice.id,
         description: concept.description,
         satKey: concept.satKey,
-        unitKey: "E48", // Using a default value as it's not in the form
+        unitKey: concept.unitKey,
         unitPrice: concept.unitPrice.toString(),
         quantity: concept.quantity,
         amount: concept.amount.toString(),

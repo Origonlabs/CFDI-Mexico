@@ -59,6 +59,7 @@ interface Product extends ProductFormValues {
 const conceptSchema = z.object({
   productId: z.number(),
   satKey: z.string(),
+  unitKey: z.string(),
   description: z.string(),
   quantity: z.coerce.number().min(1, "La cantidad debe ser mayor a 0."),
   unitPrice: z.coerce.number(),
@@ -169,6 +170,7 @@ export default function NewInvoicePage() {
           productId: product.id,
           description: product.description,
           satKey: product.satKey,
+          unitKey: product.unitKey,
           quantity: 1,
           unitPrice: product.unitPrice,
           amount: product.unitPrice,
@@ -352,7 +354,7 @@ export default function NewInvoicePage() {
                       <TableRow key={field.id}>
                         <TableCell className="font-medium">
                           {field.description}
-                          <p className="text-xs text-muted-foreground">SAT: {field.satKey}</p>
+                          <p className="text-xs text-muted-foreground">SAT: {field.satKey} / Unidad: {field.unitKey}</p>
                         </TableCell>
                         <TableCell>
                           <Controller
