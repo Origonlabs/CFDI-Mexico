@@ -1,7 +1,9 @@
+
 'use client';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,15 +11,18 @@ import { Label } from '@/components/ui/label';
 import { OrigonLogo } from '@/components/logo';
 import { auth, firebaseEnabled } from '@/lib/firebase/client';
 import { useToast } from "@/hooks/use-toast";
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleEmailSignIn = (e: React.FormEvent) => {
+  const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firebaseEnabled) {
+    if (!firebaseEnabled || !auth) {
       toast({
         title: "Error de Configuración",
         description: "Firebase no está configurado. Revisa tus variables de entorno.",
@@ -25,8 +30,24 @@ export default function LoginPage() {
       });
       return;
     }
-    // This is a placeholder since email/password sign-in isn't fully implemented.
-    router.push('/dashboard');
+    setIsSubmitting(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push('/dashboard');
+    } catch (error: any) {
+      console.error("Error al iniciar sesión con email", error);
+      let description = "Ocurrió un error inesperado.";
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        description = "Credenciales incorrectas. Verifica tu correo y contraseña.";
+      }
+      toast({
+        title: "Error de Autenticación",
+        description,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const handleGoogleSignIn = async () => {
@@ -38,6 +59,7 @@ export default function LoginPage() {
       });
       return;
     }
+    setIsSubmitting(true);
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
@@ -49,6 +71,8 @@ export default function LoginPage() {
         description: "No se pudo iniciar sesión con Google. Revisa la consola para más detalles.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -81,7 +105,9 @@ export default function LoginPage() {
                     type="email"
                     placeholder="m@example.com"
                     required
-                    disabled={!firebaseEnabled}
+                    disabled={!firebaseEnabled || isSubmitting}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -94,12 +120,19 @@ export default function LoginPage() {
                       ¿Olvidaste tu contraseña?
                     </Link>
                   </div>
-                  <Input id="password" type="password" required disabled={!firebaseEnabled} />
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    required 
+                    disabled={!firebaseEnabled || isSubmitting}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
                 </div>
-                <Button type="submit" className="w-full" disabled={!firebaseEnabled}>
-                  Iniciar Sesión
+                <Button type="submit" className="w-full" disabled={!firebaseEnabled || isSubmitting}>
+                  {isSubmitting ? 'Iniciando...' : 'Iniciar Sesión'}
                 </Button>
-                <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignIn} disabled={!firebaseEnabled}>
+                <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignIn} disabled={!firebaseEnabled || isSubmitting}>
                   Iniciar con Google
                 </Button>
               </form>
