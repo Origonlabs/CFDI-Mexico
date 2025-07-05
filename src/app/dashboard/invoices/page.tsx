@@ -2,13 +2,13 @@
 "use client";
 
 import Link from "next/link"
-import { MoreHorizontal, PlusCircle, FileDown, Mail } from "lucide-react"
+import { MoreHorizontal, PlusCircle, FileDown, Mail, Download } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { User } from "firebase/auth"
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client"
 import { useToast } from "@/hooks/use-toast"
-import { getInvoices } from "@/app/actions/invoices"
+import { getInvoices, generateInvoiceXml, generateInvoicePdf } from "@/app/actions/invoices"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -50,6 +50,8 @@ export default function InvoicesPage() {
   const [user, setUser] = useState<User | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState<number | null>(null);
+
 
   useEffect(() => {
     if (!firebaseEnabled || !auth) {
@@ -87,6 +89,67 @@ export default function InvoicesPage() {
       fetchInvoices(user.uid);
     }
   }, [user, fetchInvoices]);
+
+  const handleDownloadXml = async (invoice: Invoice) => {
+    if (!user) return;
+    setDownloading(invoice.id);
+    toast({ title: "Generando XML..." });
+    try {
+      const result = await generateInvoiceXml(invoice.id, user.uid);
+      if (result.success && result.xml) {
+        const blob = new Blob([result.xml], { type: "application/xml" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `factura-${invoice.id}.xml`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+        toast({ title: "Éxito", description: "XML descargado correctamente." });
+      } else {
+        toast({ title: "Error", description: result.message, variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "No se pudo generar el XML.", variant: "destructive" });
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  const handleDownloadPdf = async (invoice: Invoice) => {
+    if (!user) return;
+    setDownloading(invoice.id);
+    toast({ title: "Generando PDF..." });
+    try {
+      const result = await generateInvoicePdf(invoice.id, user.uid);
+      if (result.success && result.pdf) {
+        const byteCharacters = atob(result.pdf);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `factura-${invoice.id}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+        toast({ title: "Éxito", description: "PDF descargado correctamente." });
+      } else {
+        toast({ title: "Error", description: result.message, variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "No se pudo generar el PDF.", variant: "destructive" });
+    } finally {
+      setDownloading(null);
+    }
+  };
+
 
   const getBadgeVariant = (status: Invoice['status']) => {
     switch (status) {
@@ -192,13 +255,21 @@ export default function InvoicesPage() {
                       <div className="flex justify-end">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button aria-haspopup="true" size="icon" variant="ghost">
+                            <Button aria-haspopup="true" size="icon" variant="ghost" disabled={downloading === invoice.id}>
                               <MoreHorizontal className="h-4 w-4" />
                               <span className="sr-only">Toggle menu</span>
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => handleDownloadPdf(invoice)} disabled={downloading === invoice.id}>
+                                <Download className="mr-2 h-4 w-4" />
+                                Descargar PDF
+                              </DropdownMenuItem>
+                               <DropdownMenuItem onClick={() => handleDownloadXml(invoice)} disabled={downloading === invoice.id}>
+                                <Download className="mr-2 h-4 w-4" />
+                                Descargar XML
+                              </DropdownMenuItem>
                               {invoice.status === 'draft' && (
                                 <>
                                   <DropdownMenuItem>Editar</DropdownMenuItem>
@@ -208,8 +279,6 @@ export default function InvoicesPage() {
                               {invoice.status === 'stamped' && (
                                 <>
                                   <DropdownMenuItem>Ver detalle</DropdownMenuItem>
-                                  <DropdownMenuItem>Descargar PDF</DropdownMenuItem>
-                                  <DropdownMenuItem>Descargar XML</DropdownMenuItem>
                                   <DropdownMenuItem>
                                     <Mail className="mr-2 h-4 w-4" />
                                     <span>Enviar por correo</span>
