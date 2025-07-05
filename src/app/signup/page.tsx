@@ -47,6 +47,7 @@ export default function SignupPage() {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
@@ -64,6 +65,15 @@ export default function SignupPage() {
       toast({
         title: "Error de Configuración",
         description: "Firebase no está configurado. Revisa tus variables de entorno.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast({
+        title: "Las contraseñas no coinciden",
+        description: "Por favor, verifica que ambas contraseñas sean iguales.",
         variant: "destructive",
       });
       return;
@@ -203,6 +213,10 @@ export default function SignupPage() {
                   <div className="grid gap-2">
                     <Label htmlFor="password">Contraseña</Label>
                     <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
+                  </div>
+                   <div className="grid gap-2">
+                    <Label htmlFor="confirm-password">Confirmar Contraseña</Label>
+                    <Input id="confirm-password" type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
                   </div>
                   <Button type="submit" className="w-full" disabled={!firebaseEnabled || isSubmitting}>
                       {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta'}
