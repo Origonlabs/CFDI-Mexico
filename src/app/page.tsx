@@ -138,15 +138,7 @@ export default function LoginPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Contraseña</Label>
-                    <Link
-                      href="/reset-password"
-                      className="ml-auto inline-block text-sm underline"
-                    >
-                      ¿Olvidaste tu contraseña?
-                    </Link>
-                  </div>
+                  <Label htmlFor="password">Contraseña</Label>
                   <div className="relative">
                     <Input 
                       id="password" 
@@ -163,6 +155,14 @@ export default function LoginPage() {
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
+                  </div>
+                   <div className="text-right">
+                    <Link
+                      href="/reset-password"
+                      className="text-sm underline"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </Link>
                   </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={!firebaseEnabled || isSubmitting}>
