@@ -80,13 +80,17 @@ export default function SignupPage() {
     try {
       await signInWithPopup(auth, provider);
       router.push('/dashboard');
-    } catch (error) {
-      console.error("Error al registrarse con Google", error);
-      toast({
-        title: "Error de Autenticación",
-        description: "No se pudo registrar con Google. Revisa la consola para más detalles.",
-        variant: "destructive",
-      });
+    } catch (error: any) {
+      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+        console.log("Sign-up popup closed by user.");
+      } else {
+        console.error("Error al registrarse con Google", error);
+        toast({
+          title: "Error de Autenticación",
+          description: "No se pudo registrar con Google. Revisa la consola para más detalles.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
