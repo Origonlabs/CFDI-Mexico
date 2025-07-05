@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link'
@@ -18,6 +17,7 @@ import { auth, firebaseEnabled } from '@/lib/firebase/client';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { Eye, EyeOff } from 'lucide-react';
 
 const GoogleIcon = () => (
   <svg role="img" viewBox="0 0 24 24" className="mr-2 h-4 w-4">
@@ -52,6 +52,8 @@ export default function SignupPage() {
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Only allow numbers and limit to 10 characters
@@ -212,11 +214,29 @@ export default function SignupPage() {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="password">Contraseña</Label>
-                    <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
+                    <div className="relative">
+                        <Input id="password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
+                        >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                    </div>
                   </div>
                    <div className="grid gap-2">
                     <Label htmlFor="confirm-password">Confirmar Contraseña</Label>
-                    <Input id="confirm-password" type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
+                    <div className="relative">
+                        <Input id="confirm-password" type={showConfirmPassword ? "text" : "password"} required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
+                        <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
+                        >
+                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                    </div>
                   </div>
                   <Button type="submit" className="w-full" disabled={!firebaseEnabled || isSubmitting}>
                       {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta'}
