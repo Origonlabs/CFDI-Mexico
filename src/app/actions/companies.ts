@@ -19,7 +19,7 @@ export type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export const getCompanyProfile = async (userId: string) => {
   if (!db) {
-    return { success: false, message: "La URL de la base de datos no está configurada." };
+    return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
   }
   try {
     if (!userId) {
@@ -28,14 +28,14 @@ export const getCompanyProfile = async (userId: string) => {
     const data = await db.select().from(companies).where(eq(companies.userId, userId));
     return { success: true, data: data[0] };
   } catch (error) {
-    console.error(error);
-    return { success: false, message: "Error al obtener el perfil de la empresa." };
+    console.error("Database Error (getCompanyProfile):", error);
+    return { success: false, message: "Error al obtener el perfil de la empresa. Verifique la consola del servidor para más detalles." };
   }
 };
 
 export const saveCompanyProfile = async (formData: ProfileFormValues, userId: string) => {
   if (!db) {
-    return { success: false, message: "La URL de la base de datos no está configurada." };
+    return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
   }
   try {
     if (!userId) {
@@ -66,7 +66,7 @@ export const saveCompanyProfile = async (formData: ProfileFormValues, userId: st
      if (error instanceof z.ZodError) {
       return { success: false, message: "Datos del formulario no válidos." };
     }
-    console.error(error);
-    return { success: false, message: "No se pudo guardar el perfil de la empresa." };
+    console.error("Database Error (saveCompanyProfile):", error);
+    return { success: false, message: "No se pudo guardar el perfil de la empresa. Verifique la consola del servidor para más detalles." };
   }
 };

@@ -21,7 +21,7 @@ export type ClientFormValues = z.infer<typeof clientSchema>;
 
 export const getClients = async (userId: string) => {
   if (!db) {
-    return { success: false, message: "La URL de la base de datos no está configurada." };
+    return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
   }
   try {
     if (!userId) {
@@ -30,14 +30,14 @@ export const getClients = async (userId: string) => {
     const data = await db.select().from(clients).where(eq(clients.userId, userId));
     return { success: true, data };
   } catch (error) {
-    console.error(error);
-    return { success: false, message: "Error al obtener los clientes." };
+    console.error("Database Error (getClients):", error);
+    return { success: false, message: "Error al obtener los clientes. Verifique la consola del servidor para más detalles." };
   }
 };
 
 export const addClient = async (formData: ClientFormValues, userId: string) => {
   if (!db) {
-    return { success: false, message: "La URL de la base de datos no está configurada." };
+    return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
   }
   try {
     if (!userId) {
@@ -58,7 +58,7 @@ export const addClient = async (formData: ClientFormValues, userId: string) => {
     if (error instanceof z.ZodError) {
       return { success: false, message: "Datos del formulario no válidos." };
     }
-    console.error(error);
-    return { success: false, message: "No se pudo guardar el cliente." };
+    console.error("Database Error (addClient):", error);
+    return { success: false, message: "No se pudo guardar el cliente. Verifique la consola del servidor para más detalles." };
   }
 };

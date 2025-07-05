@@ -30,7 +30,7 @@ export type InvoiceFormValues = z.infer<typeof invoiceSchema>;
 
 export const getInvoices = async (userId: string) => {
   if (!db) {
-    return { success: false, message: "La URL de la base de datos no está configurada." };
+    return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
   }
   try {
     if (!userId) {
@@ -51,14 +51,14 @@ export const getInvoices = async (userId: string) => {
 
     return { success: true, data };
   } catch (error) {
-    console.error(error);
-    return { success: false, message: "Error al obtener las facturas." };
+    console.error("Database Error (getInvoices):", error);
+    return { success: false, message: "Error al obtener las facturas. Verifique la consola del servidor para más detalles." };
   }
 };
 
 export const saveInvoice = async (formData: InvoiceFormValues, userId: string) => {
   if (!db) {
-    return { success: false, message: "La URL de la base de datos no está configurada." };
+    return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
   }
   try {
     if (!userId) {
@@ -113,7 +113,7 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
     if (error instanceof z.ZodError) {
       return { success: false, message: "Datos del formulario no válidos.", errors: error.flatten().fieldErrors };
     }
-    console.error(error);
-    return { success: false, message: "No se pudo guardar la factura." };
+    console.error("Database Error (saveInvoice):", error);
+    return { success: false, message: "No se pudo guardar la factura. Verifique la consola del servidor para más detalles." };
   }
 };

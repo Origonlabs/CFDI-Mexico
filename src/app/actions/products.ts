@@ -18,7 +18,7 @@ export type ProductFormValues = z.infer<typeof productSchema>;
 
 export const getProducts = async (userId: string) => {
   if (!db) {
-    return { success: false, message: "La URL de la base de datos no está configurada." };
+    return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
   }
   try {
     if (!userId) {
@@ -27,14 +27,14 @@ export const getProducts = async (userId: string) => {
     const data = await db.select().from(products).where(eq(products.userId, userId));
     return { success: true, data };
   } catch (error) {
-    console.error(error);
-    return { success: false, message: "Error al obtener los productos." };
+    console.error("Database Error (getProducts):", error);
+    return { success: false, message: "Error al obtener los productos. Verifique la consola del servidor para más detalles." };
   }
 };
 
 export const addProduct = async (formData: ProductFormValues, userId: string) => {
   if (!db) {
-    return { success: false, message: "La URL de la base de datos no está configurada." };
+    return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
   }
   try {
     if (!userId) {
@@ -56,7 +56,7 @@ export const addProduct = async (formData: ProductFormValues, userId: string) =>
     if (error instanceof z.ZodError) {
       return { success: false, message: "Datos del formulario no válidos.", errors: error.flatten().fieldErrors };
     }
-    console.error(error);
-    return { success: false, message: "No se pudo guardar el producto." };
+    console.error("Database Error (addProduct):", error);
+    return { success: false, message: "No se pudo guardar el producto. Verifique la consola del servidor para más detalles." };
   }
 };
