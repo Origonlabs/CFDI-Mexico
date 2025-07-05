@@ -14,6 +14,7 @@ import { auth, firebaseEnabled } from "@/lib/firebase/client"
 import { useToast } from "@/hooks/use-toast"
 import { getClients, type ClientFormValues } from "@/app/actions/clients"
 import { getProducts, type ProductFormValues } from "@/app/actions/products"
+import { saveInvoice } from "@/app/actions/invoices";
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -188,12 +189,30 @@ export default function NewInvoicePage() {
   };
   
   async function onSubmit(data: InvoiceFormValues) {
-    // TODO: Implement save invoice action
-    console.log(data);
-    toast({
-      title: "Factura guardada (simulación)",
-      description: "La funcionalidad para guardar la factura se implementará próximamente.",
-    });
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "Debes iniciar sesión para guardar una factura.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const result = await saveInvoice(data, user.uid);
+
+    if (result.success) {
+      toast({
+        title: "Éxito",
+        description: "La factura se ha guardado como borrador.",
+      });
+      router.push("/dashboard/invoices");
+    } else {
+       toast({
+        title: "Error al guardar",
+        description: result.message || "No se pudo guardar la factura.",
+        variant: "destructive",
+      });
+    }
   }
 
   const handleDiscard = () => {
@@ -221,7 +240,7 @@ export default function NewInvoicePage() {
             <Button variant="outline" size="sm" type="button" onClick={handleDiscard}>
               Descartar
             </Button>
-            <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>Guardar y Timbrar</Button>
+            <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>Guardar Borrador</Button>
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
@@ -314,7 +333,7 @@ export default function NewInvoicePage() {
               <CardHeader>
                 <CardTitle className="font-headline">Conceptos</CardTitle>
                  <FormMessage className={cn(!form.formState.errors.concepts?.message && "hidden")}>
-                  {form.formState.errors.concepts?.message}
+                  {form.formState.errors.concepts?.root?.message}
                 </FormMessage>
               </CardHeader>
               <CardContent>
@@ -344,8 +363,9 @@ export default function NewInvoicePage() {
                                 type="number"
                                 {...controllerField}
                                 onChange={e => {
-                                  controllerField.onChange(e);
-                                  updateQuantity(index, Number(e.target.value));
+                                  const quantity = Number(e.target.value);
+                                  controllerField.onChange(quantity);
+                                  updateQuantity(index, quantity);
                                 }}
                                 className="w-20"
                               />
@@ -454,7 +474,7 @@ export default function NewInvoicePage() {
            <Button variant="outline" size="sm" type="button" onClick={handleDiscard}>
               Descartar
           </Button>
-          <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>Guardar y Timbrar</Button>
+          <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>Guardar Borrador</Button>
         </div>
       </form>
     </Form>

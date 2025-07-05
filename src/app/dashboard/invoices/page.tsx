@@ -1,5 +1,14 @@
+
+"use client";
+
 import Link from "next/link"
 import { MoreHorizontal, PlusCircle, FileDown, Mail } from "lucide-react"
+import { useState, useEffect, useCallback } from "react"
+import { User } from "firebase/auth"
+
+import { auth, firebaseEnabled } from "@/lib/firebase/client"
+import { useToast } from "@/hooks/use-toast"
+import { getInvoices } from "@/app/actions/invoices"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -26,8 +35,95 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface Invoice {
+  id: number;
+  clientName: string | null;
+  status: 'draft' | 'stamped' | 'canceled';
+  createdAt: Date;
+  total: string;
+}
 
 export default function InvoicesPage() {
+  const { toast } = useToast();
+  const [user, setUser] = useState<User | null>(null);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!firebaseEnabled || !auth) {
+      setLoading(false);
+      return;
+    }
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+      if (!currentUser) {
+        setLoading(false);
+        setInvoices([]);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const fetchInvoices = useCallback(async (uid: string) => {
+    setLoading(true);
+    const response = await getInvoices(uid);
+
+    if (response.success && response.data) {
+      setInvoices(response.data as any[]); // Cast to any to avoid TS date errors
+    } else {
+      toast({
+        title: "Error",
+        description: response.message || "No se pudieron cargar las facturas.",
+        variant: "destructive",
+      });
+    }
+    setLoading(false);
+  }, [toast]);
+
+  useEffect(() => {
+    if (user) {
+      fetchInvoices(user.uid);
+    }
+  }, [user, fetchInvoices]);
+
+  const getBadgeVariant = (status: Invoice['status']) => {
+    switch (status) {
+      case 'stamped':
+        return 'default';
+      case 'canceled':
+        return 'destructive';
+      case 'draft':
+      default:
+        return 'secondary';
+    }
+  };
+
+  const getStatusLabel = (status: Invoice['status']) => {
+    switch (status) {
+      case 'stamped':
+        return 'Timbrada';
+      case 'canceled':
+        return 'Cancelada';
+      case 'draft':
+      default:
+        return 'Borrador';
+    }
+  }
+  
+  const formatCurrency = (amount: string) => {
+     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(parseFloat(amount));
+  }
+
+  const formatDate = (date: Date | string) => {
+    return new Date(date).toLocaleDateString('es-MX', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+  }
+
   return (
     <div className="flex flex-col sm:gap-4 sm:py-4">
       <div className="flex items-center justify-between">
@@ -71,94 +167,77 @@ export default function InvoicesPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">Liam Johnson</TableCell>
-                <TableCell>
-                  <Badge variant="outline">Timbrada</Badge>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">Ingreso</TableCell>
-                <TableCell className="hidden md:table-cell">
-                  2023-06-23
-                </TableCell>
-                <TableCell className="text-right">$250.00</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                      <DropdownMenuItem>Ver detalle</DropdownMenuItem>
-                      <DropdownMenuItem>Descargar PDF</DropdownMenuItem>
-                       <DropdownMenuItem>Descargar XML</DropdownMenuItem>
-                       <DropdownMenuItem>
-                          <Mail className="mr-2 h-4 w-4" />
-                          <span>Enviar por correo</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Olivia Smith</TableCell>
-                <TableCell>
-                  <Badge variant="destructive">Cancelada</Badge>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">Ingreso</TableCell>
-                <TableCell className="hidden md:table-cell">
-                  2023-06-24
-                </TableCell>
-                <TableCell className="text-right">$150.00</TableCell>
-                 <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                      <DropdownMenuItem>Ver detalle</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Noah Williams</TableCell>
-                <TableCell>
-                  <Badge variant="secondary">Borrador</Badge>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">Ingreso</TableCell>
-                <TableCell className="hidden md:table-cell">
-                  2023-06-25
-                </TableCell>
-                <TableCell className="text-right">$350.00</TableCell>
-                 <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                      <DropdownMenuItem>Editar</DropdownMenuItem>
-                      <DropdownMenuItem>Eliminar</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
+               {loading ? (
+                Array.from({ length: 4 }).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-5 w-20 ml-auto" /></TableCell>
+                    <TableCell><div className="flex justify-end"><Skeleton className="h-8 w-8 rounded-full" /></div></TableCell>
+                  </TableRow>
+                ))
+              ) : invoices.length > 0 ? (
+                invoices.map((invoice) => (
+                  <TableRow key={invoice.id}>
+                    <TableCell className="font-medium">{invoice.clientName ?? 'N/A'}</TableCell>
+                    <TableCell>
+                      <Badge variant={getBadgeVariant(invoice.status)}>{getStatusLabel(invoice.status)}</Badge>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">Ingreso</TableCell>
+                    <TableCell className="hidden md:table-cell">{formatDate(invoice.createdAt)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(invoice.total)}</TableCell>
+                    <TableCell>
+                      <div className="flex justify-end">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" size="icon" variant="ghost">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                              {invoice.status === 'draft' && (
+                                <>
+                                  <DropdownMenuItem>Editar</DropdownMenuItem>
+                                  <DropdownMenuItem>Eliminar</DropdownMenuItem>
+                                </>
+                              )}
+                              {invoice.status === 'stamped' && (
+                                <>
+                                  <DropdownMenuItem>Ver detalle</DropdownMenuItem>
+                                  <DropdownMenuItem>Descargar PDF</DropdownMenuItem>
+                                  <DropdownMenuItem>Descargar XML</DropdownMenuItem>
+                                  <DropdownMenuItem>
+                                    <Mail className="mr-2 h-4 w-4" />
+                                    <span>Enviar por correo</span>
+                                  </DropdownMenuItem>
+                                </>
+                              )}
+                              {invoice.status === 'canceled' && (
+                                <DropdownMenuItem>Ver detalle</DropdownMenuItem>
+                              )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center h-24">
+                    No has creado ninguna factura.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
         <CardFooter>
           <div className="text-xs text-muted-foreground">
-            Mostrando <strong>1-10</strong> de <strong>32</strong> facturas
+            Mostrando <strong>{invoices.length}</strong> {invoices.length === 1 ? "factura" : "facturas"}.
           </div>
         </CardFooter>
       </Card>
