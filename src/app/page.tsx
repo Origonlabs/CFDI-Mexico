@@ -7,9 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { OrigonLogo } from '@/components/logo';
-import { auth, firebaseEnabled } from '@/lib/firebase/client';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { firebaseEnabled } from '@/lib/firebase/client';
 import { useToast } from "@/hooks/use-toast";
+import { signInWithGoogle } from '@/app/actions/auth';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -30,18 +30,8 @@ export default function LoginPage() {
   }
 
   const handleGoogleSignIn = async () => {
-    if (!firebaseEnabled || !auth) {
-       toast({
-        title: "Error de Configuración",
-        description: "Firebase no está configurado. Revisa tus variables de entorno.",
-        variant: "destructive",
-      });
-      return;
-    }
-    const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      router.push('/dashboard');
+      await signInWithGoogle();
     } catch (error) {
       console.error("Error al iniciar sesión con Google", error);
       toast({

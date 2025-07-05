@@ -13,10 +13,10 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { OrigonLogo } from '@/components/logo'
-import { auth, firebaseEnabled } from '@/lib/firebase/client';
-import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
+import { firebaseEnabled } from '@/lib/firebase/client';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { signInWithGoogle } from '@/app/actions/auth';
 
 
 export default function SignupPage() {
@@ -29,7 +29,7 @@ export default function SignupPage() {
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firebaseEnabled || !auth) {
+    if (!firebaseEnabled) {
       toast({
         title: "Error de Configuración",
         description: "Firebase no está configurado. Revisa tus variables de entorno.",
@@ -38,7 +38,7 @@ export default function SignupPage() {
       return;
     }
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      // await createUserWithEmailAndPassword(auth, email, password);
       // We can add logic here to save first/last name to Firestore
       router.push('/dashboard');
     } catch (error) {
@@ -52,18 +52,8 @@ export default function SignupPage() {
   };
 
   const handleGoogleSignUp = async () => {
-    if (!firebaseEnabled || !auth) {
-      toast({
-        title: "Error de Configuración",
-        description: "Firebase no está configurado. Revisa tus variables de entorno.",
-        variant: "destructive",
-      });
-      return;
-    }
-    const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      router.push('/dashboard');
+      await signInWithGoogle();
     } catch (error) {
       console.error("Error al registrarse con Google", error);
       toast({

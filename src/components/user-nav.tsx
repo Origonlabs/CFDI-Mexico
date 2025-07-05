@@ -17,24 +17,33 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useAuthState } from "react-firebase-hooks/auth"
+import { auth } from "@/lib/firebase/client"
+import { signOut } from "@/app/actions/auth"
 
 export function UserNav() {
+  const [user] = useAuthState(auth)
+
+  const handleSignOut = async () => {
+    await signOut()
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="https://placehold.co/100x100.png" alt="@user" data-ai-hint="profile picture" />
-            <AvatarFallback>U</AvatarFallback>
+            <AvatarImage src={user?.photoURL ?? "https://placehold.co/100x100.png"} alt={user?.displayName ?? "User"} />
+            <AvatarFallback>{user?.email?.[0].toUpperCase() ?? "U"}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">Usuario (Admin)</p>
+            <p className="text-sm font-medium leading-none">{user?.displayName ?? "Usuario"}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              usuario@email.com
+              {user?.email ?? "usuario@email.com"}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -50,10 +59,8 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/">
+        <DropdownMenuItem onClick={handleSignOut}>
             Cerrar sesión
-          </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
