@@ -1,4 +1,3 @@
-
 "use server";
 
 import * as z from "zod";
@@ -241,7 +240,7 @@ export const generateInvoicePdf = async (invoiceId: number, userId: string) => {
         const { invoice, client, items, company } = data;
 
         const pdfDoc = await PDFDocument.create();
-        const page = pdfDoc.addPage();
+        let page = pdfDoc.addPage();
         const { width, height } = page.getSize();
         const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
         const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
