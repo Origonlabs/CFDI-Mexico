@@ -33,6 +33,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
   Tabs,
   TabsContent,
   TabsList,
@@ -66,6 +73,7 @@ const profileFormSchema = z.object({
     .min(12, { message: "El RFC debe tener 12 o 13 caracteres." })
     .max(13, { message: "El RFC debe tener 12 o 13 caracteres." }),
   address: z.string().min(1, { message: "La dirección fiscal es obligatoria." }),
+  taxRegime: z.string().min(1, { message: "El régimen fiscal es obligatorio." }),
 });
 
 
@@ -87,6 +95,7 @@ export default function SettingsPage() {
       companyName: "",
       rfc: "",
       address: "",
+      taxRegime: "",
     },
   });
 
@@ -249,6 +258,10 @@ export default function SettingsPage() {
                         <Skeleton className="h-4 w-1/4" />
                         <Skeleton className="h-10 w-full" />
                       </div>
+                       <div className="space-y-2">
+                        <Skeleton className="h-4 w-1/4" />
+                        <Skeleton className="h-10 w-full" />
+                      </div>
                       <div className="space-y-2">
                         <Skeleton className="h-4 w-1/4" />
                         <Skeleton className="h-10 w-full" />
@@ -286,14 +299,37 @@ export default function SettingsPage() {
                           </FormItem>
                         )}
                       />
+                       <FormField
+                        control={form.control}
+                        name="taxRegime"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Régimen Fiscal</FormLabel>
+                               <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                   <SelectTrigger>
+                                    <SelectValue placeholder="Seleccionar régimen..." />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="601">601 - General de Ley Personas Morales</SelectItem>
+                                  <SelectItem value="612">612 - Personas Físicas con Actividades Empresariales y Profesionales</SelectItem>
+                                  <SelectItem value="621">621 - Incorporación Fiscal</SelectItem>
+                                  <SelectItem value="626">626 - Régimen Simplificado de Confianza</SelectItem>
+                                </SelectContent>
+                              </Select>
+                             <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       <FormField
                         control={form.control}
                         name="address"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Dirección Fiscal</FormLabel>
+                            <FormLabel>Dirección Fiscal (Código Postal)</FormLabel>
                             <FormControl>
-                              <Input placeholder="Av. Siempreviva 742, Springfield" {...field} />
+                              <Input placeholder="12345" {...field} />
                             </FormControl>
                              <FormMessage />
                           </FormItem>
@@ -537,5 +573,3 @@ export default function SettingsPage() {
     </div>
   )
 }
-
-    

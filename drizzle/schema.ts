@@ -18,6 +18,7 @@ export const companies = pgTable('companies', {
     companyName: text('company_name').notNull(),
     rfc: varchar('rfc', { length: 13 }).notNull(),
     address: text('address').notNull(),
+    taxRegime: varchar('tax_regime', { length: 10 }).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -41,6 +42,7 @@ export const invoices = pgTable('invoices', {
   serie: varchar('serie', { length: 10 }).notNull(),
   folio: integer('folio').notNull(),
   usoCfdi: varchar('uso_cfdi', { length: 3 }).notNull(),
+  formaPago: varchar('forma_pago', { length: 3 }).notNull(),
   metodoPago: varchar('metodo_pago', { length: 3 }).notNull(),
   condicionesPago: text('condiciones_pago'),
   subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),

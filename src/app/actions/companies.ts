@@ -13,6 +13,7 @@ const profileFormSchema = z.object({
     .min(12, { message: "El RFC debe tener 12 o 13 caracteres." })
     .max(13, { message: "El RFC debe tener 12 o 13 caracteres." }),
   address: z.string().min(1, { message: "La dirección fiscal es obligatoria." }),
+  taxRegime: z.string().min(1, { message: "El régimen fiscal es obligatorio." }),
 });
 
 export type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -29,7 +30,8 @@ export const getCompanyProfile = async (userId: string) => {
     return { success: true, data: data[0] };
   } catch (error) {
     console.error("Database Error (getCompanyProfile):", error);
-    return { success: false, message: "Error al obtener el perfil de la empresa. Verifique la consola del servidor para más detalles." };
+    const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
+    return { success: false, message: `Error al obtener el perfil de la empresa. Verifique la consola del servidor para más detalles: ${errorMessage}` };
   }
 };
 
@@ -67,6 +69,7 @@ export const saveCompanyProfile = async (formData: ProfileFormValues, userId: st
       return { success: false, message: "Datos del formulario no válidos." };
     }
     console.error("Database Error (saveCompanyProfile):", error);
-    return { success: false, message: "No se pudo guardar el perfil de la empresa. Verifique la consola del servidor para más detalles." };
+    const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
+    return { success: false, message: `No se pudo guardar el perfil de la empresa. Verifique la consola del servidor para más detalles: ${errorMessage}` };
   }
 };

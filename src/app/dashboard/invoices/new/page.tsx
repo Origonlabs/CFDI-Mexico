@@ -69,6 +69,7 @@ const conceptSchema = z.object({
 const invoiceSchema = z.object({
   clientId: z.coerce.number().min(1, "Debes seleccionar un cliente."),
   usoCfdi: z.string().min(1, "Debes seleccionar un uso de CFDI."),
+  formaPago: z.string().min(1, "Debes seleccionar una forma de pago."),
   metodoPago: z.string().default("PUE"),
   serie: z.string().default("A"),
   folio: z.coerce.number().default(1025),
@@ -94,6 +95,7 @@ export default function NewInvoicePage() {
     defaultValues: {
       clientId: 0,
       usoCfdi: "",
+      formaPago: "",
       metodoPago: "PUE",
       serie: "A",
       folio: 1025,
@@ -221,6 +223,7 @@ export default function NewInvoicePage() {
 
   const handleDiscard = () => {
     form.reset();
+    setSavedInvoice(null);
     router.push("/dashboard/invoices");
   }
 
@@ -400,6 +403,31 @@ export default function NewInvoicePage() {
                     />
                      <FormField
                       control={form.control}
+                      name="formaPago"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label htmlFor="forma-pago">Forma de Pago</Label>
+                           <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                  <SelectTrigger id="forma-pago" aria-label="Forma de Pago">
+                                      <SelectValue placeholder="Forma de Pago" />
+                                  </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                  <SelectItem value="01">01 - Efectivo</SelectItem>
+                                  <SelectItem value="03">03 - Transferencia electrónica</SelectItem>
+                                  <SelectItem value="04">04 - Tarjeta de crédito</SelectItem>
+                                  <SelectItem value="28">28 - Tarjeta de débito</SelectItem>
+                                  <SelectItem value="99">99 - Por definir</SelectItem>
+                              </SelectContent>
+                          </Select>
+                           <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                   <FormField
+                      control={form.control}
                       name="metodoPago"
                       render={({ field }) => (
                         <FormItem>
@@ -419,7 +447,6 @@ export default function NewInvoicePage() {
                         </FormItem>
                       )}
                     />
-                  </div>
                 </div>
               </CardContent>
             </Card>
