@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { PlusCircle, MoreHorizontal } from "lucide-react";
 import { User } from "firebase/auth";
-import { useRouter } from "next/navigation";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -68,7 +67,6 @@ interface Product extends ProductFormValues {
 
 export default function ProductsPage() {
   const { toast } = useToast();
-  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,7 +146,7 @@ export default function ProductsPage() {
       });
       form.reset();
       setIsDialogOpen(false);
-      router.refresh(); 
+      fetchProducts();
     } else {
       toast({
         title: "Error al guardar",

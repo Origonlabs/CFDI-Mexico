@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { PlusCircle, MoreHorizontal } from "lucide-react";
 import { User } from "firebase/auth";
-import { useRouter } from "next/navigation";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -80,7 +79,6 @@ interface Client extends ClientFormValues {
 
 export default function ClientsPage() {
   const { toast } = useToast();
-  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
@@ -162,7 +160,7 @@ export default function ClientsPage() {
       });
       form.reset();
       setIsDialogOpen(false);
-      router.refresh(); // Refreshes server components and refetches data
+      fetchClients();
     } else {
        toast({
         title: "Error al guardar",
