@@ -52,6 +52,12 @@ export default function SignupPage() {
   const [phone, setPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Only allow numbers and limit to 10 characters
+    const numericValue = e.target.value.replace(/[^0-9]/g, '');
+    setPhone(numericValue.slice(0, 10));
+  };
+
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!firebaseEnabled || !auth) {
@@ -188,7 +194,7 @@ export default function SignupPage() {
                           placeholder="5512345678"
                           required
                           value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
+                          onChange={handlePhoneChange}
                           disabled={!firebaseEnabled || isSubmitting}
                           className="pl-10"
                       />
