@@ -252,14 +252,17 @@ export default function SignupPage() {
                   La configuración de Firebase está incompleta. La autenticación está deshabilitada.
                 </p>
               )}
-            <div className="mt-4 text-center text-sm">
-                ¿Ya tienes una cuenta?{' '}
-                <Link href="/" className="underline">
-                Iniciar sesión
-                </Link>
-            </div>
             </CardContent>
         </Card>
+        <div className="mt-4 text-center text-sm">
+            ¿Ya tienes una cuenta?{' '}
+            <Link href="/" className="underline">
+            Iniciar sesión
+            </Link>
+        </div>
+        <div className="mt-8 text-center text-xs text-muted-foreground">
+            &copy; {new Date().getFullYear()} Opendex Corporation. Todos los derechos reservados.
+        </div>
       </div>
     </div>
   )

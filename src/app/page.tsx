@@ -138,7 +138,9 @@ export default function LoginPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="password">Contraseña</Label>
+                  <div className="flex items-center">
+                    <Label htmlFor="password">Contraseña</Label>
+                  </div>
                   <div className="relative">
                     <Input 
                       id="password" 
@@ -156,7 +158,7 @@ export default function LoginPage() {
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                   <div className="text-right">
+                  <div className="text-right">
                     <Link
                       href="/reset-password"
                       className="text-sm underline"
@@ -185,6 +187,9 @@ export default function LoginPage() {
             <Link href="/signup" className="underline">
               Regístrate
             </Link>
+          </div>
+          <div className="mt-8 text-center text-xs text-muted-foreground">
+            &copy; {new Date().getFullYear()} Opendex Corporation. Todos los derechos reservados.
           </div>
         </div>
       </div>

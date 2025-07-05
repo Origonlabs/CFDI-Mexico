@@ -111,6 +111,9 @@ export default function ResetPasswordPage() {
             Iniciar sesión
           </Link>
         </div>
+        <div className="mt-8 text-center text-xs text-muted-foreground">
+          &copy; {new Date().getFullYear()} Opendex Corporation. Todos los derechos reservados.
+        </div>
       </div>
     </div>
   );
