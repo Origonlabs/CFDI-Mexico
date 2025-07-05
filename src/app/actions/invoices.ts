@@ -81,7 +81,7 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
         folio: validatedData.folio,
         usoCfdi: validatedData.usoCfdi,
         metodoPago: validatedData.metodoPago,
-        condicionesPago: validatedData.condicionesPago,
+        condicionesPago: validatedData.condicionesPago ?? null,
         subtotal: subtotal.toString(),
         iva: iva.toString(),
         total: total.toString(),
@@ -115,6 +115,7 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
       return { success: false, message: "Datos del formulario no válidos.", errors: error.flatten().fieldErrors };
     }
     console.error("Database Error (saveInvoice):", error);
-    return { success: false, message: "No se pudo guardar la factura. Verifique la consola del servidor para más detalles." };
+    const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido al guardar la factura.";
+    return { success: false, message: `Error al guardar: ${errorMessage}` };
   }
 };
