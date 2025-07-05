@@ -18,7 +18,7 @@ const profileFormSchema = z.object({
 export type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export const getCompanyProfile = async (userId: string) => {
-  if (!process.env.DATABASE_URL) {
+  if (!db) {
     return { success: false, message: "La URL de la base de datos no está configurada." };
   }
   try {
@@ -34,7 +34,7 @@ export const getCompanyProfile = async (userId: string) => {
 };
 
 export const saveCompanyProfile = async (formData: ProfileFormValues, userId: string) => {
-  if (!process.env.DATABASE_URL) {
+  if (!db) {
     return { success: false, message: "La URL de la base de datos no está configurada." };
   }
   try {

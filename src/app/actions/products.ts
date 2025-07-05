@@ -17,7 +17,7 @@ const productSchema = z.object({
 export type ProductFormValues = z.infer<typeof productSchema>;
 
 export const getProducts = async (userId: string) => {
-  if (!process.env.DATABASE_URL) {
+  if (!db) {
     return { success: false, message: "La URL de la base de datos no está configurada." };
   }
   try {
@@ -33,7 +33,7 @@ export const getProducts = async (userId: string) => {
 };
 
 export const addProduct = async (formData: ProductFormValues, userId: string) => {
-  if (!process.env.DATABASE_URL) {
+  if (!db) {
     return { success: false, message: "La URL de la base de datos no está configurada." };
   }
   try {

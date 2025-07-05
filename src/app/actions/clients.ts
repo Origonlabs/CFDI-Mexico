@@ -20,7 +20,7 @@ const clientSchema = z.object({
 export type ClientFormValues = z.infer<typeof clientSchema>;
 
 export const getClients = async (userId: string) => {
-  if (!process.env.DATABASE_URL) {
+  if (!db) {
     return { success: false, message: "La URL de la base de datos no está configurada." };
   }
   try {
@@ -36,7 +36,7 @@ export const getClients = async (userId: string) => {
 };
 
 export const addClient = async (formData: ClientFormValues, userId: string) => {
-  if (!process.env.DATABASE_URL) {
+  if (!db) {
     return { success: false, message: "La URL de la base de datos no está configurada." };
   }
   try {
