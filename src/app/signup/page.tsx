@@ -196,7 +196,7 @@ export default function SignupPage() {
                           value={phone}
                           onChange={handlePhoneChange}
                           disabled={!firebaseEnabled || isSubmitting}
-                          className="pl-10"
+                          className="pl-12"
                       />
                     </div>
                   </div>
