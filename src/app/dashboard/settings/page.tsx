@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useEffect, useState, useCallback } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged, User, sendPasswordResetEmail, updateProfile } from "firebase/auth";
 import { UploadCloud, PlusCircle, Building, Workflow } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -58,6 +58,7 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
 
 const profileFormSchema = z.object({
   companyName: z.string().min(1, { message: "La razón social es obligatoria." }),
@@ -74,6 +75,11 @@ export default function SettingsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [loadingProfile, setLoadingProfile] = useState(true);
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -117,6 +123,13 @@ export default function SettingsPage() {
   useEffect(() => {
     if (user) {
       fetchProfile(user.uid);
+       if (user.displayName) {
+        const nameParts = user.displayName.split(" ");
+        const lName = nameParts.length > 1 ? nameParts.pop() || "" : "";
+        const fName = nameParts.join(" ");
+        setFirstName(fName);
+        setLastName(lName);
+      }
     } else if (!loadingAuth) {
       // User is not logged in, finished loading
       setLoadingProfile(false);
@@ -150,17 +163,74 @@ export default function SettingsPage() {
     }
   }
 
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !auth || !auth.currentUser) {
+      toast({ title: "Error", description: "No estás autenticado.", variant: "destructive" });
+      return;
+    };
+
+    setIsUpdatingProfile(true);
+    try {
+        await updateProfile(auth.currentUser, {
+            displayName: `${firstName} ${lastName}`.trim(),
+        });
+        toast({
+            title: "Éxito",
+            description: "Tu perfil ha sido actualizado.",
+        });
+        await auth.currentUser.reload();
+        setUser(auth.currentUser); 
+        router.refresh();
+    } catch (error) {
+        console.error(error);
+        toast({
+            title: "Error",
+            description: "No se pudo actualizar tu perfil.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsUpdatingProfile(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!user || !user.email || !auth) {
+      toast({ title: "Error", description: "No se encontró tu correo electrónico.", variant: "destructive" });
+      return
+    };
+
+    setIsSendingReset(true);
+    try {
+        await sendPasswordResetEmail(auth, user.email);
+        toast({
+            title: "Correo enviado",
+            description: "Revisa tu bandeja de entrada para restablecer tu contraseña.",
+        });
+    } catch (error) {
+        console.error(error);
+        toast({
+            title: "Error",
+            description: "No se pudo enviar el correo para restablecer la contraseña.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsSendingReset(false);
+    }
+  };
+
 
   return (
     <div className="mx-auto w-full max-w-4xl">
       <h1 className="text-3xl font-bold font-headline mb-6">Configuración</h1>
       <Tabs defaultValue="profile">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="profile">Perfil de Empresa</TabsTrigger>
-          <TabsTrigger value="signature">Firma Electrónica</TabsTrigger>
-          <TabsTrigger value="folios">Series y Folios</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6">
+          <TabsTrigger value="profile">Perfil Empresa</TabsTrigger>
+          <TabsTrigger value="signature">Firma</TabsTrigger>
+          <TabsTrigger value="folios">Folios</TabsTrigger>
           <TabsTrigger value="integrations">Integraciones</TabsTrigger>
           <TabsTrigger value="appearance">Apariencia</TabsTrigger>
+          <TabsTrigger value="account">Cuenta</TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
           <Form {...form}>
@@ -426,7 +496,46 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="account">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-headline">Mi Cuenta</CardTitle>
+              <CardDescription>
+                Actualiza tu información personal y gestiona tu contraseña.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <form onSubmit={handleProfileUpdate} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">Nombre(s)</Label>
+                    <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} disabled={isUpdatingProfile || loadingAuth} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Apellidos</Label>
+                    <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={isUpdatingProfile || loadingAuth} />
+                  </div>
+                </div>
+                <Button type="submit" disabled={isUpdatingProfile || loadingAuth || !firebaseEnabled}>
+                  {isUpdatingProfile ? "Guardando..." : "Guardar Cambios"}
+                </Button>
+              </form>
+              <Separator />
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Contraseña</h3>
+                <p className="text-sm text-muted-foreground">
+                  Recibirás un correo electrónico con un enlace para restablecer tu contraseña.
+                </p>
+                <Button variant="outline" onClick={handlePasswordReset} disabled={isSendingReset || loadingAuth || !firebaseEnabled}>
+                  {isSendingReset ? "Enviando..." : "Cambiar Contraseña"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   )
 }
+
+    
