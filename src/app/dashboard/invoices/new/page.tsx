@@ -14,7 +14,7 @@ import { auth, firebaseEnabled } from "@/lib/firebase/client"
 import { useToast } from "@/hooks/use-toast"
 import { getClients, type ClientFormValues } from "@/app/actions/clients"
 import { getProducts, type ProductFormValues } from "@/app/actions/products"
-import { saveInvoice, generateInvoicePdf, generateInvoiceXml } from "@/app/actions/invoices";
+import { saveInvoice } from "@/app/actions/invoices";
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -43,7 +43,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { cn } from "@/lib/utils"
 
@@ -54,6 +53,13 @@ interface Client extends ClientFormValues {
 interface Product extends ProductFormValues {
   id: number;
   unitPrice: number;
+}
+interface SavedInvoice {
+  id: number;
+  serie: string;
+  folio: number;
+  pdfUrl?: string | null;
+  xmlUrl?: string | null;
 }
 
 const conceptSchema = z.object({
@@ -87,8 +93,7 @@ export default function NewInvoicePage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [savedInvoice, setSavedInvoice] = useState<{ id: number; serie: string; folio: number; } | null>(null);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [savedInvoice, setSavedInvoice] = useState<SavedInvoice | null>(null);
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
@@ -227,57 +232,6 @@ export default function NewInvoicePage() {
     router.push("/dashboard/invoices");
   }
 
-  const handleDownload = async (type: 'pdf' | 'xml') => {
-    if (!user || !savedInvoice) return;
-    setIsDownloading(true);
-    toast({ title: `Generando ${type.toUpperCase()}...` });
-    try {
-        if (type === 'pdf') {
-            const result = await generateInvoicePdf(savedInvoice.id, user.uid);
-            if (result.success && result.pdf) {
-                const byteCharacters = atob(result.pdf);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: "application/pdf" });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `factura-${savedInvoice.serie}-${savedInvoice.folio}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                a.remove();
-                toast({ title: "Éxito", description: "PDF descargado correctamente." });
-            } else if (!result.success) {
-                toast({ title: "Error", description: result.message, variant: "destructive" });
-            }
-        } else { // type is 'xml'
-            const result = await generateInvoiceXml(savedInvoice.id, user.uid);
-            if (result.success && result.xml) {
-                const blob = new Blob([result.xml], { type: "application/xml" });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `factura-${savedInvoice.serie}-${savedInvoice.folio}.xml`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                a.remove();
-                toast({ title: "Éxito", description: "XML descargado correctamente." });
-            } else if (!result.success) {
-                toast({ title: "Error", description: result.message, variant: "destructive" });
-            }
-        }
-    } catch (error) {
-        toast({ title: "Error", description: `No se pudo generar el ${type.toUpperCase()}.`, variant: "destructive" });
-    } finally {
-        setIsDownloading(false);
-    }
-};
-
   if (savedInvoice) {
     return (
       <div className="flex flex-col items-center justify-center gap-6 flex-1 py-12">
@@ -289,17 +243,24 @@ export default function NewInvoicePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-             <p className="text-sm text-muted-foreground text-center">Ahora puedes descargar los archivos correspondientes o crear una nueva factura.</p>
+             <p className="text-sm text-muted-foreground text-center">
+               Tus archivos han sido generados y guardados. Ahora puedes descargarlos o crear una nueva factura.
+             </p>
              <div className="flex justify-center gap-4">
-                <Button onClick={() => handleDownload('pdf')} disabled={isDownloading}>
+                <Button asChild disabled={!savedInvoice.pdfUrl}>
+                  <a href={savedInvoice.pdfUrl ?? '#'} target="_blank" rel="noopener noreferrer">
                     <Download className="mr-2 h-4 w-4" />
-                    {isDownloading ? 'Generando...' : 'Descargar PDF'}
+                    Descargar PDF
+                  </a>
                 </Button>
-                <Button onClick={() => handleDownload('xml')} disabled={isDownloading}>
+                <Button asChild disabled={!savedInvoice.xmlUrl}>
+                  <a href={savedInvoice.xmlUrl ?? '#'} target="_blank" rel="noopener noreferrer">
                     <Download className="mr-2 h-4 w-4" />
-                    {isDownloading ? 'Generando...' : 'Descargar XML'}
+                    Descargar XML
+                  </a>
                 </Button>
             </div>
+             {!savedInvoice.pdfUrl && <p className="text-xs text-center text-muted-foreground">La subida de archivos está en proceso o no está configurada.</p>}
           </CardContent>
           <CardFooter className="flex-col gap-4 pt-6">
             <Button variant="outline" className="w-full" onClick={() => { form.reset(); setSavedInvoice(null); }}>
@@ -337,7 +298,9 @@ export default function NewInvoicePage() {
             <Button variant="outline" size="sm" type="button" onClick={handleDiscard}>
               Descartar
             </Button>
-            <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>Guardar Borrador</Button>
+            <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? 'Guardando...' : 'Guardar Borrador'}
+            </Button>
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
@@ -595,7 +558,9 @@ export default function NewInvoicePage() {
            <Button variant="outline" size="sm" type="button" onClick={handleDiscard}>
               Descartar
           </Button>
-          <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>Guardar Borrador</Button>
+          <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>
+             {form.formState.isSubmitting ? 'Guardando...' : 'Guardar Borrador'}
+          </Button>
         </div>
       </form>
     </Form>

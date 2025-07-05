@@ -49,6 +49,8 @@ export const invoices = pgTable('invoices', {
   iva: numeric('iva', { precision: 10, scale: 2 }).notNull(),
   total: numeric('total', { precision: 10, scale: 2 }).notNull(),
   status: invoiceStatusEnum('status').default('draft').notNull(),
+  pdfUrl: text('pdf_url'),
+  xmlUrl: text('xml_url'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

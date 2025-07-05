@@ -43,6 +43,8 @@ interface Invoice {
   status: 'draft' | 'stamped' | 'canceled';
   createdAt: Date;
   total: string;
+  pdfUrl?: string | null;
+  xmlUrl?: string | null;
 }
 
 export default function InvoicesPage() {
@@ -73,7 +75,7 @@ export default function InvoicesPage() {
     const response = await getInvoices(uid);
 
     if (response.success && response.data) {
-      setInvoices(response.data as any[]); // Cast to any to avoid TS date errors
+      setInvoices(response.data as Invoice[]);
     } else {
       toast({
         title: "Error",
@@ -91,6 +93,11 @@ export default function InvoicesPage() {
   }, [user, fetchInvoices]);
 
   const handleDownloadXml = async (invoice: Invoice) => {
+    if (invoice.xmlUrl) {
+      window.open(invoice.xmlUrl, '_blank');
+      return;
+    }
+
     if (!user) return;
     setDownloading(invoice.id);
     toast({ title: "Generando XML..." });
@@ -118,6 +125,11 @@ export default function InvoicesPage() {
   };
 
   const handleDownloadPdf = async (invoice: Invoice) => {
+     if (invoice.pdfUrl) {
+      window.open(invoice.pdfUrl, '_blank');
+      return;
+    }
+
     if (!user) return;
     setDownloading(invoice.id);
     toast({ title: "Generando PDF..." });
