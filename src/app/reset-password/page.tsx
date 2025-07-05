@@ -87,7 +87,7 @@ export default function ResetPasswordPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="GlobalID@company.com"
                   required
                   disabled={!firebaseEnabled || isSubmitting}
                   value={email}
