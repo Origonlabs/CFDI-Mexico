@@ -1,1 +1,2 @@
-export * from './neon/client';
+import db from './neon/client';
+export default db;
