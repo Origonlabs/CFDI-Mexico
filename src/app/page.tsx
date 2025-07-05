@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -11,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { OrigonLogo } from '@/components/logo';
 import { auth, firebaseEnabled } from '@/lib/firebase/client';
 import { useToast } from "@/hooks/use-toast";
-import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -80,6 +79,46 @@ export default function LoginPage() {
     }
   };
 
+  const handlePasswordReset = async () => {
+    if (!email) {
+      toast({
+        title: "Correo Requerido",
+        description: "Por favor, ingresa tu correo electrónico para restablecer la contraseña.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!firebaseEnabled || !auth) {
+      toast({
+        title: "Error de Configuración",
+        description: "Firebase no está configurado.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast({
+        title: "Correo Enviado",
+        description: "Se ha enviado un enlace a tu correo para restablecer tu contraseña.",
+      });
+    } catch (error: any) {
+      console.error("Error al enviar correo de restablecimiento", error);
+      let description = "Ocurrió un error inesperado.";
+       if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-email') {
+        description = "No se encontró ninguna cuenta con ese correo electrónico.";
+      }
+      toast({
+        title: "Error",
+        description,
+        variant: "destructive",
+      });
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="w-full h-screen lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
       <div className="flex items-center justify-center py-12">
@@ -117,12 +156,15 @@ export default function LoginPage() {
                 <div className="grid gap-2">
                   <div className="flex items-center">
                     <Label htmlFor="password">Contraseña</Label>
-                    <Link
-                      href="#"
-                      className="ml-auto inline-block text-sm underline"
+                    <Button
+                      variant="link"
+                      type="button"
+                      onClick={handlePasswordReset}
+                      className="ml-auto h-auto p-0 inline-block text-sm underline"
+                      disabled={isSubmitting}
                     >
                       ¿Olvidaste tu contraseña?
-                    </Link>
+                    </Button>
                   </div>
                   <Input 
                     id="password" 
