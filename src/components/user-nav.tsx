@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   Avatar,
   AvatarFallback,
@@ -14,18 +15,21 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { auth } from "@/lib/firebase/client"
-import { signOut } from "@/app/actions/auth"
+import { signOut as firebaseSignOut } from "firebase/auth"
 
 export function UserNav() {
   const [user] = useAuthState(auth)
+  const router = useRouter()
 
   const handleSignOut = async () => {
-    await signOut()
+    if (auth) {
+      await firebaseSignOut(auth)
+      router.push("/")
+    }
   }
 
   return (
