@@ -42,7 +42,7 @@ export function UserNav() {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-80" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user?.displayName ?? "Usuario"}</p>
@@ -54,17 +54,37 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-             <Link href="/dashboard/settings">
-                Configuración
-             </Link>
+            <Link href="/dashboard/settings">
+              <span>🧑‍🔧</span>
+              <span>Asistente de Configuración</span>
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            Nueva Empresa
+            <span>😄</span>
+            <span>Incrementa la vigencia</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <span>💵</span>
+            <span>Adquirir Origon CFDI Facturación en línea</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/settings">
+              <span>➕</span>
+              <span>Mi cuenta</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <span>ℹ️</span>
+            <span>Acerca de...</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
-            Cerrar sesión
+          <span>🚪</span>
+          <span>Cerrar sesión</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
