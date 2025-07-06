@@ -32,10 +32,24 @@ export const companies = pgTable('companies', {
     userId: varchar('user_id', { length: 256 }).notNull().unique(),
     companyName: text('company_name').notNull(),
     rfc: varchar('rfc', { length: 13 }).notNull(),
-    address: text('address').notNull(),
     taxRegime: varchar('tax_regime', { length: 10 }).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    
+    street: text('street'),
+    exteriorNumber: varchar('exterior_number', { length: 50 }),
+    interiorNumber: varchar('interior_number', { length: 50 }),
+    neighborhood: text('neighborhood'), // Colonia
+    sector: text('sector'),
+    municipality: text('municipality'),
+    state: text('state'),
+    city: text('city'),
+    zip: varchar('zip', { length: 5 }),
+    phone: varchar('phone', { length: 20 }),
+    phone2: varchar('phone2', { length: 20 }),
+    fax: varchar('fax', { length: 20 }),
+    contadorEmail: varchar('contador_email', { length: 256 }),
+    web: varchar('web', { length: 256 }),
 });
 
 export const products = pgTable('products', {

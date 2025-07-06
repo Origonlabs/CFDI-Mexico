@@ -5,578 +5,249 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useEffect, useState, useCallback } from "react";
-import { onAuthStateChanged, User, sendPasswordResetEmail, updateProfile } from "firebase/auth";
-import { UploadCloud, PlusCircle, Building, Workflow } from "lucide-react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { onAuthStateChanged, User, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getCompanyProfile, saveCompanyProfile, type ProfileFormValues } from "@/app/actions/companies";
-import { getSeries } from "@/app/actions/series";
+import { getCompanyProfile, saveCompanyProfile } from "@/app/actions/companies";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 
+// Schemas
 const profileFormSchema = z.object({
   companyName: z.string().min(1, { message: "La razón social es obligatoria." }),
-  rfc: z.string()
-    .min(12, { message: "El RFC debe tener 12 o 13 caracteres." })
-    .max(13, { message: "El RFC debe tener 12 o 13 caracteres." }),
-  address: z.string().min(1, { message: "La dirección fiscal es obligatoria." }),
-  taxRegime: z.string().min(1, { message: "El régimen fiscal es obligatorio." }),
+  rfc: z.string().min(12, "El RFC debe tener 12 o 13 caracteres.").max(13, "El RFC debe tener 12 o 13 caracteres.").optional().or(z.literal('')),
+  street: z.string().optional(),
+  exteriorNumber: z.string().optional(),
+  interiorNumber: z.string().optional(),
+  state: z.string().optional(),
+  municipality: z.string().optional(),
+  sector: z.string().optional(),
+  neighborhood: z.string().optional(), // Colonia
+  zip: z.string().optional(),
+  phone: z.string().optional(),
+  phone2: z.string().optional(),
+  fax: z.string().optional(),
+  city: z.string().optional(),
+  web: z.string().optional(),
+  contadorEmail: z.string().email({ message: "Email inválido"}).optional().or(z.literal('')),
 });
+type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
-interface Serie {
-  id: number;
-  serie: string;
-  folio: number;
-  documentType: string;
-}
+const passwordChangeSchema = z.object({
+  currentPassword: z.string().min(1, "La contraseña actual es obligatoria."),
+  newPassword: z.string().min(6, "La nueva contraseña debe tener al menos 6 caracteres."),
+  confirmPassword: z.string(),
+}).refine(data => data.newPassword === data.confirmPassword, {
+  message: "Las nuevas contraseñas no coinciden.",
+  path: ["confirmPassword"],
+});
+type PasswordChangeValues = z.infer<typeof passwordChangeSchema>;
+
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [loadingAuth, setLoadingAuth] = useState(true);
-  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-  const [isSendingReset, setIsSendingReset] = useState(false);
-
-  const [series, setSeries] = useState<Serie[]>([]);
-  const [loadingSeries, setLoadingSeries] = useState(true);
-
-
-  const form = useForm<ProfileFormValues>({
+  // User profile state
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  
+  const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      companyName: "",
-      rfc: "",
-      address: "",
-      taxRegime: "",
+      companyName: "", rfc: "", street: "", exteriorNumber: "", interiorNumber: "", state: "", municipality: "", sector: "", neighborhood: "", zip: "", phone: "", phone2: "", fax: "", city: "", web: "", contadorEmail: ""
     },
   });
 
+  const passwordForm = useForm<PasswordChangeValues>({
+    resolver: zodResolver(passwordChangeSchema),
+    defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
+  });
+  
   useEffect(() => {
     if (!firebaseEnabled || !auth) {
-      setLoadingAuth(false);
-      setLoadingProfile(false);
+      setLoading(false);
       return;
     }
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      setLoadingAuth(false);
+      if (currentUser) {
+        if (currentUser.displayName) {
+          const nameParts = currentUser.displayName.split(" ");
+          const lName = nameParts.length > 1 ? nameParts.pop() || "" : "";
+          const fName = nameParts.join(" ");
+          setFirstName(fName);
+          setLastName(lName);
+        }
+        await fetchProfile(currentUser.uid);
+      }
+      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
   const fetchProfile = useCallback(async (uid: string) => {
-      setLoadingProfile(true);
       const response = await getCompanyProfile(uid);
-
       if (response.success && response.data) {
-        form.reset(response.data as ProfileFormValues);
-      } else if (!response.success) {
-        toast({
-          title: "Error",
-          description: response.message,
-          variant: "destructive"
-        });
+        profileForm.reset(response.data as any);
+      } else if (!response.success && response.message) {
+        // toast({ title: "Error al cargar perfil", description: response.message, variant: "destructive" });
       }
-      setLoadingProfile(false);
-  }, [form, toast]);
+  }, [profileForm]);
 
-  const fetchSeries = useCallback(async (uid: string) => {
-      setLoadingSeries(true);
-      const response = await getSeries(uid);
-      if (response.success && response.data) {
-        setSeries(response.data as Serie[]);
-      } else {
-          toast({ title: "Error", description: response.message || "No se pudieron cargar las series.", variant: "destructive" });
-      }
-      setLoadingSeries(false);
-  }, [toast]);
-
-
-  useEffect(() => {
-    if (user) {
-      fetchProfile(user.uid);
-      fetchSeries(user.uid);
-       if (user.displayName) {
-        const nameParts = user.displayName.split(" ");
-        const lName = nameParts.length > 1 ? nameParts.pop() || "" : "";
-        const fName = nameParts.join(" ");
-        setFirstName(fName);
-        setLastName(lName);
-      }
-    } else if (!loadingAuth) {
-      // User is not logged in, finished loading
-      setLoadingProfile(false);
-    }
-  }, [user, loadingAuth, fetchProfile, fetchSeries]);
-
-  async function onSubmit(data: ProfileFormValues) {
+  async function onProfileSubmit(data: ProfileFormValues) {
     if (!user) {
-      toast({
-        title: "Error",
-        description: "Debes iniciar sesión para guardar los cambios.",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Debes iniciar sesión para guardar los cambios.", variant: "destructive" });
       return;
     }
 
+    // Update company profile
     const result = await saveCompanyProfile(data, user.uid);
-
+    
+    // Update user display name
+    await updateProfile(user, { displayName: `${firstName} ${lastName}`.trim() });
+    
     if (result.success) {
-      toast({
-        title: "Éxito",
-        description: result.message || "El perfil de la empresa se ha guardado correctamente.",
-      });
-      router.refresh();
+      toast({ title: "Éxito", description: "El domicilio y los datos de usuario se han actualizado." });
     } else {
-      toast({
-        title: "Error al guardar",
-        description: result.message || "No se pudo guardar la información de la empresa.",
-        variant: "destructive",
-      });
+      toast({ title: "Error al guardar", description: result.message || "No se pudo guardar la información.", variant: "destructive" });
     }
   }
 
-  const handleProfileUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !auth || !auth.currentUser) {
-      toast({ title: "Error", description: "No estás autenticado.", variant: "destructive" });
-      return;
-    };
-
-    setIsUpdatingProfile(true);
-    try {
-        await updateProfile(auth.currentUser, {
-            displayName: `${firstName} ${lastName}`.trim(),
-        });
-        toast({
-            title: "Éxito",
-            description: "Tu perfil ha sido actualizado.",
-        });
-        await auth.currentUser.reload();
-        setUser(auth.currentUser); 
-        router.refresh();
-    } catch (error) {
-        console.error(error);
-        toast({
-            title: "Error",
-            description: "No se pudo actualizar tu perfil.",
-            variant: "destructive",
-        });
-    } finally {
-        setIsUpdatingProfile(false);
+  async function onPasswordSubmit(data: PasswordChangeValues) {
+    if (!user || !user.email) {
+        toast({ title: "Error", description: "Usuario no autenticado.", variant: "destructive" });
+        return;
     }
-  };
-
-  const handlePasswordReset = async () => {
-    if (!user || !user.email || !auth) {
-      toast({ title: "Error", description: "No se encontró tu correo electrónico.", variant: "destructive" });
-      return
-    };
-
-    setIsSendingReset(true);
+    
+    const credential = EmailAuthProvider.credential(user.email, data.currentPassword);
+    
     try {
-        await sendPasswordResetEmail(auth, user.email);
-        toast({
-            title: "Correo enviado",
-            description: "Revisa tu bandeja de entrada para restablecer tu contraseña.",
-        });
+        await reauthenticateWithCredential(user, credential);
+        await updatePassword(user, data.newPassword);
+        toast({ title: "Éxito", description: "Tu contraseña ha sido actualizada." });
+        passwordForm.reset();
     } catch (error) {
-        console.error(error);
-        toast({
-            title: "Error",
-            description: "No se pudo enviar el correo para restablecer la contraseña.",
-            variant: "destructive",
-        });
-    } finally {
-        setIsSendingReset(false);
+        toast({ title: "Error", description: "La contraseña actual es incorrecta o ha ocurrido otro error.", variant: "destructive" });
     }
-  };
-
+  }
+  
+  const handleAccountDelete = () => {
+    toast({
+        title: "Función no implementada",
+        description: "La eliminación de cuenta está en desarrollo.",
+        variant: "default",
+    })
+  }
+  
+  const isLoading = loading || profileForm.formState.isSubmitting || passwordForm.formState.isSubmitting;
 
   return (
-    <div className="mx-auto w-full max-w-4xl">
-      <h1 className="text-lg font-bold font-headline mb-6">Configuración</h1>
-      <Tabs defaultValue="profile">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
-          <TabsTrigger value="profile">Perfil Empresa</TabsTrigger>
-          <TabsTrigger value="signature">Firma</TabsTrigger>
-          <TabsTrigger value="folios">Folios</TabsTrigger>
-          <TabsTrigger value="integrations">Integraciones</TabsTrigger>
-          <TabsTrigger value="account">Cuenta</TabsTrigger>
-        </TabsList>
-        <TabsContent value="profile">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="font-headline text-base">Perfil de Empresa</CardTitle>
-                  <CardDescription className="text-sm">
-                    Actualiza la información fiscal y el logo de tu empresa.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                   {loadingProfile || loadingAuth ? (
-                    <div className="space-y-6">
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-1/4" />
-                        <Skeleton className="h-10 w-full" />
-                      </div>
-                       <div className="space-y-2">
-                        <Skeleton className="h-4 w-1/4" />
-                        <Skeleton className="h-10 w-full" />
-                      </div>
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-1/4" />
-                        <Skeleton className="h-10 w-full" />
-                      </div>
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-1/4" />
-                        <Skeleton className="h-10 w-full" />
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <FormField
-                        control={form.control}
-                        name="companyName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Razón Social</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Mi Empresa S.A. de C.V." {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="rfc"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>RFC</FormLabel>
-                            <FormControl>
-                              <Input placeholder="MEI920101ABC" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                       <FormField
-                        control={form.control}
-                        name="taxRegime"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Régimen Fiscal</FormLabel>
-                               <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                   <SelectTrigger>
-                                    <SelectValue placeholder="Seleccionar régimen..." />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="601">601 - General de Ley Personas Morales</SelectItem>
-                                  <SelectItem value="612">612 - Personas Físicas con Actividades Empresariales y Profesionales</SelectItem>
-                                  <SelectItem value="621">621 - Incorporación Fiscal</SelectItem>
-                                  <SelectItem value="626">626 - Régimen Simplificado de Confianza</SelectItem>
-                                </SelectContent>
-                              </Select>
-                             <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="address"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Dirección Fiscal (Código Postal)</FormLabel>
-                            <FormControl>
-                              <Input placeholder="12345" {...field} />
-                            </FormControl>
-                             <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <div className="grid w-full max-w-sm items-center gap-1.5 pt-2">
-                        <Label>Logo de la Empresa</Label>
-                        <div className="flex items-center gap-4">
-                          <div className="flex h-16 w-16 items-center justify-center rounded-md border border-dashed">
-                            <UploadCloud className="h-8 w-8 text-muted-foreground" />
+    <div className="mx-auto w-full max-w-5xl">
+      <h1 className="text-2xl font-bold font-headline mb-6">Mi cuenta</h1>
+      
+      {loading ? (
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-48 w-full" />
+        </div>
+      ) : (
+      <Accordion type="multiple" defaultValue={['domicilio']} className="w-full space-y-4">
+          <AccordionItem value="domicilio">
+              <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Domicilio</AccordionTrigger>
+              <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
+                  <Form {...profileForm}>
+                      <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
+                          <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
+                              {/* Left Column */}
+                              <div className="space-y-4">
+                                  <FormField control={profileForm.control} name="companyName" render={({ field }) => ( <FormItem><FormLabel>*Nombre o Razón Social</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                  <FormField control={profileForm.control} name="rfc" render={({ field }) => ( <FormItem><FormLabel>RFC</FormLabel><FormControl><Input {...field} disabled/></FormControl><FormMessage /></FormItem> )} />
+                                  <FormField control={profileForm.control} name="street" render={({ field }) => ( <FormItem><FormLabel>Calle</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                  <FormField control={profileForm.control} name="exteriorNumber" render={({ field }) => ( <FormItem><FormLabel>Número exterior</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                  <FormField control={profileForm.control} name="interiorNumber" render={({ field }) => ( <FormItem><FormLabel>Número interior</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                  <FormField control={profileForm.control} name="state" render={({ field }) => ( <FormItem><FormLabel>Estado</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                  <FormField control={profileForm.control} name="municipality" render={({ field }) => ( <FormItem><FormLabel>Municipio</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccionar"/></SelectTrigger></FormControl><SelectContent></SelectContent></Select><FormMessage /></FormItem> )} />
+                                  <FormField control={profileForm.control} name="sector" render={({ field }) => ( <FormItem><FormLabel>Sector</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccionar"/></SelectTrigger></FormControl><SelectContent></SelectContent></Select><FormMessage /></FormItem> )} />
+                                  <FormField control={profileForm.control} name="neighborhood" render={({ field }) => ( <FormItem><FormLabel>Colonia</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                  <FormField control={profileForm.control} name="contadorEmail" render={({ field }) => ( <FormItem><FormLabel>Email contador</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                              </div>
+                              {/* Right Column */}
+                              <div className="space-y-4">
+                                  <FormField control={profileForm.control} name="zip" render={({ field }) => ( <FormItem><FormLabel>*Código Postal</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                  <FormField control={profileForm.control} name="phone" render={({ field }) => ( <FormItem><FormLabel>Teléfono</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                  <FormField control={profileForm.control} name="phone2" render={({ field }) => ( <FormItem><FormLabel>Teléfono 2</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                  <FormField control={profileForm.control} name="fax" render={({ field }) => ( <FormItem><FormLabel>Fax</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                  <FormItem>
+                                      <FormLabel>Nombre</FormLabel>
+                                      <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                                  </FormItem>
+                                  <FormItem>
+                                      <FormLabel>Apellidos</FormLabel>
+                                      <Input value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                                  </FormItem>
+                                  <FormField control={profileForm.control} name="city" render={({ field }) => ( <FormItem><FormLabel>Ciudad</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                  <FormItem><FormLabel>*Email</FormLabel><Input value={user?.email || ''} disabled/></FormItem>
+                                  <FormField control={profileForm.control} name="web" render={({ field }) => ( <FormItem><FormLabel>Web</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                              </div>
                           </div>
-                          <Button variant="outline" type="button" disabled>Cambiar Logo</Button>
-                        </div>
-                        <p className="text-xs text-muted-foreground">Próximamente.</p>
-                      </div>
-                    </>
-                  )}
-                </CardContent>
-                <CardFooter>
-                   <Button type="submit" disabled={loadingProfile || form.formState.isSubmitting || !firebaseEnabled}>
-                    {form.formState.isSubmitting ? "Guardando..." : "Guardar Cambios"}
-                  </Button>
-                </CardFooter>
-              </Card>
-            </form>
-          </Form>
-        </TabsContent>
-        <TabsContent value="signature">
-          <Card>
-            <CardContent className="space-y-6 pt-6">
-              <div>
-                <h3 className="text-base font-semibold mb-2">Certificado de Sello Digital Instalado</h3>
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>No. de certificado</TableHead>
-                        <TableHead>Fecha Inicial</TableHead>
-                        <TableHead>Fecha Final</TableHead>
-                        <TableHead>Estado de certificado</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell colSpan={4} className="h-24 text-center">
-                          No hay ningún certificado instalado.
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-              
-              <Separator/>
+                          <div className="flex justify-end pt-4">
+                              <Button type="submit" disabled={isLoading}>Actualizar</Button>
+                          </div>
+                      </form>
+                  </Form>
+              </AccordionContent>
+          </AccordionItem>
 
-              <div>
-                <h3 className="text-base font-semibold mb-4">Instalar Nuevo Certificado de Sello Digital</h3>
-                <div className="space-y-4 max-w-md">
-                  <div className="space-y-2">
-                    <Label htmlFor="key-file">*Archivo clave privada:</Label>
-                    <Input id="key-file" type="file" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="cer-file">*Certificado:</Label>
-                    <Input id="cer-file" type="file" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">*Contraseña de Clave Privada:</Label>
-                    <Input id="password" type="password" />
-                  </div>
-                  <div className="flex gap-2 pt-2">
-                    <Button type="button">Subir</Button>
-                    <Button type="button" variant="outline">Borrar</Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="folios">
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
-                        <CardTitle className="font-headline text-base">Series y Folios</CardTitle>
-                        <CardDescription className="text-sm">
-                            Administra las series y el folio inicial para tus facturas.
-                        </CardDescription>
-                    </div>
-                    <Button asChild size="sm" className="gap-1">
-                        <Link href="/dashboard/settings/series/new">
-                           <PlusCircle className="h-3.5 w-3.5" />
-                           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                               Agregar Serie
-                           </span>
-                        </Link>
-                    </Button>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Serie</TableHead>
-                                <TableHead>Folio Actual</TableHead>
-                                <TableHead>Tipo</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {loadingSeries ? (
-                                <TableRow>
-                                    <TableCell colSpan={3} className="h-24 text-center">
-                                      Cargando series...
-                                    </TableCell>
-                                </TableRow>
-                            ) : series.length > 0 ? (
-                                series.map((s) => (
-                                    <TableRow key={s.id}>
-                                        <TableCell className="font-medium">{s.serie}</TableCell>
-                                        <TableCell>{s.folio}</TableCell>
-                                        <TableCell>{s.documentType}</TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={3} className="text-center h-24">
-                                        No has agregado ninguna serie.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
-        </TabsContent>
-        <TabsContent value="integrations">
-            <Card>
-                <CardHeader>
-                <CardTitle className="font-headline text-base">Integraciones</CardTitle>
-                <CardDescription className="text-sm">
-                    Conecta tus servicios favoritos para automatizar tu facturación.
-                </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between rounded-lg border p-4">
-                        <div className="flex items-center gap-4">
-                            <Workflow className="h-8 w-8 text-indigo-500" />
-                            <div className="grid gap-0.5">
-                                <h3 className="text-base font-medium">Stripe</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Sincroniza pagos y genera facturas automáticamente.
-                                </p>
-                            </div>
+          <AccordionItem value="usuario">
+              <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Datos de Usuario</AccordionTrigger>
+              <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
+                   <Form {...passwordForm}>
+                      <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-6">
+                        <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
+                            <FormItem><FormLabel>Usuario</FormLabel><Input value={user?.email || ''} disabled /></FormItem>
+                            <div></div>
+                            <FormField control={passwordForm.control} name="currentPassword" render={({ field }) => ( <FormItem><FormLabel>*Contraseña Anterior</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <div></div>
+                            <FormField control={passwordForm.control} name="newPassword" render={({ field }) => ( <FormItem><FormLabel>*Nueva Contraseña</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={passwordForm.control} name="confirmPassword" render={({ field }) => ( <FormItem><FormLabel>*Repetir Contraseña</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem> )} />
                         </div>
-                        <Switch id="stripe-switch" aria-label="Stripe" defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between rounded-lg border p-4">
-                        <div className="flex items-center gap-4">
-                            <Workflow className="h-8 w-8 text-green-500" />
-                            <div className="grid gap-0.5">
-                                <h3 className="text-base font-medium">Shopify</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Crea facturas para cada venta en tu tienda.
-                                </p>
-                            </div>
+                        <div className="flex justify-end pt-4">
+                            <Button type="submit" disabled={isLoading}>Actualizar</Button>
                         </div>
-                        <Switch id="shopify-switch" aria-label="Shopify" />
-                    </div>
-                     <div className="flex items-center justify-between rounded-lg border p-4">
-                        <div className="flex items-center gap-4">
-                            <Workflow className="h-8 w-8 text-purple-500" />
-                            <div className="grid gap-0.5">
-                                <h3 className="text-base font-medium">WooCommerce</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Conecta tu tienda de WordPress para facturar.
-                                </p>
-                            </div>
-                        </div>
-                        <Switch id="woocommerce-switch" aria-label="WooCommerce" />
-                    </div>
-                     <div className="flex items-center justify-between rounded-lg border p-4">
-                        <div className="flex items-center gap-4">
-                            <Building className="h-8 w-8 text-red-700" />
-                            <div className="grid gap-0.5">
-                                <h3 className="text-base font-medium">SAT Directo</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Consulta CFDI emitidos por terceros directamente.
-                                </p>
-                            </div>
-                        </div>
-                        <Switch id="sat-switch" aria-label="SAT Directo" defaultChecked />
-                    </div>
-                </CardContent>
-            </Card>
-        </TabsContent>
-        <TabsContent value="account">
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-headline text-base">Mi Cuenta</CardTitle>
-              <CardDescription className="text-sm">
-                Actualiza tu información personal y gestiona tu contraseña.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <form onSubmit={handleProfileUpdate} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">Nombre(s)</Label>
-                    <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} disabled={isUpdatingProfile || loadingAuth} />
+                      </form>
+                  </Form>
+              </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="eliminacion">
+              <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Eliminación de la Cuenta</AccordionTrigger>
+              <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
+                  <div className="space-y-6">
+                      <div className="grid md:grid-cols-2 gap-x-8 gap-y-4 max-w-lg">
+                        <FormItem><FormLabel>*Archivo .key de la Fiel:</FormLabel><Input type="file" /></FormItem>
+                        <FormItem><FormLabel>*Archivo .cer de la Fiel:</FormLabel><Input type="file" /></FormItem>
+                        <FormItem className="md:col-span-1"><FormLabel>*Contraseña de la Fiel:</FormLabel><Input type="password" /></FormItem>
+                      </div>
+                      <div className="flex justify-end pt-4">
+                          <Button variant="destructive" onClick={handleAccountDelete} disabled={isLoading}>Eliminar Cuenta</Button>
+                      </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Apellidos</Label>
-                    <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={isUpdatingProfile || loadingAuth} />
-                  </div>
-                </div>
-                <Button type="submit" disabled={isUpdatingProfile || loadingAuth || !firebaseEnabled}>
-                  {isUpdatingProfile ? "Guardando..." : "Guardar Cambios"}
-                </Button>
-              </form>
-              <Separator />
-              <div className="space-y-4">
-                <h3 className="text-base font-medium">Contraseña</h3>
-                <p className="text-sm text-muted-foreground">
-                  Recibirás un correo electrónico con un enlace para restablecer tu contraseña.
-                </p>
-                <Button variant="outline" onClick={handlePasswordReset} disabled={isSendingReset || loadingAuth || !firebaseEnabled}>
-                  {isSendingReset ? "Enviando..." : "Cambiar Contraseña"}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </AccordionContent>
+          </AccordionItem>
+      </Accordion>
+      )}
     </div>
   )
 }
-
-    
