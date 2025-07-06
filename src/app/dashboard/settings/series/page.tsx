@@ -1,114 +1,177 @@
 
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useState, useEffect } from "react";
-import { User } from "firebase/auth";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { PlusCircle, RefreshCw, Trash2, Pencil } from "lucide-react";
+import { User } from "firebase/auth";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
-import { addSerie, type SerieFormValues } from "@/app/actions/series";
-
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getSeries } from "@/app/actions/series";
+import { getCompanyProfile } from "@/app/actions/companies";
 
-const serieSchema = z.object({
-  serie: z.string().min(1, "La serie es obligatoria.").max(10, "La serie no debe exceder los 10 caracteres."),
-  folio: z.coerce.number().min(1, "El folio inicial debe ser al menos 1."),
-  documentType: z.string().min(1, "El tipo de documento es obligatorio."),
-});
+interface Serie {
+  id: number;
+  serie: string;
+  folio: number;
+  documentType: string;
+  createdAt: string;
+}
 
-export default function NewSeriePage() {
-    const { toast } = useToast();
-    const router = useRouter();
-    const [user, setUser] = useState<User | null>(null);
+export default function SeriesListPage() {
+  const { toast } = useToast();
+  const [user, setUser] = useState<User | null>(null);
+  const [series, setSeries] = useState<Serie[]>([]);
+  const [rfc, setRfc] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
-    const form = useForm<SerieFormValues>({
-        resolver: zodResolver(serieSchema),
-        defaultValues: {
-            serie: "",
-            folio: 1,
-            documentType: "",
-        },
-    });
-
-    useEffect(() => {
-        if (!firebaseEnabled || !auth) return;
-        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-            setUser(currentUser);
-        });
-        return () => unsubscribe();
-    }, []);
-
-    async function onSubmit(data: SerieFormValues) {
-        if (!user) {
-            toast({ title: "Error", description: "Debes iniciar sesión para agregar una serie.", variant: "destructive" });
-            return;
-        }
-        const result = await addSerie(data, user.uid);
-
-        if (result.success) {
-            toast({ title: "Éxito", description: "La serie se ha guardado correctamente." });
-            router.push("/dashboard/settings");
-        } else {
-            toast({ title: "Error al guardar", description: result.message || "No se pudo guardar la serie.", variant: "destructive" });
-        }
+  useEffect(() => {
+    if (!firebaseEnabled || !auth) {
+      setLoading(false);
+      return;
     }
-    
-    const handleBorrar = () => {
-        form.reset();
-        toast({ title: "Formulario limpiado." });
-    };
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+      if (!currentUser) {
+        setLoading(false);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
-    return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-lg mx-auto">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-lg font-bold font-headline">Crear Serie y Folio</h1>
-                     <Button asChild variant="outline" size="sm">
-                        <Link href="/dashboard/settings">Listar Folios</Link>
-                    </Button>
-                </div>
-                
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline text-base">Nueva Serie</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                       <FormField control={form.control} name="serie" render={({ field }) => ( <FormItem><FormLabel>* Serie</FormLabel><FormControl><Input placeholder="A" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                       <FormField control={form.control} name="folio" render={({ field }) => ( <FormItem><FormLabel>* Folio inicial</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                       <FormField control={form.control} name="documentType" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>* Tipo de Documento</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl><SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger></FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="Factura de Ingreso">Factura de Ingreso</SelectItem>
-                                        <SelectItem value="Nota de Crédito">Nota de Crédito</SelectItem>
-                                        <SelectItem value="Complemento de Pago">Complemento de Pago</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                    </CardContent>
-                     <CardFooter className="flex justify-end gap-2">
-                        <Button type="submit" disabled={form.formState.isSubmitting}>
-                            {form.formState.isSubmitting ? "Guardando..." : "Guardar"}
-                        </Button>
-                        <Button type="button" variant="outline" onClick={handleBorrar}>
-                            Borrar
-                        </Button>
-                    </CardFooter>
-                </Card>
-            </form>
-        </Form>
-    );
+  const fetchData = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    const [seriesResponse, profileResponse] = await Promise.all([
+      getSeries(user.uid),
+      getCompanyProfile(user.uid)
+    ]);
+
+    if (seriesResponse.success && seriesResponse.data) {
+      const seriesData = seriesResponse.data.map((serie: any) => ({
+        ...serie,
+        id: serie.id,
+        createdAt: new Date(serie.createdAt).toISOString(),
+      })) as Serie[];
+      setSeries(seriesData);
+    } else {
+      toast({
+        title: "Error",
+        description: seriesResponse.message || "No se pudieron cargar las series.",
+        variant: "destructive",
+      });
+    }
+
+    if (profileResponse.success && profileResponse.data) {
+        setRfc(profileResponse.data.rfc);
+    }
+
+    setLoading(false);
+  }, [user, toast]);
+
+  useEffect(() => {
+    if (user) {
+      fetchData();
+    }
+  }, [user, fetchData]);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  }
+
+  return (
+    <Card className="flex flex-col flex-1">
+      <CardHeader className="p-2 border-b bg-muted/30">
+          <div className="flex items-center gap-4 flex-wrap">
+              <Button asChild size="sm" className="h-8">
+                  <Link href="/dashboard/settings/series/new">
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Agregar más folios
+                  </Link>
+              </Button>
+              <Button variant="outline" size="sm" className="h-8" onClick={fetchData} disabled={loading}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Recargar
+              </Button>
+          </div>
+      </CardHeader>
+      <CardContent className="p-0 flex-grow">
+        <div className="overflow-x-auto">
+          <Table>
+              <TableHeader>
+                <TableRow>
+                    <TableHead>RFC</TableHead>
+                    <TableHead>Serie</TableHead>
+                    <TableHead>Folio Inicial</TableHead>
+                    <TableHead>Folio Final</TableHead>
+                    <TableHead>Folio Inicio</TableHead>
+                    <TableHead>Folio Actual</TableHead>
+                    <TableHead>Folios Disponibles</TableHead>
+                    <TableHead>Fecha de creación</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+              {loading ? (
+                  <TableRow>
+                      <TableCell colSpan={9}>
+                        <Skeleton className="h-8 w-full" />
+                      </TableCell>
+                  </TableRow>
+              ) : series.length > 0 ? (
+                  series.map((serie) => (
+                  <TableRow key={serie.id}>
+                      <TableCell>{rfc || 'N/A'}</TableCell>
+                      <TableCell className="font-medium">{serie.serie}</TableCell>
+                      <TableCell>{serie.folio}</TableCell>
+                      <TableCell>&#8734;</TableCell>
+                      <TableCell>{serie.folio}</TableCell>
+                      <TableCell>{serie.folio}</TableCell>
+                      <TableCell>&#8734;</TableCell>
+                      <TableCell>{formatDate(serie.createdAt)}</TableCell>
+                      <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Eliminar</span>
+                          </Button>
+                           <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Pencil className="h-4 w-4" />
+                              <span className="sr-only">Editar</span>
+                          </Button>
+                      </TableCell>
+                  </TableRow>
+                  ))
+              ) : (
+                  <TableRow>
+                    <TableCell colSpan={9} className="text-center h-24">
+                      No has agregado ninguna serie.
+                    </TableCell>
+                  </TableRow>
+              )}
+              </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }

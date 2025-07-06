@@ -53,7 +53,7 @@ export const addSerie = async (formData: SerieFormValues, userId: string) => {
       userId,
     }).returning();
 
-    revalidatePath("/dashboard/settings");
+    revalidatePath("/dashboard/settings/series");
     
     return { success: true, data: data[0] };
   } catch (error) {

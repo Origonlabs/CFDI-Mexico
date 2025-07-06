@@ -407,7 +407,7 @@ export default function SettingsPage() {
                         </CardDescription>
                     </div>
                     <Button asChild size="sm" className="gap-1">
-                        <Link href="/dashboard/settings/series">
+                        <Link href="/dashboard/settings/series/new">
                            <PlusCircle className="h-3.5 w-3.5" />
                            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                                Agregar Serie
