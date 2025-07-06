@@ -189,16 +189,19 @@ export default function SettingsPage() {
                                   <FormField control={profileForm.control} name="phone" render={({ field }) => ( <FormItem><FormLabel>Teléfono</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
                                   <FormField control={profileForm.control} name="phone2" render={({ field }) => ( <FormItem><FormLabel>Teléfono 2</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
                                   <FormField control={profileForm.control} name="fax" render={({ field }) => ( <FormItem><FormLabel>Fax</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
-                                  <FormItem>
-                                      <FormLabel>Nombre</FormLabel>
+                                  <div className="space-y-2">
+                                      <Label>Nombre</Label>
                                       <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-                                  </FormItem>
-                                  <FormItem>
-                                      <FormLabel>Apellidos</FormLabel>
+                                  </div>
+                                  <div className="space-y-2">
+                                      <Label>Apellidos</Label>
                                       <Input value={lastName} onChange={(e) => setLastName(e.target.value)} />
-                                  </FormItem>
+                                  </div>
                                   <FormField control={profileForm.control} name="city" render={({ field }) => ( <FormItem><FormLabel>Ciudad</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
-                                  <FormItem><FormLabel>*Email</FormLabel><Input value={user?.email || ''} disabled/></FormItem>
+                                  <div className="space-y-2">
+                                    <Label>*Email</Label>
+                                    <Input value={user?.email || ''} disabled/>
+                                  </div>
                                   <FormField control={profileForm.control} name="web" render={({ field }) => ( <FormItem><FormLabel>Web</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
                               </div>
                           </div>
@@ -216,7 +219,10 @@ export default function SettingsPage() {
                    <Form {...passwordForm}>
                       <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-6">
                         <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
-                            <FormItem><FormLabel>Usuario</FormLabel><Input value={user?.email || ''} disabled /></FormItem>
+                            <div className="space-y-2">
+                                <Label>Usuario</Label>
+                                <Input value={user?.email || ''} disabled />
+                            </div>
                             <div></div>
                             <FormField control={passwordForm.control} name="currentPassword" render={({ field }) => ( <FormItem><FormLabel>*Contraseña Anterior</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             <div></div>
@@ -236,9 +242,18 @@ export default function SettingsPage() {
               <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
                   <div className="space-y-6">
                       <div className="grid md:grid-cols-2 gap-x-8 gap-y-4 max-w-lg">
-                        <FormItem><FormLabel>*Archivo .key de la Fiel:</FormLabel><Input type="file" /></FormItem>
-                        <FormItem><FormLabel>*Archivo .cer de la Fiel:</FormLabel><Input type="file" /></FormItem>
-                        <FormItem className="md:col-span-1"><FormLabel>*Contraseña de la Fiel:</FormLabel><Input type="password" /></FormItem>
+                        <div className="space-y-2">
+                          <Label>*Archivo .key de la Fiel:</Label>
+                          <Input type="file" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>*Archivo .cer de la Fiel:</Label>
+                          <Input type="file" />
+                        </div>
+                        <div className="space-y-2 md:col-span-1">
+                          <Label>*Contraseña de la Fiel:</Label>
+                          <Input type="password" />
+                        </div>
                       </div>
                       <div className="flex justify-end pt-4">
                           <Button variant="destructive" onClick={handleAccountDelete} disabled={isLoading}>Eliminar Cuenta</Button>
