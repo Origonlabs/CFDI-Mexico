@@ -64,6 +64,10 @@ interface SavedInvoice {
   xmlUrl?: string | null;
 }
 
+const relatedCfdiSchema = z.object({
+  uuid: z.string().uuid("Debe ser un UUID válido."),
+});
+
 const conceptSchema = z.object({
   productId: z.number(),
   satKey: z.string(),
@@ -88,6 +92,16 @@ const invoiceSchema = z.object({
   moneda: z.string().default("MXN"),
   condicionesPago: z.string().optional(),
   concepts: z.array(conceptSchema).min(1, "La factura debe tener al menos un concepto."),
+  relationType: z.string().optional(),
+  relatedCfdis: z.array(relatedCfdiSchema).optional(),
+}).refine(data => {
+    if (data.relatedCfdis && data.relatedCfdis.length > 0) {
+        return !!data.relationType;
+    }
+    return true;
+}, {
+    message: "Debes seleccionar un tipo de relación si agregas CFDI relacionados.",
+    path: ["relationType"],
 });
 
 type InvoiceFormValues = z.infer<typeof invoiceSchema>;
@@ -101,6 +115,7 @@ export default function NewInvoicePage() {
   const [loading, setLoading] = useState(true);
   const [savedInvoice, setSavedInvoice] = useState<SavedInvoice | null>(null);
   const [progress, setProgress] = useState(0);
+  const [tempUuid, setTempUuid] = useState("");
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
@@ -115,12 +130,19 @@ export default function NewInvoicePage() {
       metodoPago: "PUE",
       moneda: "MXN",
       concepts: [],
+      relationType: "",
+      relatedCfdis: [],
     },
   });
 
-  const { fields, append, remove, update } = useFieldArray({
+  const { fields: conceptFields, append: conceptAppend, remove: conceptRemove, update: conceptUpdate } = useFieldArray({
     control: form.control,
     name: "concepts",
+  });
+  
+  const { fields: cfdiFields, append: cfdiAppend, remove: cfdiRemove } = useFieldArray({
+      control: form.control,
+      name: "relatedCfdis"
   });
 
   const watchedConcepts = form.watch("concepts");
@@ -196,13 +218,13 @@ export default function NewInvoicePage() {
   const updateConcept = (index: number, newValues: Partial<InvoiceFormValues['concepts'][0]>) => {
     const concept = { ...form.getValues('concepts')[index], ...newValues };
     const amount = (concept.quantity * concept.unitPrice) - (concept.discount || 0);
-    update(index, { ...concept, amount });
+    conceptUpdate(index, { ...concept, amount });
   };
 
   const addProductToConcepts = (productId: string) => {
     const product = products.find(p => p.id.toString() === productId);
     if (product) {
-        append({
+        conceptAppend({
           productId: product.id,
           description: product.description,
           satKey: product.satKey,
@@ -320,10 +342,90 @@ export default function NewInvoicePage() {
                 <AccordionTrigger className="bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Información Global</AccordionTrigger>
                 <AccordionContent className="p-4 border border-t-0 rounded-b-lg"><p>Próximamente.</p></AccordionContent>
             </AccordionItem>
-             <AccordionItem value="cfdi-relacionados" disabled>
+             <AccordionItem value="cfdi-relacionados">
                 <AccordionTrigger className="bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">CFDI Relacionados</AccordionTrigger>
-                 <AccordionContent className="p-4 border border-t-0 rounded-b-lg"><p>Próximamente.</p></AccordionContent>
-            </AccordionItem>
+                <AccordionContent className="p-4 border border-t-0 rounded-b-lg space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="relationType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo Relación</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl><SelectTrigger><SelectValue placeholder="Seleccionar tipo de relación..." /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            <SelectItem value="01">01 - Nota de crédito de los documentos relacionados</SelectItem>
+                            <SelectItem value="02">02 - Nota de débito de los documentos relacionados</SelectItem>
+                            <SelectItem value="03">03 - Devolución de mercancía sobre facturas o traslados previos</SelectItem>
+                            <SelectItem value="04">04 - Sustitución de los CFDI previos</SelectItem>
+                            <SelectItem value="07">07 - CFDI por aplicación de anticipo</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex gap-2 items-end">
+                    <div className="flex-grow">
+                          <Label htmlFor="uuid-input">UUID a relacionar</Label>
+                          <Input 
+                              id="uuid-input"
+                              placeholder="Escribe o pega un UUID válido y presiona Agregar"
+                              value={tempUuid}
+                              onChange={(e) => setTempUuid(e.target.value)}
+                          />
+                    </div>
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      size="sm" 
+                      onClick={() => {
+                          if (tempUuid.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+                              cfdiAppend({ uuid: tempUuid });
+                              setTempUuid("");
+                          } else {
+                              toast({
+                                  title: "UUID Inválido",
+                                  description: "El formato del UUID no es correcto.",
+                                  variant: "destructive"
+                              })
+                          }
+                      }}
+                      disabled={!tempUuid || !form.watch("relationType")}
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4"/>
+                      Agregar
+                    </Button>
+                  </div>
+                  <FormMessage>{form.formState.errors.relatedCfdis?.message}</FormMessage>
+
+                  {cfdiFields.length > 0 && (
+                    <div className="rounded-md border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>UUID Relacionado</TableHead>
+                            <TableHead className="w-[50px] text-right">Acción</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {cfdiFields.map((field, index) => (
+                            <TableRow key={field.id}>
+                              <TableCell className="font-mono text-xs">{field.uuid}</TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="icon" type="button" className="h-8 w-8" onClick={() => cfdiRemove(index)}>
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                  <span className="sr-only">Eliminar UUID</span>
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
              <AccordionItem value="impuestos-locales" disabled>
                 <AccordionTrigger className="bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Impuestos Locales</AccordionTrigger>
                  <AccordionContent className="p-4 border border-t-0 rounded-b-lg"><p>Próximamente.</p></AccordionContent>
@@ -433,7 +535,7 @@ export default function NewInvoicePage() {
           <Card className="mt-4">
             <CardHeader>
               <div className="flex items-center gap-4">
-                <Button type="button" variant="outline" size="sm" onClick={() => addProductToConcepts("")}>
+                <Button type="button" variant="outline" size="sm" onClick={() => conceptAppend({ productId: 0, description: "", satKey: "", unitKey: "", quantity: 1, unitPrice: 0, discount: 0, objetoImpuesto: '02', amount: 0 })}>
                   <PlusCircle className="mr-2 h-4 w-4" />
                    Agregar partida (productos y servicios) al documento
                 </Button>
@@ -462,14 +564,14 @@ export default function NewInvoicePage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {fields.map((field, index) => {
+                    {conceptFields.map((field, index) => {
                       const itemSubtotal = field.quantity * field.unitPrice;
                       const itemDiscount = field.discount || 0;
                       const itemTax = (itemSubtotal - itemDiscount) * 0.16;
 
                       return (
                       <TableRow key={field.id}>
-                        <TableCell><Button variant="ghost" size="icon" type="button" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                        <TableCell><Button variant="ghost" size="icon" type="button" onClick={() => conceptRemove(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                         <TableCell><Input value={field.satKey} onChange={e => updateConcept(index, { satKey: e.target.value })}/></TableCell>
                         <TableCell><Input value={field.description} onChange={e => updateConcept(index, { description: e.target.value })} /></TableCell>
                         <TableCell><Input value={field.unitKey} onChange={e => updateConcept(index, { unitKey: e.target.value })}/></TableCell>
@@ -492,7 +594,7 @@ export default function NewInvoicePage() {
                         </TableCell>
                       </TableRow>
                     )})}
-                    {fields.length === 0 && (<TableRow><TableCell colSpan={10} className="text-center h-24">Agrega productos del catálogo o una nueva partida.</TableCell></TableRow>)}
+                    {conceptFields.length === 0 && (<TableRow><TableCell colSpan={10} className="text-center h-24">Agrega productos del catálogo o una nueva partida.</TableCell></TableRow>)}
                   </TableBody>
                 </Table>
               </div>
