@@ -7,11 +7,12 @@ import * as z from "zod";
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { onAuthStateChanged, User, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
-import { Check } from "lucide-react";
+import { Check, XCircle, AlertTriangle } from "lucide-react";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getCompanyProfile, saveCompanyProfile } from "@/app/actions/companies";
+import { getCertificateDetails } from "@/app/actions/setup";
 import { profileFormSchema, type ProfileFormValues, passwordChangeSchema, type PasswordChangeValues } from "@/lib/schemas";
 
 import { Button } from "@/components/ui/button";
@@ -28,10 +29,19 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
+interface Certificate {
+    id: number;
+    certificateNumber: string;
+    validFrom: string;
+    validTo: string;
+    status: 'active' | 'revoked' | 'expired';
+}
+
 export default function SettingsPage() {
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [certificate, setCertificate] = useState<Certificate | null>(null);
 
   // User profile state
   const [firstName, setFirstName] = useState('');
@@ -73,11 +83,19 @@ export default function SettingsPage() {
   }, []);
 
   const fetchProfile = useCallback(async (uid: string) => {
-      const response = await getCompanyProfile(uid);
-      if (response.success && response.data) {
-        profileForm.reset(response.data as any);
-      } else if (!response.success && response.message) {
-        // toast({ title: "Error al cargar perfil", description: response.message, variant: "destructive" });
+      const [profileResponse, certificateResponse] = await Promise.all([
+          getCompanyProfile(uid),
+          getCertificateDetails(uid)
+      ]);
+      
+      if (profileResponse.success && profileResponse.data) {
+        profileForm.reset(profileResponse.data as any);
+      } else if (!profileResponse.success && profileResponse.message) {
+        // toast({ title: "Error al cargar perfil", description: profileResponse.message, variant: "destructive" });
+      }
+
+      if (certificateResponse.success && certificateResponse.data) {
+          setCertificate(certificateResponse.data as Certificate);
       }
   }, [profileForm]);
 
@@ -127,6 +145,25 @@ export default function SettingsPage() {
         variant: "default",
     })
   }
+
+  const CertificateStatusBadge = ({ status }: { status: 'active' | 'revoked' | 'expired' | null }) => {
+    if (!status) return <Badge variant="secondary">Desconocido</Badge>;
+
+    const config = {
+        active: { label: 'Activo', variant: 'default' as const, icon: <Check className="mr-1 h-3.5 w-3.5" /> },
+        revoked: { label: 'Revocado', variant: 'destructive' as const, icon: <XCircle className="mr-1 h-3.5 w-3.5" /> },
+        expired: { label: 'Expirado', variant: 'secondary' as const, icon: <AlertTriangle className="mr-1 h-3.5 w-3.5" /> },
+    };
+
+    const currentConfig = config[status];
+
+    return (
+        <Badge variant={currentConfig.variant}>
+            {currentConfig.icon}
+            {currentConfig.label}
+        </Badge>
+    );
+  };
   
   const isLoading = loading || profileForm.formState.isSubmitting || passwordForm.formState.isSubmitting;
 
@@ -281,17 +318,22 @@ export default function SettingsPage() {
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            <TableRow>
-                              <TableCell className="font-mono text-sm">30001000000500003416</TableCell>
-                              <TableCell>02/02/2023</TableCell>
-                              <TableCell>02/02/2027</TableCell>
-                              <TableCell>
-                                <Badge variant="default">
-                                    <Check className="mr-1 h-4 w-4" />
-                                    Activo
-                                </Badge>
-                              </TableCell>
-                            </TableRow>
+                            {certificate ? (
+                                <TableRow>
+                                    <TableCell className="font-mono text-sm">{certificate.certificateNumber}</TableCell>
+                                    <TableCell>{new Date(certificate.validFrom).toLocaleDateString('es-MX')}</TableCell>
+                                    <TableCell>{new Date(certificate.validTo).toLocaleDateString('es-MX')}</TableCell>
+                                    <TableCell>
+                                        <CertificateStatusBadge status={certificate.status} />
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="h-24 text-center">
+                                        No hay ningún certificado instalado.
+                                    </TableCell>
+                                </TableRow>
+                            )}
                           </TableBody>
                         </Table>
                       </div>
