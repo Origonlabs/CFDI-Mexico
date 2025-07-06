@@ -119,6 +119,10 @@ export const savePayment = async (formData: PaymentFormValues, userId: string) =
             totalAmount: restOfData.totalPago.toString(),
             operationNumber: restOfData.numeroOperacion,
             status: 'draft',
+            relationType: restOfData.relationType,
+            relatedCfdis: restOfData.relatedCfdis && restOfData.relatedCfdis.length > 0
+                ? JSON.stringify(restOfData.relatedCfdis)
+                : null,
         }).returning({ id: payments.id, serie: payments.serie, folio: payments.folio });
 
         if (!newPayment) {

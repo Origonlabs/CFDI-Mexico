@@ -124,6 +124,8 @@ export const payments = pgTable('payments', {
   pdfUrl: text('pdf_url'),
   xmlUrl: text('xml_url'),
   operationNumber: varchar('operation_number', { length: 100 }),
+  relationType: varchar('relation_type', { length: 2 }),
+  relatedCfdis: text('related_cfdis'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
