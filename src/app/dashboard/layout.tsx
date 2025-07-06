@@ -184,7 +184,7 @@ export default function DashboardLayout({
         </div>
       </header>
       <div className="flex flex-1 overflow-hidden">
-        <aside className="hidden w-56 flex-col border-r bg-[#EBEBEB] text-neutral-800 md:flex">
+        <aside className="hidden w-60 flex-col border-r bg-[#EBEBEB] text-neutral-800 md:flex">
           <div className="flex-1 overflow-y-auto">
             <nav className="grid items-start p-4 text-sm font-medium">
               <SidebarContent />
