@@ -7,6 +7,7 @@ interface StarBorderProps extends React.HTMLAttributes<HTMLDivElement> {
   color?: string;
   speed?: string;
   thickness?: number;
+  borderRadius?: number;
   children: React.ReactNode;
 }
 
@@ -17,12 +18,13 @@ const StarBorder = React.forwardRef<HTMLDivElement, StarBorderProps>(
       color = 'hsl(var(--primary))',
       speed = '6s',
       thickness = 1,
+      borderRadius = 12,
       children,
       ...props
     },
     ref
   ) => {
-    const outerRadius = 12;
+    const outerRadius = borderRadius;
     const innerRadius = outerRadius - thickness;
 
     return (
