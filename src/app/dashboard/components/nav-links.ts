@@ -31,7 +31,7 @@ export const navigationLinks = [
     title: "Empresa",
     icon: Building,
     sublinks: [
-      { href: "/dashboard/clients", label: "Crear Clientes" },
+      { href: "/dashboard/clients/new", label: "Crear Clientes" },
       { href: "/dashboard/clients", label: "Listar Clientes" },
       { href: "/dashboard/products", label: "Crear Productos" },
       { href: "/dashboard/products", label: "Listar Productos" },

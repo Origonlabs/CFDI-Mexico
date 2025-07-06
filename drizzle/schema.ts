@@ -10,6 +10,21 @@ export const clients = pgTable('clients', {
   zip: varchar('zip', { length: 5 }).notNull(),
   taxRegime: varchar('tax_regime', { length: 10 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+
+  // New fields from image
+  country: text('country'),
+  state: text('state'),
+  municipality: text('municipality'),
+  city: text('city'),
+  neighborhood: text('neighborhood'),
+  street: text('street'),
+  exteriorNumber: varchar('exterior_number', { length: 50 }),
+  interiorNumber: varchar('interior_number', { length: 50 }),
+  phone: varchar('phone', { length: 20 }),
+  paymentMethod: varchar('payment_method', { length: 3 }),
+  paymentForm: varchar('payment_form', { length: 3 }),
+  usoCfdi: varchar('uso_cfdi', { length: 4 }),
+  reference: text('reference'),
 });
 
 export const companies = pgTable('companies', {
@@ -41,7 +56,7 @@ export const invoices = pgTable('invoices', {
   clientId: integer('client_id').references(() => clients.id).notNull(),
   serie: varchar('serie', { length: 10 }).notNull(),
   folio: integer('folio').notNull(),
-  usoCfdi: varchar('uso_cfdi', { length: 3 }).notNull(),
+  usoCfdi: varchar('uso_cfdi', { length: 4 }).notNull(),
   formaPago: varchar('forma_pago', { length: 3 }).notNull(),
   metodoPago: varchar('metodo_pago', { length: 3 }).notNull(),
   condicionesPago: text('condiciones_pago'),
