@@ -46,7 +46,7 @@ export const navigationLinks = [
     icon: Settings,
     sublinks: [
       { href: "/dashboard/settings", label: "Instalar Certificados" },
-      { href: "#", label: "Tipos de documentos" },
+      { href: "/dashboard/settings/document-types", label: "Tipos de documentos" },
     ],
   },
   {
