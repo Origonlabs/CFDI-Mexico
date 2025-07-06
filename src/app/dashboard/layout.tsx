@@ -34,14 +34,13 @@ import {
   SidebarContent,
   SidebarInset,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuButton,
   SidebarMenuSub,
   SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarProvider,
-  SidebarRail,
   SidebarTrigger,
+  SidebarMenuSubItem
 } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { auth } from '@/lib/firebase/client';
@@ -74,13 +73,13 @@ export default function DashboardLayout({
       <div className="!flex-col min-h-screen w-full">
          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4">
            <div className="flex items-center gap-2">
-             <SidebarTrigger className="md:hidden -ml-1" />
              <Link href="/" className="flex items-center gap-2 font-semibold">
                 <OrigonLogo className="h-6 w-6 text-primary" />
                 <span className="font-headline text-base hidden sm:inline-block">Origon CFDI</span>
              </Link>
            </div>
           <div className="ml-auto flex items-center gap-2">
+             <SidebarTrigger className="md:hidden -ml-1" />
              <ThemeToggle />
              <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -128,51 +127,50 @@ export default function DashboardLayout({
         
         <div className="flex flex-1">
             <Sidebar collapsible="icon" className="md:w-56">
-                <SidebarContent className="pt-4">
-                <SidebarMenu>
-                    {navigationLinks.map((item, index) => (
-                    <Collapsible
-                        key={index}
-                        asChild
-                        defaultOpen={isSublinkActive(item.sublinks, pathname)}
-                        className="group/collapsible"
-                    >
-                        <SidebarMenuItem>
-                        <CollapsibleTrigger asChild>
-                            <SidebarMenuButton tooltip={item.title}>
-                            {item.icon && <item.icon />}
-                            <span className="group-data-[collapsible=icon]:hidden">
-                                {item.title}
-                            </span>
-                            <ChevronRight className="ml-auto transition-transform duration-300 group-data-[state=open]/collapsible:rotate-90 group-data-[collapsible=icon]:hidden" />
-                            </SidebarMenuButton>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                            <SidebarMenuSub>
-                            {item.sublinks?.map((subItem) => (
-                                <SidebarMenuSubItem key={subItem.label}>
-                                <SidebarMenuSubButton
-                                    asChild
-                                    isActive={pathname === subItem.href}
-                                >
-                                    <Link href={subItem.href}>
-                                    <span>{subItem.label}</span>
-                                    </Link>
-                                </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                            ))}
-                            </SidebarMenuSub>
-                        </CollapsibleContent>
-                        </SidebarMenuItem>
-                    </Collapsible>
-                    ))}
-                </SidebarMenu>
+                <SidebarContent>
+                  <SidebarMenu>
+                      {navigationLinks.map((item, index) => (
+                      <Collapsible
+                          key={index}
+                          asChild
+                          defaultOpen={isSublinkActive(item.sublinks, pathname)}
+                          className="group/collapsible"
+                      >
+                          <SidebarMenuItem>
+                          <CollapsibleTrigger asChild>
+                              <SidebarMenuButton tooltip={item.title}>
+                              {item.icon && <item.icon />}
+                              <span className="group-data-[collapsible=icon]:hidden">
+                                  {item.title}
+                              </span>
+                              <ChevronRight className="ml-auto transition-transform duration-300 group-data-[state=open]/collapsible:rotate-90 group-data-[collapsible=icon]:hidden" />
+                              </SidebarMenuButton>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                              <SidebarMenuSub>
+                              {item.sublinks?.map((subItem) => (
+                                  <SidebarMenuSubItem key={subItem.label}>
+                                  <SidebarMenuSubButton
+                                      asChild
+                                      isActive={pathname === subItem.href}
+                                  >
+                                      <Link href={subItem.href}>
+                                      <span>{subItem.label}</span>
+                                      </Link>
+                                  </SidebarMenuSubButton>
+                                  </SidebarMenuSubItem>
+                              ))}
+                              </SidebarMenuSub>
+                          </CollapsibleContent>
+                          </SidebarMenuItem>
+                      </Collapsible>
+                      ))}
+                  </SidebarMenu>
                 </SidebarContent>
-                <SidebarRail />
             </Sidebar>
 
             <SidebarInset>
-                <main className="flex flex-1 flex-col overflow-auto">
+                <main className="flex flex-1 flex-col overflow-auto p-4 lg:p-6">
                     {children}
                 </main>
             </SidebarInset>
