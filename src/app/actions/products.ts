@@ -7,6 +7,7 @@ import { products } from "../../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { productSchema, type ProductFormValues } from "@/lib/schemas";
+import { getRateLimiter } from "@/lib/rate-limiter";
 
 export const getProducts = async (userId: string) => {
   if (!db) {
@@ -25,6 +26,12 @@ export const getProducts = async (userId: string) => {
 };
 
 export const addProduct = async (formData: ProductFormValues, userId: string) => {
+  const ratelimit = getRateLimiter();
+  const { success: rateLimitSuccess } = await ratelimit.limit(userId);
+  if (!rateLimitSuccess) {
+      return { success: false, message: "Demasiadas solicitudes. Por favor, inténtalo de nuevo más tarde." };
+  }
+  
   if (!db) {
     return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
   }

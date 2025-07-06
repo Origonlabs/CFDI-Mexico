@@ -14,6 +14,7 @@ import { Buffer } from 'buffer';
 import { numeroALetras } from 'numero-a-letras';
 import { stampWithFacturaLoPlus } from "@/lib/pac";
 import { invoiceSchema, type InvoiceFormValues } from "@/lib/schemas";
+import { getRateLimiter } from "@/lib/rate-limiter";
 
 export const getInvoices = async (userId: string) => {
   if (!db) {
@@ -142,6 +143,12 @@ export const getDeletedInvoices = async (userId: string) => {
 };
 
 export const saveInvoice = async (formData: InvoiceFormValues, userId: string) => {
+  const ratelimit = getRateLimiter();
+  const { success: rateLimitSuccess } = await ratelimit.limit(userId);
+  if (!rateLimitSuccess) {
+      return { success: false, message: "Demasiadas solicitudes. Por favor, inténtalo de nuevo más tarde." };
+  }
+  
   if (!db) {
     return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
   }
@@ -209,6 +216,12 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
 
 
 export const stampInvoice = async (invoiceId: number, userId: string) => {
+    const ratelimit = getRateLimiter();
+    const { success: rateLimitSuccess } = await ratelimit.limit(userId);
+    if (!rateLimitSuccess) {
+        return { success: false, message: "Demasiadas solicitudes. Por favor, inténtalo de nuevo más tarde." };
+    }
+
     if (!db) {
         return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
     }

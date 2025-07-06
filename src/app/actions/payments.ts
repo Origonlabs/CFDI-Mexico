@@ -7,6 +7,7 @@ import { payments, paymentDocuments, clients } from "../../../drizzle/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { paymentSchema, type PaymentFormValues } from "@/lib/schemas";
+import { getRateLimiter } from "@/lib/rate-limiter";
 
 export const getPayments = async (userId: string) => {
   if (!db) {
@@ -47,6 +48,12 @@ export const getPayments = async (userId: string) => {
 };
 
 export const savePayment = async (formData: PaymentFormValues, userId: string) => {
+    const ratelimit = getRateLimiter();
+    const { success: rateLimitSuccess } = await ratelimit.limit(userId);
+    if (!rateLimitSuccess) {
+        return { success: false, message: "Demasiadas solicitudes. Por favor, inténtalo de nuevo más tarde." };
+    }
+    
     if (!db) {
         return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
     }
