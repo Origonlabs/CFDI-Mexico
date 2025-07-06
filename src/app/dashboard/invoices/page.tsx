@@ -1,8 +1,7 @@
 
 "use client";
 
-import Link from "next/link"
-import { MoreHorizontal, PlusCircle, FileDown, Mail, Download } from "lucide-react"
+import { MoreHorizontal, Download, Mail, Filter, Plus, Archive, ListFilter, XCircle, ChevronLeft, ChevronRight, Eye, Sheet, File as FileIcon, ChevronFirst, ChevronLast, ChevronDown } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { User } from "firebase/auth"
 
@@ -15,17 +14,19 @@ import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardDescription
 } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import {
   Table,
@@ -36,15 +37,21 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input"
 
 interface Invoice {
   id: number;
   clientName: string | null;
+  clientRfc: string | null;
+  clientEmail: string | null;
   status: 'draft' | 'stamped' | 'canceled';
   createdAt: Date;
   total: string;
   pdfUrl?: string | null;
   xmlUrl?: string | null;
+  serie: string;
+  folio: number;
+  metodoPago: string | null;
 }
 
 export default function InvoicesPage() {
@@ -188,7 +195,7 @@ export default function InvoicesPage() {
   }
   
   const formatCurrency = (amount: string) => {
-     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(parseFloat(amount));
+     return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(parseFloat(amount));
   }
 
   const formatDate = (date: Date | string) => {
@@ -201,127 +208,149 @@ export default function InvoicesPage() {
 
   return (
     <div className="flex flex-col flex-1 gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold font-headline">Facturas</h1>
-        <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" className="gap-1">
-              <FileDown className="h-3.5 w-3.5" />
-              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Exportar
-              </span>
-            </Button>
-            <Button size="sm" className="gap-1" asChild>
-                <Link href="/dashboard/invoices/new">
-                    <PlusCircle className="h-3.5 w-3.5" />
-                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Nueva Factura
-                    </span>
-                </Link>
-            </Button>
-        </div>
-      </div>
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">Historial de Facturas</CardTitle>
-          <CardDescription>
-            Administra tus facturas emitidas y consulta su estado.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead className="hidden md:table-cell">Tipo</TableHead>
-                <TableHead className="hidden md:table-cell">Fecha</TableHead>
-                <TableHead className="text-right">Monto</TableHead>
-                <TableHead>
-                  <span className="sr-only">Acciones</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-               {loading ? (
-                Array.from({ length: 4 }).map((_, index) => (
-                  <TableRow key={index}>
-                    <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-20" /></TableCell>
-                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
-                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
-                    <TableCell className="text-right"><Skeleton className="h-5 w-20 ml-auto" /></TableCell>
-                    <TableCell><div className="flex justify-end"><Skeleton className="h-8 w-8 rounded-full" /></div></TableCell>
-                  </TableRow>
-                ))
-              ) : invoices.length > 0 ? (
-                invoices.map((invoice) => (
-                  <TableRow key={invoice.id}>
-                    <TableCell className="font-medium">{invoice.clientName ?? 'N/A'}</TableCell>
-                    <TableCell>
-                      <Badge variant={getBadgeVariant(invoice.status)}>{getStatusLabel(invoice.status)}</Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">Ingreso</TableCell>
-                    <TableCell className="hidden md:table-cell">{formatDate(invoice.createdAt)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(invoice.total)}</TableCell>
-                    <TableCell>
-                      <div className="flex justify-end">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button aria-haspopup="true" size="icon" variant="ghost" disabled={downloading === invoice.id}>
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => handleDownloadPdf(invoice)} disabled={downloading === invoice.id}>
-                                <Download className="mr-2 h-4 w-4" />
-                                Descargar PDF
-                              </DropdownMenuItem>
-                               <DropdownMenuItem onClick={() => handleDownloadXml(invoice)} disabled={downloading === invoice.id}>
-                                <Download className="mr-2 h-4 w-4" />
-                                Descargar XML
-                              </DropdownMenuItem>
-                              {invoice.status === 'draft' && (
-                                <>
-                                  <DropdownMenuItem>Editar</DropdownMenuItem>
-                                  <DropdownMenuItem>Eliminar</DropdownMenuItem>
-                                </>
-                              )}
-                              {invoice.status === 'stamped' && (
-                                <>
-                                  <DropdownMenuItem>Ver detalle</DropdownMenuItem>
-                                  <DropdownMenuItem>
-                                    <Mail className="mr-2 h-4 w-4" />
-                                    <span>Enviar por correo</span>
-                                  </DropdownMenuItem>
-                                </>
-                              )}
-                              {invoice.status === 'canceled' && (
-                                <DropdownMenuItem>Ver detalle</DropdownMenuItem>
-                              )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center h-24">
-                    No has creado ninguna factura.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-        <CardFooter>
-          <div className="text-xs text-muted-foreground">
-            Mostrando <strong>{invoices.length}</strong> {invoices.length === 1 ? "factura" : "facturas"}.
-          </div>
-        </CardFooter>
-      </Card>
+        <h1 className="text-lg font-bold font-headline">Listar Facturas</h1>
+        <Card className="flex flex-col flex-1">
+            <CardHeader className="p-2 border-b">
+                <span className="text-sm">Mostrando documentos: Mes-Año: {new Date().toLocaleString('es-MX', { month: 'short', year: 'numeric' }).toUpperCase()}</span>
+            </CardHeader>
+            <CardContent className="p-2 border-b bg-muted/30 flex flex-wrap items-center gap-2">
+                <div className="flex items-center space-x-2">
+                    <Checkbox id="filter-pay" />
+                    <Label htmlFor="filter-pay" className="text-xs font-normal">Filtrar CFDI a Pagar</Label>
+                </div>
+                <Button size="sm" variant="outline" className="text-xs h-7"><Plus className="mr-1 h-3.5 w-3.5" />Crear REP</Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button size="sm" variant="outline" className="text-xs h-7">Exportar listado <ChevronDown className="ml-1 h-3.5 w-3.5" /></Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem><FileIcon className="mr-2 h-4 w-4" /> Exportar PDF</DropdownMenuItem>
+                        <DropdownMenuItem><Sheet className="mr-2 h-4 w-4" /> Exportar Excel</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                <Button size="sm" variant="outline" className="text-xs h-7"><Archive className="mr-1 h-3.5 w-3.5" />Descargar ZIP</Button>
+                <div className="flex-grow"></div>
+                <Button size="sm" variant="outline" className="text-xs h-7"><Filter className="mr-1 h-3.5 w-3.5" />Filtrar</Button>
+                <Button size="sm" variant="outline" className="text-xs h-7"><ListFilter className="mr-1 h-3.5 w-3.5" />Mostrar todos</Button>
+                <Button size="sm" variant="destructive" className="text-xs h-7"><XCircle className="mr-1 h-3.5 w-3.5" />Cancelar seleccionados</Button>
+            </CardContent>
+            
+            <div className="flex-grow overflow-auto">
+                <Table>
+                <TableHeader>
+                    <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="w-12"><Checkbox /></TableHead>
+                    <TableHead>Vista</TableHead>
+                    <TableHead>Versión</TableHead>
+                    <TableHead>Folio</TableHead>
+                    <TableHead>UUID</TableHead>
+                    <TableHead>Confirmación</TableHead>
+                    <TableHead>RFC</TableHead>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead>Tipo CFDI</TableHead>
+                    <TableHead>Serie</TableHead>
+                    <TableHead>Monto</TableHead>
+                    <TableHead>Moneda</TableHead>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>Saldo</TableHead>
+                    <TableHead>Estado PAC</TableHead>
+                    <TableHead>Estado SAT</TableHead>
+                    <TableHead>CFDI Pagado</TableHead>
+                    <TableHead>Referencia</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Vigencia</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {loading ? (
+                        Array.from({ length: 5 }).map((_, index) => (
+                        <TableRow key={index}>
+                            <TableCell colSpan={21}><Skeleton className="h-5 w-full" /></TableCell>
+                        </TableRow>
+                        ))
+                    ) : invoices.length > 0 ? (
+                        invoices.map((invoice) => (
+                        <TableRow key={invoice.id}>
+                            <TableCell><Checkbox /></TableCell>
+                            <TableCell><Button variant="ghost" size="icon" className="h-6 w-6"><Eye className="h-4 w-4" /></Button></TableCell>
+                            <TableCell>4.0</TableCell>
+                            <TableCell>{invoice.folio}</TableCell>
+                            <TableCell className="font-mono text-xs">...{invoice.id.toString().padStart(8, '0')}</TableCell> 
+                            <TableCell>N/A</TableCell>
+                            <TableCell>{invoice.clientRfc}</TableCell>
+                            <TableCell className="font-medium truncate max-w-32">{invoice.clientName}</TableCell>
+                            <TableCell>Factura</TableCell>
+                            <TableCell>{invoice.serie}</TableCell>
+                            <TableCell className="text-right">{formatCurrency(invoice.total)}</TableCell>
+                            <TableCell>MXN</TableCell>
+                            <TableCell>{formatDate(invoice.createdAt)}</TableCell>
+                            <TableCell className="text-right">{invoice.metodoPago === 'PPD' ? formatCurrency(invoice.total) : formatCurrency("0")}</TableCell>
+                            <TableCell><Badge variant={getBadgeVariant(invoice.status)}>{getStatusLabel(invoice.status)}</Badge></TableCell>
+                            <TableCell><Badge variant="secondary">N/A</Badge></TableCell>
+                            <TableCell>{invoice.metodoPago === 'PUE' ? 'SI' : 'NO'}</TableCell>
+                            <TableCell>N/A</TableCell>
+                            <TableCell>{invoice.clientEmail}</TableCell>
+                            <TableCell>N/A</TableCell>
+                            <TableCell>
+                            <div className="flex justify-end">
+                                <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button aria-haspopup="true" size="icon" variant="ghost" disabled={downloading === invoice.id}>
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">Toggle menu</span>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                                    <DropdownMenuItem onClick={() => handleDownloadPdf(invoice)} disabled={downloading === invoice.id || !invoice.pdfUrl}>
+                                        <Download className="mr-2 h-4 w-4" />
+                                        Descargar PDF
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleDownloadXml(invoice)} disabled={downloading === invoice.id || !invoice.xmlUrl}>
+                                        <Download className="mr-2 h-4 w-4" />
+                                        Descargar XML
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem><Mail className="mr-2 h-4 w-4" />Enviar por correo</DropdownMenuItem>
+                                    <DropdownMenuItem className="text-destructive"><XCircle className="mr-2 h-4 w-4" />Cancelar CFDI</DropdownMenuItem>
+                                </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+                            </TableCell>
+                        </TableRow>
+                        ))
+                    ) : (
+                        <TableRow>
+                        <TableCell colSpan={21} className="text-center h-24">
+                            No hay CFDIs para mostrar
+                        </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+                </Table>
+            </div>
+
+            <div className="p-2 border-t bg-muted/30 flex justify-between items-center text-xs">
+                <div className="flex items-center gap-2">
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronFirst className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronLeft className="h-4 w-4" /></Button>
+                    <span>Página 1 de {Math.ceil(invoices.length / 10)}</span>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronRight className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronLast className="h-4 w-4" /></Button>
+                </div>
+                <div className="flex items-center gap-4">
+                    <span>Comprobante Versión: Factura 4.0</span>
+                    <div className="flex items-center gap-1">
+                        <Label>Mes/Año:</Label>
+                        <Input type="month" className="h-6 text-xs w-32" defaultValue={new Date().toISOString().substring(0, 7)} />
+                    </div>
+                </div>
+                <div className="text-muted-foreground">
+                    {invoices.length > 0 ? `Mostrando ${invoices.length} CFDIs` : 'No hay CFDIs para mostrar'}
+                </div>
+            </div>
+        </Card>
     </div>
   )
 }

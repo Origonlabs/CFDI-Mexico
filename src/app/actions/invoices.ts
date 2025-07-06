@@ -52,11 +52,16 @@ export const getInvoices = async (userId: string) => {
       .select({
         id: invoices.id,
         clientName: clients.name,
+        clientRfc: clients.rfc,
+        clientEmail: clients.email,
         status: invoices.status,
         createdAt: invoices.createdAt,
         total: invoices.total,
         pdfUrl: invoices.pdfUrl,
         xmlUrl: invoices.xmlUrl,
+        serie: invoices.serie,
+        folio: invoices.folio,
+        metodoPago: invoices.metodoPago,
       })
       .from(invoices)
       .leftJoin(clients, eq(invoices.clientId, clients.id))
