@@ -229,7 +229,7 @@ export default function SettingsPage() {
 
 
   return (
-    <div className="mx-auto w-full max-w-4xl p-4 md:p-8">
+    <div className="mx-auto w-full max-w-4xl">
       <h1 className="text-lg font-bold font-headline mb-6">Configuración</h1>
       <Tabs defaultValue="profile">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
