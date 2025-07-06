@@ -24,7 +24,7 @@ export const navigationLinks = [
     sublinks: [
       { href: "/dashboard/payments/new", label: "Crear Pagos 4.0" },
       { href: "/dashboard/payments", label: "Listar Pagos" },
-      { href: "#", label: "Listar Pagos Cancelados" },
+      { href: "/dashboard/payments/canceled", label: "Listar Pagos Cancelados" },
     ],
   },
   {
