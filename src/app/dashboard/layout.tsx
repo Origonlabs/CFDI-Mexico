@@ -54,8 +54,8 @@ export default function DashboardLayout({
   const [openCategory, setOpenCategory] = React.useState<string | undefined>();
 
   React.useEffect(() => {
-    const activeItem = navigationLinks.find((item) =>
-      item.sublinks.some((link) => link.href !== '#' && pathname.startsWith(link.href))
+    const activeItem = navigationLinks.find((item: any) =>
+      item.sublinks?.some((link: any) => link.href !== '#' && pathname.startsWith(link.href))
     );
     setOpenCategory(activeItem?.title);
   }, [pathname]);
@@ -87,7 +87,7 @@ export default function DashboardLayout({
   const mainLinks = navigationLinks.slice(0, -1);
   // We will handle settings link separately as a dropdown.
 
-  const renderLinkGroup = (item: (typeof navigationLinks)[0]) => (
+  const renderLinkGroup = (item: any) => (
     <Collapsible
       key={item.title}
       open={openCategory === item.title}
@@ -109,7 +109,7 @@ export default function DashboardLayout({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="mt-1 ml-4 flex flex-col gap-1 border-l pl-4">
-            {item.sublinks?.map((subItem) => (
+            {item.sublinks?.map((subItem: any) => (
               <Button
                 key={subItem.label}
                 asChild
@@ -216,7 +216,27 @@ export default function DashboardLayout({
         <aside className="hidden w-[240px] flex-col border-r bg-[#EBEBEB] text-neutral-800 md:flex">
           <div className="flex-1 overflow-y-auto p-4">
             <nav className="grid items-start gap-1 text-sm font-medium">
-              {mainLinks.map(renderLinkGroup)}
+              {mainLinks.map((item: any) =>
+                item.sublinks ? (
+                  renderLinkGroup(item)
+                ) : (
+                  <Button
+                    key={item.title}
+                    asChild
+                    variant="ghost"
+                    className={cn(
+                      'w-full justify-start gap-2 px-2',
+                      pathname === item.href &&
+                        'bg-accent text-accent-foreground'
+                    )}
+                  >
+                    <Link href={item.href}>
+                      {item.icon && <item.icon className="h-4 w-4" />}
+                      <span>{item.title}</span>
+                    </Link>
+                  </Button>
+                )
+              )}
             </nav>
           </div>
           <div className="shrink-0 border-t p-4">

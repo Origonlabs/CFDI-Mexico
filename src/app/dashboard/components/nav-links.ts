@@ -5,9 +5,15 @@ import {
   Building,
   Database,
   HelpCircle,
+  Home,
 } from "lucide-react";
 
 export const navigationLinks = [
+  {
+    title: "Inicio",
+    icon: Home,
+    href: "/dashboard",
+  },
   {
     title: "CFDI",
     icon: FileText,
