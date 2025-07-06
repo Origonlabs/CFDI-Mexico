@@ -84,3 +84,22 @@ export const getCanceledPayments = async (userId: string) => {
     return { success: false, message: `Error al obtener los pagos cancelados. Verifique la consola del servidor para más detalles: ${errorMessage}` };
   }
 };
+
+export const getDeletedPayments = async (userId: string) => {
+  if (!db) {
+    return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
+  }
+  try {
+    if (!userId) {
+      return { success: false, message: "Usuario no autenticado." };
+    }
+    // For now, this will return no documents as there is no "deleted" state.
+    // This matches the requested UI.
+    const data: any[] = [];
+    return { success: true, data };
+  } catch (error) {
+    console.error("Database Error (getDeletedPayments):", error);
+    const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
+    return { success: false, message: `Error al obtener los pagos eliminados. Verifique la consola del servidor para más detalles: ${errorMessage}` };
+  }
+};

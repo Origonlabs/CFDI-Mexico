@@ -54,7 +54,7 @@ export const navigationLinks = [
     icon: Database,
     sublinks: [
       { href: "/dashboard/storage/deleted-invoices", label: "Listar CFDI Eliminados" },
-      { href: "#", label: "Listar Pagos Eliminados" },
+      { href: "/dashboard/storage/deleted-payments", label: "Listar Pagos Eliminados" },
     ],
   },
   {
