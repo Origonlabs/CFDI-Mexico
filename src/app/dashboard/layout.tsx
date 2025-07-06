@@ -6,7 +6,14 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { signOut as firebaseSignOut } from 'firebase/auth';
-import { ChevronRight, LogOut } from 'lucide-react';
+import {
+  ChevronRight,
+  LogOut,
+  ChevronDown,
+  Search,
+  Bell,
+  CircleHelp,
+} from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -28,6 +35,7 @@ import { navigationLinks } from './components/nav-links';
 import { Button } from '@/components/ui/button';
 import { OrigonLogo } from '@/components/logo';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
 
 const SidebarContent = () => {
   const pathname = usePathname();
@@ -100,42 +108,66 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen w-full flex-col">
-      <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-neutral-700 bg-[#1A1A1A] px-4 text-primary-foreground">
-        <Link
-          href="/"
-          className="flex items-center gap-2 font-semibold text-current"
-        >
-          <OrigonLogo className="h-6 w-6" />
-          <span className="font-headline text-base hidden sm:inline-block">
-            Origon CFDI
-          </span>
-        </Link>
-        <div className="ml-auto flex items-center gap-2">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-neutral-700 bg-[#1A1A1A] px-4 text-primary-foreground">
+        {/* Left side */}
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 font-semibold text-current"
+          >
+            <OrigonLogo className="h-7 w-7" />
+            <span className="font-headline text-lg hidden sm:inline-block">
+              Origon
+            </span>
+          </Link>
+        </div>
+
+        {/* Center: Search Bar */}
+        <div className="flex-1 max-w-xl mx-auto hidden md:block">
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+            <Input
+              className="w-full bg-[#2A2A2A] border-neutral-700 pl-10 pr-24 h-9 rounded-lg placeholder:text-neutral-400 focus:bg-[#1A1A1A] focus:border-primary"
+              placeholder="Buscar"
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 gap-1">
+              <kbd className="h-6 inline-flex items-center rounded border border-neutral-600 bg-neutral-800 px-2 text-xs font-sans text-neutral-400">
+                Ctrl
+              </kbd>
+              <kbd className="h-6 inline-flex items-center rounded border border-neutral-600 bg-neutral-800 px-2 text-xs font-sans text-neutral-400">
+                K
+              </kbd>
+            </div>
+          </div>
+        </div>
+
+        {/* Right side */}
+        <div className="flex items-center gap-1">
+           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-neutral-800 hover:text-white">
+            <CircleHelp className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-neutral-800 hover:text-white">
+            <Bell className="h-5 w-5" />
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="relative h-8 w-8 rounded-full"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage
-                    src={user?.photoURL ?? undefined}
-                    alt={user?.displayName ?? ''}
-                  />
-                  <AvatarFallback>
-                    {user?.email?.[0].toUpperCase() ?? 'U'}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
+                <Button variant="ghost" className="flex items-center gap-2 rounded-full h-9 px-1.5 sm:px-2 text-primary-foreground hover:bg-neutral-800">
+                    <Avatar className="h-7 w-7">
+                        <AvatarFallback className="bg-cyan-400 text-black font-semibold text-xs">
+                            MT
+                        </AvatarFallback>
+                    </Avatar>
+                    <span className="hidden sm:inline text-sm font-normal">Mi tienda</span>
+                </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end">
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">
-                    {user?.displayName ?? 'Usuario'}
+                    {user?.displayName ?? 'Mi Tienda'}
                   </p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    {user?.email ?? 'usuario@email.com'}
+                    {user?.email ?? 'tienda@example.com'}
                   </p>
                 </div>
               </DropdownMenuLabel>
