@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,6 +10,8 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { Eye, EyeOff } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { OrigonLogo } from '@/components/logo';
 
 const GoogleIcon = () => (
   <svg role="img" viewBox="0 0 24 24" className="mr-2 h-4 w-4">
@@ -49,7 +50,6 @@ export default function SignupPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Only allow numbers and limit to 10 characters
     const numericValue = e.target.value.replace(/[^0-9]/g, '');
     setPhone(numericValue.slice(0, 10));
   };
@@ -86,13 +86,11 @@ export default function SignupPage() {
 
     setIsSubmitting(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await createUserWithEmailAndPassword(auth, email, password);
       if (auth.currentUser) {
         await updateProfile(auth.currentUser, {
           displayName: `${firstName} ${lastName}`.trim(),
         });
-        // Note: Saving phone number requires a different flow, often with verification.
-        // For now, it's collected but not saved to the auth profile directly.
       }
       router.push('/dashboard');
     } catch (error: any) {
@@ -144,114 +142,112 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="w-full h-screen lg:grid lg:grid-cols-2">
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
-          <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold font-headline">Crear una cuenta</h1>
-            <p className="text-balance text-muted-foreground">
-                Ingresa tus datos para empezar a facturar
-            </p>
-          </div>
-          <form onSubmit={handleEmailSignUp}>
-              <div className="grid gap-4">
-                  <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                      <Label htmlFor="first-name">Nombre(s)</Label>
-                      <Input id="first-name" placeholder="Max" required value={firstName} onChange={(e) => setFirstName(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
-                  </div>
-                  <div className="grid gap-2">
-                      <Label htmlFor="last-name">Apellidos</Label>
-                      <Input id="last-name" placeholder="Robinson" required value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
-                  </div>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="email">Correo electrónico</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        placeholder="m@example.com"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={!firebaseEnabled || isSubmitting}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="phone">Número de teléfono</Label>
-                    <div className="relative">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <span className="text-muted-foreground sm:text-sm">+52</span>
-                      </div>
-                      <Input
-                          id="phone"
-                          type="tel"
-                          placeholder="5512345678"
-                          required
-                          value={phone}
-                          onChange={handlePhoneChange}
-                          disabled={!firebaseEnabled || isSubmitting}
-                          className="pl-12"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="password">Contraseña</Label>
-                    <div className="relative">
-                        <Input id="password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
-                        <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
-                        >
-                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                    </div>
-                  </div>
-                   <div className="grid gap-2">
-                    <Label htmlFor="confirm-password">Confirmar Contraseña</Label>
-                    <div className="relative">
-                        <Input id="confirm-password" type={showConfirmPassword ? "text" : "password"} required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
-                        <button
-                            type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
-                        >
-                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                    </div>
-                  </div>
-                  <Button type="submit" className="w-full" disabled={!firebaseEnabled || isSubmitting}>
-                      {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta'}
-                  </Button>
-                  <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignUp} disabled={!firebaseEnabled || isSubmitting}>
-                      <GoogleIcon />
-                      Registrarse con Google
-                  </Button>
-                  {!firebaseEnabled && (
-                    <p className="text-center text-xs text-destructive pt-2">
-                      La configuración de Firebase está incompleta. La autenticación está deshabilitada.
-                    </p>
-                  )}
+    <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+      <div className="flex w-full max-w-sm flex-col gap-6">
+          <Link href="/" className="flex items-center gap-2 self-center font-medium">
+              <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-md p-1">
+                  <OrigonLogo />
               </div>
-            </form>
+              <span className="font-headline text-lg">Origon CFDI</span>
+          </Link>
+          <Card>
+              <CardHeader className="text-center">
+                  <CardTitle className="text-xl">Crear una cuenta</CardTitle>
+                  <CardDescription>
+                      Ingresa tus datos para empezar a facturar
+                  </CardDescription>
+              </CardHeader>
+              <CardContent>
+                  <form onSubmit={handleEmailSignUp}>
+                      <div className="grid gap-4">
+                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid gap-2">
+                              <Label htmlFor="first-name">Nombre(s)</Label>
+                              <Input id="first-name" placeholder="Max" required value={firstName} onChange={(e) => setFirstName(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
+                          </div>
+                          <div className="grid gap-2">
+                              <Label htmlFor="last-name">Apellidos</Label>
+                              <Input id="last-name" placeholder="Robinson" required value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
+                          </div>
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="email">Correo electrónico</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                placeholder="m@example.com"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={!firebaseEnabled || isSubmitting}
+                            />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="phone">Número de teléfono</Label>
+                            <div className="relative">
+                              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <span className="text-muted-foreground sm:text-sm">+52</span>
+                              </div>
+                              <Input
+                                  id="phone"
+                                  type="tel"
+                                  placeholder="5512345678"
+                                  required
+                                  value={phone}
+                                  onChange={handlePhoneChange}
+                                  disabled={!firebaseEnabled || isSubmitting}
+                                  className="pl-12"
+                              />
+                            </div>
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="password">Contraseña</Label>
+                            <div className="relative">
+                                <Input id="password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
+                                >
+                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="confirm-password">Confirmar Contraseña</Label>
+                            <div className="relative">
+                                <Input id="confirm-password" type={showConfirmPassword ? "text" : "password"} required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
+                                >
+                                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
+                          </div>
+                          <Button type="submit" className="w-full" disabled={!firebaseEnabled || isSubmitting}>
+                              {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta'}
+                          </Button>
+                          <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignUp} disabled={!firebaseEnabled || isSubmitting}>
+                              <GoogleIcon />
+                              Registrarse con Google
+                          </Button>
+                          {!firebaseEnabled && (
+                            <p className="text-center text-xs text-destructive pt-2">
+                              La configuración de Firebase está incompleta. La autenticación está deshabilitada.
+                            </p>
+                          )}
+                      </div>
+                    </form>
+              </CardContent>
+          </Card>
           <div className="mt-4 text-center text-sm">
               ¿Ya tienes una cuenta?{' '}
               <Link href="/" className="underline">
               Iniciar sesión
               </Link>
           </div>
-        </div>
-      </div>
-      <div className="hidden bg-muted lg:block">
-        <Image
-          src="https://placehold.co/1000x1200.png"
-          alt="Image"
-          width="1000"
-          height="1200"
-          data-ai-hint="abstract texture"
-          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        />
       </div>
     </div>
   )
