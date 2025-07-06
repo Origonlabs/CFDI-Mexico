@@ -6,9 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import { onAuthStateChanged, User, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword, multiFactor, TotpMultiFactorGenerator, type TotpSecret } from "firebase/auth";
+import { onAuthStateChanged, User, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
 import { Check, XCircle, AlertTriangle } from "lucide-react";
-import QRCode from "qrcode";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -29,7 +28,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 
 interface Certificate {
@@ -45,13 +43,6 @@ export default function SettingsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [certificate, setCertificate] = useState<Certificate | null>(null);
-
-  // 2FA State
-  const [is2faDialogOpen, setIs2faDialogOpen] = useState(false);
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
-  const [mfaSecret, setMfaSecret] = useState<TotpSecret | null>(null);
-  const [verificationCode, setVerificationCode] = useState('');
-  const [isEnrolling2fa, setIsEnrolling2fa] = useState(false);
 
   // User profile state
   const [firstName, setFirstName] = useState('');
@@ -150,57 +141,6 @@ export default function SettingsPage() {
     }
   }
 
-  const handleEnable2faStart = async () => {
-    if (!auth.currentUser) return;
-    setIsEnrolling2fa(true);
-    try {
-      const mfaUser = multiFactor(auth.currentUser);
-      const session = await mfaUser.getSession();
-      const secret = await TotpMultiFactorGenerator.generateSecret(session);
-
-      const qrCodeUri = secret.toUri();
-      const dataUrl = await QRCode.toDataURL(qrCodeUri);
-      
-      setMfaSecret(secret);
-      setQrCodeDataUrl(dataUrl);
-      setIs2faDialogOpen(true);
-    } catch (error) {
-      console.error("Error starting 2FA enrollment:", error);
-      toast({ title: "Error", description: "No se pudo iniciar la configuración de 2FA.", variant: "destructive" });
-    } finally {
-      setIsEnrolling2fa(false);
-    }
-  };
-
-  const handle2faVerifyAndEnroll = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!auth.currentUser || !mfaSecret || !verificationCode) return;
-    setIsEnrolling2fa(true);
-
-    try {
-      const mfaUser = multiFactor(auth.currentUser);
-      const mfaAssertion = TotpMultiFactorGenerator.assertionForEnrollment(
-          mfaSecret,
-          verificationCode
-      );
-      await mfaUser.enroll(mfaAssertion, "Origon CFDI");
-      toast({ title: "Éxito", description: "La verificación de 2 pasos ha sido habilitada." });
-      
-      // The onAuthStateChanged listener will automatically update the user state and UI
-      await auth.currentUser.reload();
-      
-      setIs2faDialogOpen(false);
-      setVerificationCode('');
-      setQrCodeDataUrl('');
-      setMfaSecret(null);
-    } catch (error) {
-        console.error("Error enrolling 2FA:", error);
-        toast({ title: "Error", description: "El código de verificación es incorrecto.", variant: "destructive" });
-    } finally {
-      setIsEnrolling2fa(false);
-    }
-  };
-  
   const handleAccountDelete = () => {
     toast({
         title: "Función no implementada",
@@ -229,49 +169,9 @@ export default function SettingsPage() {
   };
   
   const isLoading = loading || profileForm.formState.isSubmitting || passwordForm.formState.isSubmitting;
-  const is2faEnabled = user?.multiFactor?.enrolledFactors.length > 0;
 
   return (
     <>
-    <Dialog open={is2faDialogOpen} onOpenChange={setIs2faDialogOpen}>
-        <DialogContent>
-            <DialogHeader>
-                <DialogTitle>Configurar Verificación de 2 Pasos</DialogTitle>
-                <DialogDescription>
-                    1. Escanea este código QR con tu app de autenticación (ej. Google Authenticator).
-                    <br />
-                    2. Ingresa el código de 6 dígitos que genera la app para finalizar.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="flex justify-center p-4 bg-white rounded-md">
-                {qrCodeDataUrl ? <Image src={qrCodeDataUrl} alt="Código QR para 2FA" width={200} height={200} data-ai-hint="qr code"/> : <Skeleton className="h-48 w-48" />}
-            </div>
-            <form onSubmit={handle2faVerifyAndEnroll}>
-                <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="verification-code" className="text-right">
-                            Código
-                        </Label>
-                        <Input
-                            id="verification-code"
-                            value={verificationCode}
-                            onChange={(e) => setVerificationCode(e.target.value)}
-                            className="col-span-3"
-                            placeholder="123456"
-                            maxLength={6}
-                            required
-                        />
-                    </div>
-                </div>
-                <DialogFooter>
-                    <Button type="submit" disabled={isEnrolling2fa}>
-                        {isEnrolling2fa ? 'Verificando...' : 'Verificar y Habilitar'}
-                    </Button>
-                </DialogFooter>
-            </form>
-        </DialogContent>
-    </Dialog>
-
     <div className="mx-auto w-full max-w-5xl">
       <h1 className="text-2xl font-bold font-headline mb-6">Mi cuenta</h1>
       
@@ -491,28 +391,15 @@ export default function SettingsPage() {
                   </AccordionContent>
               </AccordionItem>
 
+              {/* 2FA Accordion Item Temporarily Disabled */}
+              {/*
               <AccordionItem value="2fa">
                 <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Verificación de 2 Pasos (2FA)</AccordionTrigger>
                 <AccordionContent className="p-4 border border-t-0 rounded-b-lg space-y-4">
-                    {is2faEnabled ? (
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <Check className="h-5 w-5 text-green-500" />
-                                <p>La verificación de 2 pasos está <strong>habilitada</strong> en tu cuenta.</p>
-                            </div>
-                            <Button variant="destructive" className="mt-4" disabled>Deshabilitar</Button>
-                            <p className="text-xs text-muted-foreground mt-2">Próximamente: Podrás deshabilitar 2FA desde aquí.</p>
-                        </div>
-                    ) : (
-                        <div>
-                            <p className="mb-4 text-sm text-muted-foreground">Protege tu cuenta con una capa adicional de seguridad. Para iniciar sesión, necesitarás tu contraseña y un código de tu aplicación de autenticación.</p>
-                            <Button onClick={handleEnable2faStart} disabled={isEnrolling2fa}>
-                                {isEnrolling2fa ? 'Generando...' : 'Habilitar Verificación de 2 Pasos'}
-                            </Button>
-                        </div>
-                    )}
+                    ... 2FA Content ...
                 </AccordionContent>
               </AccordionItem>
+              */}
 
               <AccordionItem value="eliminacion">
                   <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Eliminación de la Cuenta</AccordionTrigger>

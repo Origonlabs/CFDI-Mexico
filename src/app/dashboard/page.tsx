@@ -15,7 +15,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Overview } from "./components/overview";
 import { firebaseEnabled, auth } from "@/lib/firebase/client";
-import { AlertCircle, DollarSign, Users, Hourglass, Info, CheckCircle, ShieldCheck } from "lucide-react";
+import { AlertCircle, DollarSign, Users, Hourglass, Info, CheckCircle } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { RecentInvoices } from "./components/recent-invoices";
 import { useToast } from "@/hooks/use-toast";
@@ -114,8 +114,7 @@ export default function DashboardPage() {
   }, [user, fetchDashboardData]);
   
   const isCoreSetupComplete = setupStatus?.hasCsd && user?.emailVerified;
-  const is2faEnabled = user?.multiFactor?.enrolledFactors?.length > 0;
-  const showSetupAlert = !isCoreSetupComplete || !is2faEnabled;
+  const showSetupAlert = !isCoreSetupComplete;
 
 
   return (
@@ -135,10 +134,6 @@ export default function DashboardPage() {
                 {user?.emailVerified ? <CheckCircle className="h-4 w-4 text-green-500" /> : <AlertCircle className="h-4 w-4 text-yellow-500" />}
                 <span>Verificar tu correo electrónico.</span>
                 {!user?.emailVerified && <span className="text-xs text-muted-foreground">(Revisa tu bandeja de entrada)</span>}
-              </li>
-               <li className="flex items-center gap-2">
-                {is2faEnabled ? <CheckCircle className="h-4 w-4 text-green-500" /> : <ShieldCheck className="h-4 w-4 text-yellow-500" />}
-                <span>Habilitar la Verificación de 2 Pasos (Recomendado).</span>
               </li>
             </ul>
             <Button asChild size="sm" className="mt-4">

@@ -65,10 +65,6 @@ export function LoginForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
-  // 2FA state
-  const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(null);
-  const [mfaCode, setMfaCode] = useState('');
-
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!firebaseEnabled || !auth) {
@@ -80,48 +76,16 @@ export function LoginForm({
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/dashboard');
     } catch (error: any) {
-      if (error.code === 'auth/multi-factor-required') {
-          if (!auth) return;
-          const resolver = getMultiFactorResolver(auth, error);
-          setMfaResolver(resolver);
-          toast({ title: "Verificación de 2 Pasos Requerida", description: "Ingresa el código de tu app de autenticación." });
-      } else {
-          console.error("Error al iniciar sesión con email", error);
-          let description = "Ocurrió un error inesperado.";
-          if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-            description = "Credenciales incorrectas. Verifica tu correo y contraseña.";
-          }
-          toast({ title: "Error de Autenticación", description, variant: "destructive", });
+      console.error("Error al iniciar sesión con email", error);
+      let description = "Ocurrió un error inesperado.";
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        description = "Credenciales incorrectas. Verifica tu correo y contraseña.";
       }
+      toast({ title: "Error de Autenticación", description, variant: "destructive", });
     } finally {
       setIsSubmitting(false);
     }
   }
-
-  const handleMfaSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!mfaResolver) return;
-    setIsSubmitting(true);
-
-    try {
-        const mfaAssertion = TotpMultiFactorGenerator.assertionForSignIn(
-            mfaResolver.hints[0].uid,
-            mfaCode
-        );
-        await mfaResolver.resolveSignIn(mfaAssertion);
-        router.push('/dashboard');
-    } catch (err) {
-        toast({
-            title: "Código Inválido",
-            description: "El código de verificación es incorrecto. Inténtalo de nuevo.",
-            variant: "destructive",
-        });
-        setMfaResolver(null); // Reset to show email/password form again
-    } finally {
-        setIsSubmitting(false);
-    }
-  };
-
 
   const handleGoogleSignIn = async () => {
     if (!auth) {
@@ -144,46 +108,6 @@ export function LoginForm({
       setIsSubmitting(false);
     }
   };
-  
-  if (mfaResolver) {
-    return (
-        <Card>
-            <CardHeader className="text-center">
-                <CardTitle className="text-xl">Verificación de 2 Pasos</CardTitle>
-                <CardDescription>
-                    Ingresa el código de tu aplicación de autenticación.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleMfaSignIn}>
-                    <div className="grid gap-6">
-                        <div className="grid gap-3">
-                            <Label htmlFor="mfa-code">Código de Verificación</Label>
-                            <Input
-                                id="mfa-code"
-                                type="text"
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                maxLength={6}
-                                placeholder="123456"
-                                required
-                                value={mfaCode}
-                                onChange={(e) => setMfaCode(e.target.value)}
-                                disabled={isSubmitting}
-                            />
-                        </div>
-                        <Button type="submit" className="w-full" disabled={isSubmitting}>
-                            {isSubmitting ? 'Verificando...' : 'Verificar e Iniciar Sesión'}
-                        </Button>
-                        <Button variant="link" onClick={() => setMfaResolver(null)}>
-                            Volver
-                        </Button>
-                    </div>
-                </form>
-            </CardContent>
-        </Card>
-    );
-  }
   
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
