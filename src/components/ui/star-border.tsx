@@ -22,14 +22,18 @@ const StarBorder = React.forwardRef<HTMLDivElement, StarBorderProps>(
     },
     ref
   ) => {
+    const outerRadius = 12;
+    const innerRadius = outerRadius - thickness;
+
     return (
       <div
         ref={ref}
         className={cn(
-          'relative w-full overflow-hidden rounded-[12px] bg-transparent',
+          'relative w-full overflow-hidden bg-transparent',
           className
         )}
         style={{
+          borderRadius: `${outerRadius}px`,
           padding: `${thickness}px`,
           ...props.style,
         }}
@@ -49,7 +53,12 @@ const StarBorder = React.forwardRef<HTMLDivElement, StarBorderProps>(
             animationDuration: speed,
           }}
         ></div>
-        <div className="relative z-10 h-full w-full rounded-[11px] bg-[#2A2A2A] focus-within:bg-[#1A1A1A] transition-colors">
+        <div
+          className="relative z-10 h-full w-full bg-[#2A2A2A] focus-within:bg-[#1A1A1A] transition-colors"
+          style={{
+            borderRadius: `${innerRadius > 0 ? innerRadius : 0}px`,
+          }}
+        >
           {children}
         </div>
       </div>
