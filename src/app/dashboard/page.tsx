@@ -11,6 +11,7 @@ import { Overview } from "./components/overview";
 import { firebaseEnabled } from "@/lib/firebase/client";
 import { AlertCircle, DollarSign, ReceiptText, Users, Hourglass } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { RecentInvoices } from "./components/recent-invoices";
 
 const WavyTrendingUpIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -121,6 +122,7 @@ export default function DashboardPage() {
           <Overview />
         </CardContent>
       </Card>
+      <RecentInvoices />
     </div>
   );
 }
