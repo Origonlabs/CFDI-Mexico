@@ -1,9 +1,11 @@
+
 "use client"
 
 import { useEffect, useState } from "react"
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton"
 import { format, subDays, eachDayOfInterval } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 const generateChartData = () => {
   const now = new Date();
@@ -11,29 +13,37 @@ const generateChartData = () => {
   const days = eachDayOfInterval({ start: past90days, end: now });
 
   return days.map((day, index) => {
-    // Some wavy and spiky pattern to mimic the image
-    const base = 1500;
-    const seasonality = Math.sin(index / 15) * 500;
-    const spikiness = Math.pow(Math.abs(Math.cos(index / 2.5)), 30) * 1500;
-    const noise = Math.random() * 300;
+    const base = 4000;
+    const seasonality = Math.sin(index / 20) * 1500;
+    const monthSpike = index > 60 ? Math.pow(Math.abs(Math.cos((index - 60) / 4)), 20) * 2500 : 0;
+    const noise = Math.random() * 500;
     
-    const visitors = Math.floor(base + seasonality + spikiness + noise);
-    const previousVisitors = Math.floor(visitors * (Math.sin(index/5) * 0.15 + 0.6));
+    const total = Math.floor(base + seasonality + monthSpike + noise);
+    const previousTotal = Math.floor(total * (Math.sin(index/7) * 0.15 + 0.7));
 
     return {
-      date: format(day, 'MMM d'), // e.g., "Apr 2"
-      visitors,
-      previousVisitors,
+      date: format(day, 'd MMM', { locale: es }),
+      total,
+      previousTotal,
     };
   });
 };
+
+const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+};
+
 
 export function Overview() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // This runs only on the client, after the component has mounted.
     setData(generateChartData());
     setLoading(false);
   }, []);
@@ -64,15 +74,15 @@ export function Overview() {
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          interval={3}
+          interval={6}
         />
         <YAxis
           stroke="hsl(var(--muted-foreground))"
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tick={false}
-          domain={[0, 'dataMax + 500']}
+          tickFormatter={(value) => `$${Number(value) / 1000}K`}
+          domain={[0, 'dataMax + 1000']}
         />
         <Tooltip
             cursor={{ stroke: 'hsl(var(--border))', strokeWidth: 1 }}
@@ -82,11 +92,12 @@ export function Overview() {
                 borderRadius: "var(--radius)"
             }}
              labelStyle={{ textTransform: 'capitalize' }}
+             formatter={(value: number, name: string) => [formatCurrency(value), name === 'total' ? 'Este Periodo' : 'Periodo Anterior']}
         />
         <defs>
-          <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="hsl(var(--foreground))" stopOpacity={0.4}/>
-            <stop offset="95%" stopColor="hsl(var(--foreground))" stopOpacity={0}/>
+          <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
           </linearGradient>
           <linearGradient id="colorPrevious" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0.2}/>
@@ -95,21 +106,21 @@ export function Overview() {
         </defs>
         <Area
           type="monotone"
-          dataKey="visitors"
+          dataKey="total"
           strokeWidth={2}
-          stroke="hsl(var(--foreground))"
+          stroke="hsl(var(--primary))"
           fillOpacity={1}
-          fill="url(#colorVisitors)"
-          name="Current Visitors"
+          fill="url(#colorTotal)"
+          name="Este Periodo"
         />
         <Area
           type="monotone"
-          dataKey="previousVisitors"
+          dataKey="previousTotal"
           strokeWidth={1.5}
           stroke="hsl(var(--muted-foreground))"
           fillOpacity={1}
           fill="url(#colorPrevious)"
-          name="Previous Visitors"
+          name="Periodo Anterior"
         />
       </AreaChart>
     </ResponsiveContainer>

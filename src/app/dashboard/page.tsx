@@ -1,3 +1,4 @@
+
 import {
   Card,
   CardContent,
@@ -8,9 +9,8 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Overview } from "./components/overview";
 import { firebaseEnabled } from "@/lib/firebase/client";
-import { AlertCircle, TrendingUp, TrendingDown } from "lucide-react";
+import { AlertCircle, DollarSign, ReceiptText, Users, Hourglass } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 
 export default function DashboardPage() {
   return (
@@ -31,70 +31,46 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-normal">Total Revenue</CardTitle>
-            <Badge variant="outline" className="flex items-center gap-1 text-emerald-600 border-emerald-600/30 bg-emerald-500/10 font-mono text-xs">
-              <TrendingUp className="h-3 w-3" />
-              +12.5%
-            </Badge>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Facturado (Mes)</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">$1,250.00</div>
-            <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-              Trending up this month <TrendingUp className="h-3 w-3" />
-            </p>
-            <p className="text-xs text-muted-foreground">Visitors for the last 6 months</p>
+            <div className="text-2xl font-bold">$125,350.50</div>
+            <p className="text-xs text-muted-foreground">+15.2% sobre el mes anterior</p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-normal">New Customers</CardTitle>
-            <Badge variant="outline" className="flex items-center gap-1 text-destructive border-destructive/30 bg-destructive/10 font-mono text-xs">
-              <TrendingDown className="h-3 w-3" />
-              -20%
-            </Badge>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Facturas Timbradas (Mes)</CardTitle>
+            <ReceiptText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">1,234</div>
-            <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-              Down 20% this period <TrendingDown className="h-3 w-3" />
-            </p>
-            <p className="text-xs text-muted-foreground">Acquisition needs attention</p>
+            <div className="text-2xl font-bold">+152</div>
+            <p className="text-xs text-muted-foreground">+30 sobre el mes anterior</p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-normal">Active Accounts</CardTitle>
-            <Badge variant="outline" className="flex items-center gap-1 text-emerald-600 border-emerald-600/30 bg-emerald-500/10 font-mono text-xs">
-              <TrendingUp className="h-3 w-3" />
-              +12.5%
-            </Badge>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Clientes Activos</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">45,678</div>
-            <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-              Strong user retention <TrendingUp className="h-3 w-3" />
-            </p>
-            <p className="text-xs text-muted-foreground">Engagement exceed targets</p>
+            <div className="text-2xl font-bold">89</div>
+            <p className="text-xs text-muted-foreground">+5 nuevos este mes</p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-normal">Growth Rate</CardTitle>
-             <Badge variant="outline" className="flex items-center gap-1 text-emerald-600 border-emerald-600/30 bg-emerald-500/10 font-mono text-xs">
-              <TrendingUp className="h-3 w-3" />
-              +4.5%
-            </Badge>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Saldo Pendiente (PPD)</CardTitle>
+            <Hourglass className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">4.5%</div>
-            <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-              Steady performance increase <TrendingUp className="h-3 w-3" />
-            </p>
-            <p className="text-xs text-muted-foreground">Meets growth projections</p>
+            <div className="text-2xl font-bold">$45,820.00</div>
+            <p className="text-xs text-muted-foreground">Correspondiente a 5 facturas</p>
           </CardContent>
         </Card>
       </div>
@@ -102,14 +78,14 @@ export default function DashboardPage() {
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle>Total Visitors</CardTitle>
-            <CardDescription>Total for the last 3 months</CardDescription>
+            <CardTitle>Resumen de Facturación</CardTitle>
+            <CardDescription>Total facturado en los últimos meses.</CardDescription>
           </div>
           <Tabs defaultValue="3months" className="w-full sm:w-auto">
             <TabsList className="grid w-full grid-cols-3 sm:w-auto">
-              <TabsTrigger value="3months">Last 3 months</TabsTrigger>
-              <TabsTrigger value="30days">Last 30 days</TabsTrigger>
-              <TabsTrigger value="7days">Last 7 days</TabsTrigger>
+              <TabsTrigger value="3months">Últimos 3 meses</TabsTrigger>
+              <TabsTrigger value="30days">Últimos 30 días</TabsTrigger>
+              <TabsTrigger value="7days">Últimos 7 días</TabsTrigger>
             </TabsList>
           </Tabs>
         </CardHeader>
