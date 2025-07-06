@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -128,8 +127,8 @@ export default function DashboardLayout({
         </header>
         
         <div className="flex flex-1">
-            <Sidebar collapsible="icon">
-                <SidebarContent>
+            <Sidebar collapsible="icon" className="md:w-56">
+                <SidebarContent className="pt-4">
                 <SidebarMenu>
                     {navigationLinks.map((item, index) => (
                     <Collapsible
