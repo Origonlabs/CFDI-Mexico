@@ -74,7 +74,7 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
-        <SidebarContent className="pt-14">
+        <SidebarContent>
           <SidebarMenu>
             {navigationLinks.map((item, index) => (
               <Collapsible
