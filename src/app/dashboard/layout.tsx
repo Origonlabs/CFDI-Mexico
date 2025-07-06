@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -65,6 +66,23 @@ export default function DashboardLayout({
       router.push('/');
     }
   };
+
+  const getInitials = (name: string | null | undefined, email: string | null | undefined): string => {
+    if (name) {
+        const nameParts = name.trim().split(' ').filter(Boolean);
+        if (nameParts.length > 1 && nameParts[1]) {
+            return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+        }
+        if (nameParts.length === 1 && nameParts[0]) {
+            return nameParts[0].substring(0, 2).toUpperCase();
+        }
+    }
+    if (email) {
+        return email.substring(0, 2).toUpperCase();
+    }
+    return 'U';
+  };
+
 
   const mainLinks = navigationLinks.slice(0, -1);
   // We will handle settings link separately as a dropdown.
@@ -163,8 +181,8 @@ export default function DashboardLayout({
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="https://img.buoucoding.com/avatar/0008.png" alt="@buoooou" />
-                    <AvatarFallback>BU</AvatarFallback>
+                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
+                    <AvatarFallback>{getInitials(user?.displayName, user?.email)}</AvatarFallback>
                   </Avatar>
                 </Button>
             </DropdownMenuTrigger>
