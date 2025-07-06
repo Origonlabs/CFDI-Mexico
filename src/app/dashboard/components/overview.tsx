@@ -1,33 +1,15 @@
 
 "use client"
 
-import { useEffect, useState } from "react"
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton"
-import { format, subDays, eachDayOfInterval } from 'date-fns';
+import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-const generateChartData = () => {
-  const now = new Date();
-  const past90days = subDays(now, 89);
-  const days = eachDayOfInterval({ start: past90days, end: now });
-
-  return days.map((day, index) => {
-    const base = 4000;
-    const seasonality = Math.sin(index / 20) * 1500;
-    const monthSpike = index > 60 ? Math.pow(Math.abs(Math.cos((index - 60) / 4)), 20) * 2500 : 0;
-    const noise = Math.random() * 500;
-    
-    const total = Math.floor(base + seasonality + monthSpike + noise);
-    const previousTotal = Math.floor(total * (Math.sin(index/7) * 0.15 + 0.7));
-
-    return {
-      date: format(day, 'd MMM', { locale: es }),
-      total,
-      previousTotal,
-    };
-  });
-};
+interface OverviewProps {
+  data: { date: string, total: number }[] | undefined | null;
+  loading: boolean;
+}
 
 const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('es-MX', {
@@ -39,14 +21,7 @@ const formatCurrency = (value: number) => {
 };
 
 
-export function Overview() {
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setData(generateChartData());
-    setLoading(false);
-  }, []);
+export function Overview({ data, loading }: OverviewProps) {
 
   if (loading) {
     return (
@@ -55,11 +30,13 @@ export function Overview() {
       </div>
     );
   }
+  
+  const chartData = data || [];
 
   return (
     <ResponsiveContainer width="100%" height={350}>
       <AreaChart
-        data={data}
+        data={chartData}
         margin={{
           top: 10,
           right: 30,
@@ -92,16 +69,12 @@ export function Overview() {
                 borderRadius: "var(--radius)"
             }}
              labelStyle={{ textTransform: 'capitalize' }}
-             formatter={(value: number, name: string) => [formatCurrency(value), name === 'total' ? 'Este Periodo' : 'Periodo Anterior']}
+             formatter={(value: number, name: string) => [formatCurrency(value), 'Total Facturado']}
         />
         <defs>
           <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
             <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-          </linearGradient>
-          <linearGradient id="colorPrevious" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0.2}/>
-            <stop offset="95%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0}/>
           </linearGradient>
         </defs>
         <Area
@@ -111,16 +84,7 @@ export function Overview() {
           stroke="hsl(var(--primary))"
           fillOpacity={1}
           fill="url(#colorTotal)"
-          name="Este Periodo"
-        />
-        <Area
-          type="monotone"
-          dataKey="previousTotal"
-          strokeWidth={1.5}
-          stroke="hsl(var(--muted-foreground))"
-          fillOpacity={1}
-          fill="url(#colorPrevious)"
-          name="Periodo Anterior"
+          name="Total Facturado"
         />
       </AreaChart>
     </ResponsiveContainer>

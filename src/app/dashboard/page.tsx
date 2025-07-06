@@ -1,4 +1,9 @@
 
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { User } from "firebase/auth";
+
 import {
   Card,
   CardContent,
@@ -8,10 +13,13 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Overview } from "./components/overview";
-import { firebaseEnabled } from "@/lib/firebase/client";
+import { firebaseEnabled, auth } from "@/lib/firebase/client";
 import { AlertCircle, DollarSign, ReceiptText, Users, Hourglass } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { RecentInvoices } from "./components/recent-invoices";
+import { useToast } from "@/hooks/use-toast";
+import { getDashboardStats } from "../actions/dashboard";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const WavyTrendingUpIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -31,8 +39,61 @@ const WavyTrendingUpIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+interface DashboardStats {
+  totalFacturadoMes: number;
+  facturasTimbradasMes: number;
+  clientesActivos: number;
+  saldoPendiente: number;
+  facturacionUltimos90Dias: { date: string, total: number }[];
+}
+
+const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
+};
 
 export default function DashboardPage() {
+  const { toast } = useToast();
+  const [user, setUser] = useState<User | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!firebaseEnabled || !auth) {
+      setLoading(false);
+      return;
+    }
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+      if (!currentUser) {
+        setLoading(false);
+        setStats(null);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const fetchStats = useCallback(async (uid: string) => {
+    setLoading(true);
+    const response = await getDashboardStats(uid);
+
+    if (response.success && response.data) {
+      setStats(response.data);
+    } else {
+      toast({
+        title: "Error",
+        description: response.message || "No se pudieron cargar las estadísticas.",
+        variant: "destructive",
+      });
+    }
+    setLoading(false);
+  }, [toast]);
+  
+  useEffect(() => {
+    if (user) {
+      fetchStats(user.uid);
+    }
+  }, [user, fetchStats]);
+
   return (
     <div className="flex-1 space-y-4">
       {!firebaseEnabled && (
@@ -56,10 +117,10 @@ export default function DashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$125,350.50</div>
+            {loading ? <Skeleton className="h-7 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.totalFacturadoMes ?? 0)}</div>}
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <WavyTrendingUpIcon className="h-4 w-4" />
-              <span>+15.2% sobre el mes anterior</span>
+              <span>&nbsp;</span>
             </p>
           </CardContent>
         </Card>
@@ -70,10 +131,10 @@ export default function DashboardPage() {
             <ReceiptText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+152</div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
+             {loading ? <Skeleton className="h-7 w-1/2" /> : <div className="text-2xl font-bold">+{stats?.facturasTimbradasMes ?? 0}</div>}
+             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <WavyTrendingUpIcon className="h-4 w-4" />
-              <span>+30 sobre el mes anterior</span>
+              <span>&nbsp;</span>
             </p>
           </CardContent>
         </Card>
@@ -84,10 +145,10 @@ export default function DashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">89</div>
+            {loading ? <Skeleton className="h-7 w-1/4" /> : <div className="text-2xl font-bold">{stats?.clientesActivos ?? 0}</div>}
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <WavyTrendingUpIcon className="h-4 w-4" />
-              <span>+5 nuevos este mes</span>
+              <span>&nbsp;</span>
             </p>
           </CardContent>
         </Card>
@@ -98,8 +159,8 @@ export default function DashboardPage() {
             <Hourglass className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$45,820.00</div>
-            <p className="text-xs text-muted-foreground">Correspondiente a 5 facturas</p>
+            {loading ? <Skeleton className="h-7 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.saldoPendiente ?? 0)}</div>}
+            <p className="text-xs text-muted-foreground">Correspondiente a facturas PPD</p>
           </CardContent>
         </Card>
       </div>
@@ -108,18 +169,16 @@ export default function DashboardPage() {
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Resumen de Facturación</CardTitle>
-            <CardDescription>Total facturado en los últimos meses.</CardDescription>
+            <CardDescription>Total facturado en los últimos 90 días.</CardDescription>
           </div>
-          <Tabs defaultValue="3months" className="w-full sm:w-auto">
-            <TabsList className="grid w-full grid-cols-3 sm:w-auto">
-              <TabsTrigger value="3months">Últimos 3 meses</TabsTrigger>
-              <TabsTrigger value="30days">Últimos 30 días</TabsTrigger>
-              <TabsTrigger value="7days">Últimos 7 días</TabsTrigger>
+          <Tabs defaultValue="90days" className="w-full sm:w-auto">
+            <TabsList className="grid w-full grid-cols-1 sm:w-auto">
+              <TabsTrigger value="90days">Últimos 90 días</TabsTrigger>
             </TabsList>
           </Tabs>
         </CardHeader>
         <CardContent className="pl-2">
-          <Overview />
+          <Overview data={stats?.facturacionUltimos90Dias} loading={loading} />
         </CardContent>
       </Card>
       <RecentInvoices />
