@@ -106,7 +106,7 @@ export default function DashboardLayout({
       <Link
         href="/dashboard"
         className={cn(
-          "flex items-center gap-3 rounded-lg px-3 h-7 text-muted-foreground transition-all hover:text-primary",
+          "flex items-center gap-3 rounded-lg px-3 h-7 text-[#303030] dark:text-slate-300 transition-all hover:text-primary",
           pathname === "/dashboard" && "bg-muted text-primary"
         )}
       >
@@ -118,7 +118,7 @@ export default function DashboardLayout({
           <AccordionItem value={`item-${index}`} key={index} className="border-b-0">
             <AccordionTrigger
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 h-7 text-muted-foreground transition-all hover:text-primary hover:no-underline [&_svg:last-child]:mx-0",
+                "flex items-center gap-3 rounded-lg px-3 h-7 text-[#303030] dark:text-slate-300 transition-all hover:text-primary hover:no-underline [&_svg:last-child]:mx-0",
                  activeGroupValue === `item-${index}` && "text-primary bg-muted"
               )}
             >
@@ -132,7 +132,7 @@ export default function DashboardLayout({
                     key={link.href + link.label}
                     href={link.href}
                     className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 h-7 text-muted-foreground transition-all hover:text-primary",
+                      "flex items-center gap-3 rounded-lg px-3 h-7 text-[#303030] dark:text-slate-300 transition-all hover:text-primary",
                       pathname === link.href && "text-primary"
                     )}
                   >
@@ -152,7 +152,7 @@ export default function DashboardLayout({
       <Link
         href="/dashboard"
         className={cn(
-          "flex items-center gap-4 rounded-lg px-3 h-7 text-muted-foreground transition-all hover:text-foreground",
+          "flex items-center gap-4 rounded-lg px-3 h-7 text-[#303030] dark:text-slate-300 transition-all hover:text-foreground",
           pathname === "/dashboard" && "bg-muted text-foreground"
         )}
       >
@@ -164,12 +164,12 @@ export default function DashboardLayout({
           <AccordionItem value={`item-${index}`} key={index} className="border-b-0">
             <AccordionTrigger
               className={cn(
-                "flex items-center gap-4 rounded-lg px-3 h-7 text-muted-foreground transition-all hover:text-foreground hover:no-underline",
+                "flex items-center gap-4 rounded-lg px-3 h-7 text-[#303030] dark:text-slate-300 transition-all hover:text-foreground hover:no-underline",
                 activeGroupValue === `item-${index}` && "bg-muted text-foreground"
               )}
             >
               <group.icon className="h-5 w-5" />
-              <span className="flex-1 text-left font-semibold">{group.title}</span>
+              <span className="flex-1 text-left font-medium">{group.title}</span>
             </AccordionTrigger>
             <AccordionContent className="pl-11 pt-1">
               <nav className="grid gap-1">
@@ -178,7 +178,7 @@ export default function DashboardLayout({
                     key={link.href + link.label}
                     href={link.href}
                     className={cn(
-                      "flex items-center gap-4 rounded-lg px-3 h-7 text-muted-foreground transition-all hover:text-foreground",
+                      "flex items-center gap-4 rounded-lg px-3 h-7 text-[#303030] dark:text-slate-300 transition-all hover:text-foreground",
                        pathname === link.href && "text-foreground"
                     )}
                   >
@@ -195,7 +195,7 @@ export default function DashboardLayout({
 
 
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[232px_1fr] lg:grid-cols-[232px_1fr]">
+    <div className="grid min-h-screen w-full md:grid-cols-[240px_1fr] lg:grid-cols-[240px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
@@ -205,7 +205,7 @@ export default function DashboardLayout({
             </Link>
           </div>
           <div className="flex-1 overflow-y-auto">
-            <nav className="grid items-start px-2 text-sm font-medium">
+            <nav className="grid items-start px-3 text-[13px] font-medium leading-[20px]">
               <NavContent />
             </nav>
           </div>
@@ -228,7 +228,7 @@ export default function DashboardLayout({
               <SheetHeader className="sr-only">
                 <SheetTitle>Navigation Menu</SheetTitle>
               </SheetHeader>
-               <nav className="grid gap-2 text-base font-medium">
+               <nav className="grid gap-2 text-[13px] font-medium leading-[20px]">
                 <Link
                   href="#"
                   className="flex items-center gap-2 font-semibold mb-4"
