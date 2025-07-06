@@ -1,6 +1,7 @@
 
 import { pgTable, serial, text, varchar, timestamp, numeric, integer, pgEnum, boolean } from "drizzle-orm/pg-core";
 
+// --- Clientes ---
 export const clients = pgTable('clients', {
   id: serial('id').primaryKey(),
   userId: varchar('user_id', { length: 256 }).notNull(),
@@ -11,7 +12,7 @@ export const clients = pgTable('clients', {
   taxRegime: varchar('tax_regime', { length: 10 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 
-  // New fields from image
+  // Domicilio Fiscal
   country: text('country'),
   state: text('state'),
   municipality: text('municipality'),
@@ -20,6 +21,8 @@ export const clients = pgTable('clients', {
   street: text('street'),
   exteriorNumber: varchar('exterior_number', { length: 50 }),
   interiorNumber: varchar('interior_number', { length: 50 }),
+  
+  // Contacto y Preferencias
   phone: varchar('phone', { length: 20 }),
   paymentMethod: varchar('payment_method', { length: 3 }),
   paymentForm: varchar('payment_form', { length: 3 }),
@@ -27,6 +30,18 @@ export const clients = pgTable('clients', {
   reference: text('reference'),
 });
 
+export const clientBankAccounts = pgTable('client_bank_accounts', {
+  id: serial('id').primaryKey(),
+  clientId: integer('client_id').references(() => clients.id, { onDelete: 'cascade' }).notNull(),
+  bankRfc: varchar('bank_rfc', { length: 13 }).notNull(),
+  bankName: text('bank_name').notNull(),
+  accountNumber: varchar('account_number', { length: 50 }).notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
+  isDefault: boolean('is_default').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// --- Empresa del Usuario ---
 export const companies = pgTable('companies', {
     id: serial('id').primaryKey(),
     userId: varchar('user_id', { length: 256 }).notNull().unique(),
@@ -36,20 +51,24 @@ export const companies = pgTable('companies', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     
+    // Domicilio Fiscal
     street: text('street'),
     exteriorNumber: varchar('exterior_number', { length: 50 }),
     interiorNumber: varchar('interior_number', { length: 50 }),
-    neighborhood: text('neighborhood'), // Colonia
-    sector: text('sector'),
+    neighborhood: text('neighborhood'),
     municipality: text('municipality'),
     state: text('state'),
     city: text('city'),
     zip: varchar('zip', { length: 5 }),
+
+    // Contacto
     phone: varchar('phone', { length: 20 }),
     phone2: varchar('phone2', { length: 20 }),
     fax: varchar('fax', { length: 20 }),
     contadorEmail: varchar('contador_email', { length: 256 }),
     web: varchar('web', { length: 256 }),
+    
+    // Configuración
     commercialMessage: text('commercial_message'),
     logoUrl: varchar('logo_url', { length: 256 }),
     defaultEmailMessage: text('default_email_message'),
@@ -58,6 +77,22 @@ export const companies = pgTable('companies', {
     templateRep: varchar('template_rep', { length: 50 }),
 });
 
+export const certificateStatusEnum = pgEnum('certificate_status', ['active', 'revoked', 'expired']);
+
+export const csdCertificates = pgTable('csd_certificates', {
+  id: serial('id').primaryKey(),
+  userId: varchar('user_id', { length: 256 }).notNull(),
+  certificateNumber: varchar('certificate_number', { length: 64 }).notNull().unique(),
+  validFrom: timestamp('valid_from').notNull(),
+  validTo: timestamp('valid_to').notNull(),
+  status: certificateStatusEnum('status').default('active').notNull(),
+  privateKey: text('private_key').notNull(),
+  certificate: text('certificate').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+
+// --- Productos y Servicios ---
 export const products = pgTable('products', {
   id: serial('id').primaryKey(),
   userId: varchar('user_id', { length: 256 }).notNull(),
@@ -70,6 +105,8 @@ export const products = pgTable('products', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+
+// --- Facturas (CFDI) ---
 export const invoiceStatusEnum = pgEnum('invoice_status', ['draft', 'stamped', 'canceled']);
 
 export const invoices = pgTable('invoices', {
@@ -108,6 +145,7 @@ export const invoiceItems = pgTable('invoice_items', {
   amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
 });
 
+// --- Pagos (REP) ---
 export const paymentStatusEnum = pgEnum('payment_status', ['draft', 'stamped', 'canceled']);
 
 export const payments = pgTable('payments', {
@@ -146,6 +184,8 @@ export const paymentDocuments = pgTable('payment_documents', {
   outstandingBalance: numeric('outstanding_balance', { precision: 10, scale: 2 }).notNull(),
 });
 
+
+// --- Configuración General ---
 export const series = pgTable('series', {
   id: serial('id').primaryKey(),
   userId: varchar('user_id', { length: 256 }).notNull(),

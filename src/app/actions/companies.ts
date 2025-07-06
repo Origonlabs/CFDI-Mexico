@@ -17,7 +17,6 @@ export const profileFormSchema = z.object({
   exteriorNumber: z.string().optional(),
   interiorNumber: z.string().optional(),
   neighborhood: z.string().optional(),
-  sector: z.string().optional(),
   municipality: z.string().optional(),
   state: z.string().optional(),
   city: z.string().optional(),

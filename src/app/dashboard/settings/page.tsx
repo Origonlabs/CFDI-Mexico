@@ -23,6 +23,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
 
 const passwordChangeSchema = z.object({
   currentPassword: z.string().min(1, "La contraseña actual es obligatoria."),
@@ -47,7 +50,7 @@ export default function SettingsPage() {
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      companyName: "", rfc: "", street: "", exteriorNumber: "", interiorNumber: "", state: "", municipality: "", sector: "", neighborhood: "", zip: "", phone: "", phone2: "", fax: "", city: "", web: "", contadorEmail: "",
+      companyName: "", rfc: "", street: "", exteriorNumber: "", interiorNumber: "", state: "", municipality: "", neighborhood: "", zip: "", phone: "", phone2: "", fax: "", city: "", web: "", contadorEmail: "",
       taxRegime: "", commercialMessage: "", logoUrl: "", defaultEmailMessage: "", templateCfdi33: "costine-33", templateCfdi40: "costine-40", templateRep: "costine-rep",
     },
   });
@@ -160,10 +163,9 @@ export default function SettingsPage() {
                           <FormField control={profileForm.control} name="rfc" render={({ field }) => ( <FormItem><FormLabel>RFC</FormLabel><FormControl><Input {...field} disabled/></FormControl><FormMessage /></FormItem> )} />
                           <FormField control={profileForm.control} name="street" render={({ field }) => ( <FormItem><FormLabel>Calle</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
                           <FormField control={profileForm.control} name="exteriorNumber" render={({ field }) => ( <FormItem><FormLabel>Número exterior</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
-                          <FormField control={profileForm.control} name="interiorNumber" render={({ field }) => ( <FormItem><FormLabel>Número interior</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                          <FormField control={profileForm.control} name="interiorNumber" render={({ field }) => ( <FormItem><FormLabel>Número interior</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormMessage> )} />
                           <FormField control={profileForm.control} name="state" render={({ field }) => ( <FormItem><FormLabel>Estado</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
                           <FormField control={profileForm.control} name="municipality" render={({ field }) => ( <FormItem><FormLabel>Municipio</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccionar"/></SelectTrigger></FormControl><SelectContent></SelectContent></Select><FormMessage /></FormItem> )} />
-                          <FormField control={profileForm.control} name="sector" render={({ field }) => ( <FormItem><FormLabel>Sector</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccionar"/></SelectTrigger></FormControl><SelectContent></SelectContent></Select><FormMessage /></FormItem> )} />
                           <FormField control={profileForm.control} name="neighborhood" render={({ field }) => ( <FormItem><FormLabel>Colonia</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
                           <FormField control={profileForm.control} name="contadorEmail" render={({ field }) => ( <FormItem><FormLabel>Email contador</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem> )} />
                       </div>
@@ -281,6 +283,59 @@ export default function SettingsPage() {
                       </div>
                   </div>
               </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="firma">
+                <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Firma</AccordionTrigger>
+                <AccordionContent className="p-4 border border-t-0 rounded-b-lg space-y-6">
+                  <div>
+                    <h3 className="text-base font-medium mb-2">Certificado Instalado</h3>
+                    <div className="border rounded-lg overflow-hidden">
+                       <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>No. de certificado</TableHead>
+                            <TableHead>Fecha Inicial</TableHead>
+                            <TableHead>Fecha Final</TableHead>
+                            <TableHead>Estado</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell className="font-mono text-sm">30001000000500003416</TableCell>
+                            <TableCell>02/02/2023</TableCell>
+                            <TableCell>02/02/2027</TableCell>
+                            <TableCell>
+                              <Badge variant="default">Activo</Badge>
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-medium mb-2">Instalar Nuevo Certificado de Sello Digital</h3>
+                    <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="key-file">* Archivo .key</Label>
+                        <Input id="key-file" type="file" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="cer-file">* Archivo .cer</Label>
+                        <Input id="cer-file" type="file" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="key-password">* Contraseña de la clave privada</Label>
+                        <Input id="key-password" type="password" />
+                      </div>
+                      <div className="flex items-end gap-2">
+                          <Button type="button" disabled>Subir</Button>
+                          <Button type="button" variant="outline" disabled>Borrar</Button>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="usuario">
