@@ -13,35 +13,7 @@ import { adminStorage } from "@/lib/firebase/admin";
 import { Buffer } from 'buffer';
 import { numeroALetras } from 'numero-a-letras';
 import { stampWithFacturaLoPlus } from "@/lib/pac";
-
-
-const conceptSchema = z.object({
-  productId: z.number(),
-  satKey: z.string(),
-  unitKey: z.string(),
-  description: z.string(),
-  quantity: z.coerce.number().min(1, "La cantidad debe ser mayor a 0."),
-  unitPrice: z.coerce.number(),
-  discount: z.coerce.number().optional().default(0),
-  objetoImpuesto: z.string().min(1, "Selecciona el objeto de impuesto."),
-  amount: z.coerce.number(),
-});
-
-const invoiceSchema = z.object({
-  clientId: z.coerce.number().min(1, "Debes seleccionar un cliente."),
-  serie: z.string().default("A"),
-  folio: z.coerce.number().default(1025),
-  tipoDocumento: z.string().default("I"),
-  exportacion: z.string().default("01"),
-  usoCfdi: z.string().min(1, "Debes seleccionar un uso de CFDI."),
-  formaPago: z.string().min(1, "Debes seleccionar una forma de pago."),
-  metodoPago: z.string().default("PUE"),
-  moneda: z.string().default("MXN"),
-  condicionesPago: z.string().optional(),
-  concepts: z.array(conceptSchema).min(1, "La factura debe tener al menos un concepto."),
-});
-
-export type InvoiceFormValues = z.infer<typeof invoiceSchema>;
+import { invoiceSchema, type InvoiceFormValues } from "@/lib/schemas";
 
 export const getInvoices = async (userId: string) => {
   if (!db) {

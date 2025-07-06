@@ -30,7 +30,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getClients, type ClientFormValues } from "@/app/actions/clients";
+import { getClients } from "@/app/actions/clients";
+import type { ClientFormValues } from "@/lib/schemas";
 import { Input } from "@/components/ui/input";
 
 interface Client extends ClientFormValues {

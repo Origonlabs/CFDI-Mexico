@@ -12,7 +12,8 @@ import { PlusCircle } from "lucide-react";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
-import { addClient, type ClientFormValues } from "@/app/actions/clients";
+import { addClient } from "@/app/actions/clients";
+import { clientSchema, type ClientFormValues } from "@/lib/schemas";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,31 +22,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
-
-const clientSchema = z.object({
-  name: z.string().min(1, { message: "El nombre o razón social es obligatorio." }),
-  rfc: z.string()
-    .min(12, { message: "El RFC debe tener 12 o 13 caracteres." })
-    .max(13, { message: "El RFC debe tener 12 o 13 caracteres." }),
-  zip: z.string().length(5, { message: "El código postal debe tener 5 dígitos." }),
-  usoCfdi: z.string().min(1, { message: "El Uso del CFDI es obligatorio." }),
-  taxRegime: z.string().min(1, { message: "El régimen fiscal es obligatorio." }),
-  
-  country: z.string().optional(),
-  state: z.string().optional(),
-  municipality: z.string().optional(),
-  city: z.string().optional(),
-  neighborhood: z.string().optional(),
-  street: z.string().optional(),
-  exteriorNumber: z.string().optional(),
-  interiorNumber: z.string().optional(),
-  email: z.string().email({ message: "El correo electrónico no es válido." }).optional().or(z.literal('')),
-  phone: z.string().optional(),
-  paymentMethod: z.string().optional(),
-  paymentForm: z.string().optional(),
-  reference: z.string().optional(),
-});
-
 
 export default function NewClientPage() {
     const { toast } = useToast();

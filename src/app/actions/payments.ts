@@ -6,53 +6,7 @@ import db from "@/lib/db";
 import { payments, paymentDocuments, clients } from "../../../drizzle/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-
-const relatedCfdiSchema = z.object({
-  uuid: z.string().uuid("Debe ser un UUID válido."),
-});
-
-const relatedDocumentSchema = z.object({
-  invoiceId: z.number(),
-  uuid: z.string(),
-  fecha: z.string(),
-  serie: z.string(),
-  folio: z.string(),
-  moneda: z.string(),
-  tipoCambio: z.coerce.number().default(1),
-  metodoPago: z.string(),
-  numParcialidad: z.coerce.number(),
-  saldoAnterior: z.coerce.number(),
-  montoPago: z.coerce.number(),
-  importePagado: z.coerce.number(),
-  saldoInsoluto: z.coerce.number(),
-  totalDocumento: z.coerce.number(),
-  objetoImpuesto: z.string(),
-});
-
-const paymentSchema = z.object({
-  clientId: z.coerce.number().min(1, "Debes seleccionar un cliente."),
-  serie: z.string().default("P"),
-  folio: z.coerce.number().default(1),
-  fechaPago: z.date({ required_error: "La fecha de pago es obligatoria." }),
-  horaPago: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Formato de hora inválido (HH:mm)"),
-  formaPago: z.string().min(1, "Debes seleccionar una forma de pago."),
-  numeroOperacion: z.string().optional(),
-  moneda: z.string().default("MXN"),
-  totalPago: z.coerce.number().min(0.01, "El total debe ser mayor a cero."),
-  relatedDocuments: z.array(relatedDocumentSchema).min(1, "Debe haber al menos un documento relacionado."),
-  relationType: z.string().optional(),
-  relatedCfdis: z.array(relatedCfdiSchema).optional(),
-}).refine(data => {
-    if (data.relatedCfdis && data.relatedCfdis.length > 0) {
-        return !!data.relationType;
-    }
-    return true;
-}, {
-    message: "Debes seleccionar un tipo de relación si agregas CFDI relacionados.",
-    path: ["relationType"],
-});
-
-export type PaymentFormValues = z.infer<typeof paymentSchema>;
+import { paymentSchema, type PaymentFormValues } from "@/lib/schemas";
 
 export const getPayments = async (userId: string) => {
   if (!db) {

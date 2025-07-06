@@ -6,36 +6,7 @@ import db from "@/lib/db";
 import { companies } from "../../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-
-export const profileFormSchema = z.object({
-  companyName: z.string().min(1, { message: "La razón social es obligatoria." }),
-  rfc: z.string()
-    .min(12, { message: "El RFC debe tener 12 o 13 caracteres." })
-    .max(13, { message: "El RFC debe tener 12 o 13 caracteres." }),
-  taxRegime: z.string().min(1, { message: "El régimen fiscal es obligatorio." }),
-  street: z.string().optional(),
-  exteriorNumber: z.string().optional(),
-  interiorNumber: z.string().optional(),
-  neighborhood: z.string().optional(),
-  municipality: z.string().optional(),
-  state: z.string().optional(),
-  city: z.string().optional(),
-  zip: z.string().optional(),
-  phone: z.string().optional(),
-  phone2: z.string().optional(),
-  fax: z.string().optional(),
-  contadorEmail: z.string().email({ message: "El correo del contador no es válido." }).optional().or(z.literal('')),
-  web: z.string().url({ message: "La URL del sitio web no es válida." }).optional().or(z.literal('')),
-  commercialMessage: z.string().optional(),
-  logoUrl: z.string().url({ message: "Por favor, introduce una URL válida para el logo."}).optional().or(z.literal('')),
-  defaultEmailMessage: z.string().optional(),
-  templateCfdi33: z.string().optional(),
-  templateCfdi40: z.string().optional(),
-  templateRep: z.string().optional(),
-});
-
-
-export type ProfileFormValues = z.infer<typeof profileFormSchema>;
+import { profileFormSchema, type ProfileFormValues } from "@/lib/schemas";
 
 export const getCompanyProfile = async (userId: string) => {
   if (!db) {

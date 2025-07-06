@@ -6,17 +6,7 @@ import db from "@/lib/db";
 import { products } from "../../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-
-const productSchema = z.object({
-  code: z.string().max(50, "El código no debe exceder los 50 caracteres.").optional(),
-  unitKey: z.string().min(1, { message: "La unidad es obligatoria." }),
-  objetoImpuesto: z.string().min(1, { message: "El objeto de impuesto es obligatorio." }),
-  description: z.string().min(1, { message: "La descripción es obligatoria." }),
-  unitPrice: z.coerce.number().min(0, { message: "El precio unitario no puede ser negativo." }),
-  satKey: z.string().min(1, { message: "La clave de producto es obligatoria." }),
-});
-
-export type ProductFormValues = z.infer<typeof productSchema>;
+import { productSchema, type ProductFormValues } from "@/lib/schemas";
 
 export const getProducts = async (userId: string) => {
   if (!db) {

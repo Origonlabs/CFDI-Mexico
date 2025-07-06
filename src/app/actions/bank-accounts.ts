@@ -6,15 +6,7 @@ import db from "@/lib/db";
 import { bankAccounts } from "../../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-
-const bankAccountSchema = z.object({
-  bankRfc: z.string().min(1, "El RFC del banco es obligatorio."),
-  bankName: z.string().min(1, "El nombre del banco es obligatorio."),
-  shortName: z.string().min(1, "El nombre corto es obligatorio."),
-  accountNumber: z.string().min(1, "El número de cuenta es obligatorio."),
-});
-
-export type BankAccountFormValues = z.infer<typeof bankAccountSchema>;
+import { bankAccountSchema, type BankAccountFormValues } from "@/lib/schemas";
 
 export const getBankAccounts = async (userId: string) => {
   if (!db) {

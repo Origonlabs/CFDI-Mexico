@@ -6,32 +6,7 @@ import db from "@/lib/db";
 import { clients } from "../../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-
-const clientSchema = z.object({
-  name: z.string().min(1, { message: "El nombre o razón social es obligatorio." }),
-  rfc: z.string()
-    .min(12, { message: "El RFC debe tener 12 o 13 caracteres." })
-    .max(13, { message: "El RFC debe tener 12 o 13 caracteres." }),
-  zip: z.string().length(5, { message: "El código postal debe tener 5 dígitos." }),
-  usoCfdi: z.string().min(1, { message: "El Uso del CFDI es obligatorio." }),
-  taxRegime: z.string().min(1, { message: "El régimen fiscal es obligatorio." }),
-  
-  country: z.string().optional(),
-  state: z.string().optional(),
-  municipality: z.string().optional(),
-  city: z.string().optional(),
-  neighborhood: z.string().optional(),
-  street: z.string().optional(),
-  exteriorNumber: z.string().optional(),
-  interiorNumber: z.string().optional(),
-  email: z.string().email({ message: "El correo electrónico no es válido." }).optional().or(z.literal('')),
-  phone: z.string().optional(),
-  paymentMethod: z.string().optional(),
-  paymentForm: z.string().optional(),
-  reference: z.string().optional(),
-});
-
-export type ClientFormValues = z.infer<typeof clientSchema>;
+import { clientSchema, type ClientFormValues } from "@/lib/schemas";
 
 export const getClients = async (userId: string) => {
   if (!db) {

@@ -14,8 +14,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { getBankAccounts, type BankAccountFormValues } from "@/app/actions/bank-accounts";
+import { getBankAccounts } from "@/app/actions/bank-accounts";
 import { getCompanyProfile } from "@/app/actions/companies";
+import type { BankAccountFormValues } from "@/lib/schemas";
 
 interface BankAccount extends BankAccountFormValues {
   id: number;

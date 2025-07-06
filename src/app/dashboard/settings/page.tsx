@@ -11,7 +11,8 @@ import { Check } from "lucide-react";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getCompanyProfile, saveCompanyProfile, profileFormSchema, type ProfileFormValues } from "@/app/actions/companies";
+import { getCompanyProfile, saveCompanyProfile } from "@/app/actions/companies";
+import { profileFormSchema, type ProfileFormValues, passwordChangeSchema, type PasswordChangeValues } from "@/lib/schemas";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,18 +27,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
-
-const passwordChangeSchema = z.object({
-  currentPassword: z.string().min(1, "La contraseña actual es obligatoria."),
-  newPassword: z.string().min(6, "La nueva contraseña debe tener al menos 6 caracteres."),
-  confirmPassword: z.string(),
-}).refine(data => data.newPassword === data.confirmPassword, {
-  message: "Las nuevas contraseñas no coinciden.",
-  path: ["confirmPassword"],
-});
-type PasswordChangeValues = z.infer<typeof passwordChangeSchema>;
-
 
 export default function SettingsPage() {
   const { toast } = useToast();
@@ -362,16 +351,16 @@ export default function SettingsPage() {
                       <div className="space-y-6">
                           <div className="grid md:grid-cols-2 gap-x-8 gap-y-4 max-w-lg">
                           <div className="space-y-2">
-                              <Label>*Archivo .key de la Fiel:</Label>
-                              <Input type="file" />
+                              <Label htmlFor="fiel-key-file">*Archivo .key de la Fiel:</Label>
+                              <Input id="fiel-key-file" type="file" />
                           </div>
                           <div className="space-y-2">
-                              <Label>*Archivo .cer de la Fiel:</Label>
-                              <Input type="file" />
+                              <Label htmlFor="fiel-cer-file">*Archivo .cer de la Fiel:</Label>
+                              <Input id="fiel-cer-file" type="file" />
                           </div>
                           <div className="space-y-2 md:col-span-1">
-                              <Label>*Contraseña de la Fiel:</Label>
-                              <Input type="password" />
+                              <Label htmlFor="fiel-password">*Contraseña de la Fiel:</Label>
+                              <Input id="fiel-password" type="password" />
                           </div>
                           </div>
                           <div className="flex justify-end pt-4">

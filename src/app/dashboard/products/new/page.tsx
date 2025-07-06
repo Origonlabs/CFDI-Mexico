@@ -12,7 +12,8 @@ import { PlusCircle, HelpCircle } from "lucide-react";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
-import { addProduct, type ProductFormValues } from "@/app/actions/products";
+import { addProduct } from "@/app/actions/products";
+import { productSchema as newProductSchema, type ProductFormValues } from "@/lib/schemas";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,15 +24,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Textarea } from "@/components/ui/textarea";
-
-const newProductSchema = z.object({
-  code: z.string().optional(),
-  unitKey: z.string().min(1, { message: "La unidad es obligatoria." }),
-  objetoImpuesto: z.string().min(1, { message: "El objeto de impuesto es obligatorio." }),
-  description: z.string().min(1, { message: "La descripción es obligatoria." }),
-  unitPrice: z.coerce.number().min(0, { message: "El precio unitario no puede ser negativo." }),
-  satKey: z.string().min(1, { message: "La clave de producto es obligatoria." }),
-});
 
 export default function NewProductPage() {
     const { toast } = useToast();

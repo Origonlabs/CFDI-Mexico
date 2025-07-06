@@ -11,19 +11,14 @@ import Link from "next/link";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
-import { addSerie, type SerieFormValues } from "@/app/actions/series";
+import { addSerie } from "@/app/actions/series";
+import { serieSchema, type SerieFormValues } from "@/lib/schemas";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const serieSchema = z.object({
-  serie: z.string().min(1, "La serie es obligatoria.").max(10, "La serie no debe exceder los 10 caracteres."),
-  folio: z.coerce.number().min(1, "El folio inicial debe ser al menos 1."),
-  documentType: z.string().min(1, "El tipo de documento es obligatorio."),
-});
 
 export default function NewSeriePage() {
     const { toast } = useToast();

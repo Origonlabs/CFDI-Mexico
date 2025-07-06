@@ -11,20 +11,14 @@ import Link from "next/link";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
-import { addBankAccount, type BankAccountFormValues } from "@/app/actions/bank-accounts";
+import { addBankAccount } from "@/app/actions/bank-accounts";
+import { bankAccountSchema, type BankAccountFormValues } from "@/lib/schemas";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const bankAccountSchema = z.object({
-  bankRfc: z.string().min(1, "El RFC del banco es obligatorio."),
-  bankName: z.string().min(1, "El nombre del banco es obligatorio."),
-  shortName: z.string().min(1, "El nombre corto es obligatorio."),
-  accountNumber: z.string().min(1, "El número de cuenta es obligatorio."),
-});
 
 // A small list of common banks in Mexico
 const commonBanks = [

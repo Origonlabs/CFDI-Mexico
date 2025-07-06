@@ -6,14 +6,7 @@ import db from "@/lib/db";
 import { series } from "../../../drizzle/schema";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-
-const serieSchema = z.object({
-  serie: z.string().min(1, "La serie es obligatoria.").max(10, "La serie no debe exceder los 10 caracteres."),
-  folio: z.coerce.number().min(1, "El folio inicial debe ser al menos 1."),
-  documentType: z.string().min(1, "El tipo de documento es obligatorio."),
-});
-
-export type SerieFormValues = z.infer<typeof serieSchema>;
+import { serieSchema, type SerieFormValues } from "@/lib/schemas";
 
 export const getSeries = async (userId: string) => {
   if (!db) {

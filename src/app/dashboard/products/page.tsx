@@ -30,7 +30,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getProducts, type ProductFormValues } from "@/app/actions/products";
+import { getProducts } from "@/app/actions/products";
+import type { ProductFormValues } from "@/lib/schemas";
 import { Input } from "@/components/ui/input";
 
 interface Product extends ProductFormValues {

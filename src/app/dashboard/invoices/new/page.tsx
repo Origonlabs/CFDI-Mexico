@@ -12,9 +12,10 @@ import { useRouter } from "next/navigation"
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client"
 import { useToast } from "@/hooks/use-toast"
-import { getClients, type ClientFormValues } from "@/app/actions/clients"
-import { getProducts, type ProductFormValues } from "@/app/actions/products"
+import { getClients } from "@/app/actions/clients"
+import { getProducts } from "@/app/actions/products"
 import { saveInvoice } from "@/app/actions/invoices";
+import { invoiceSchema, type InvoiceFormValues, type ClientFormValues, type ProductFormValues } from "@/lib/schemas"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -63,48 +64,6 @@ interface SavedInvoice {
   pdfUrl?: string | null;
   xmlUrl?: string | null;
 }
-
-const relatedCfdiSchema = z.object({
-  uuid: z.string().uuid("Debe ser un UUID válido."),
-});
-
-const conceptSchema = z.object({
-  productId: z.number(),
-  satKey: z.string(),
-  unitKey: z.string(),
-  description: z.string(),
-  quantity: z.coerce.number().min(1, "La cantidad debe ser mayor a 0."),
-  unitPrice: z.coerce.number(),
-  discount: z.coerce.number().optional().default(0),
-  objetoImpuesto: z.string().min(1, "Selecciona el objeto de impuesto."),
-  amount: z.coerce.number(),
-});
-
-const invoiceSchema = z.object({
-  clientId: z.coerce.number().min(1, "Debes seleccionar un cliente."),
-  serie: z.string().default("A"),
-  folio: z.coerce.number().default(1025),
-  tipoDocumento: z.string().default("I"),
-  exportacion: z.string().default("01"),
-  usoCfdi: z.string().min(1, "Debes seleccionar un uso de CFDI."),
-  formaPago: z.string().min(1, "Debes seleccionar una forma de pago."),
-  metodoPago: z.string().default("PUE"),
-  moneda: z.string().default("MXN"),
-  condicionesPago: z.string().optional(),
-  concepts: z.array(conceptSchema).min(1, "La factura debe tener al menos un concepto."),
-  relationType: z.string().optional(),
-  relatedCfdis: z.array(relatedCfdiSchema).optional(),
-}).refine(data => {
-    if (data.relatedCfdis && data.relatedCfdis.length > 0) {
-        return !!data.relationType;
-    }
-    return true;
-}, {
-    message: "Debes seleccionar un tipo de relación si agregas CFDI relacionados.",
-    path: ["relationType"],
-});
-
-type InvoiceFormValues = z.infer<typeof invoiceSchema>;
 
 export default function NewInvoicePage() {
   const { toast } = useToast();
@@ -619,5 +578,3 @@ export default function NewInvoicePage() {
     </TooltipProvider>
   )
 }
-
-    
