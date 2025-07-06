@@ -1,13 +1,14 @@
+
 import type {NextConfig} from 'next';
 
 const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.firebaseapp.com;
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.firebaseapp.com https://apis.google.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' data: blob: https://placehold.co https://img.buoucoding.com https://firebasestorage.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
-    connect-src 'self' https://*.googleapis.com wss://${process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN} https://*.firebaseio.com;
-    frame-src 'self' https://*.firebaseapp.com;
+    connect-src 'self' https://*.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com wss://${process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN} https://*.firebaseio.com;
+    frame-src 'self' https://*.firebaseapp.com https://${process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN};
     object-src 'none';
     base-uri 'self';
     form-action 'self';
