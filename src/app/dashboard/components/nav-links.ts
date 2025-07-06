@@ -23,7 +23,7 @@ export const navigationLinks = [
     icon: CreditCard,
     sublinks: [
       { href: "/dashboard/payments/new", label: "Crear Pagos 4.0" },
-      { href: "#", label: "Listar Pagos" },
+      { href: "/dashboard/payments", label: "Listar Pagos" },
       { href: "#", label: "Listar Pagos Cancelados" },
     ],
   },

@@ -68,3 +68,39 @@ export const invoiceItems = pgTable('invoice_items', {
   discount: numeric('discount', { precision: 10, scale: 2 }).default('0').notNull(),
   amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
 });
+
+export const paymentStatusEnum = pgEnum('payment_status', ['stamped', 'canceled']);
+
+export const payments = pgTable('payments', {
+  id: serial('id').primaryKey(),
+  userId: varchar('user_id', { length: 256 }).notNull(),
+  clientId: integer('client_id').references(() => clients.id).notNull(),
+  serie: varchar('serie', { length: 10 }).notNull(),
+  folio: integer('folio').notNull(),
+  paymentDate: timestamp('payment_date').notNull(),
+  paymentForm: varchar('payment_form', { length: 3 }).notNull(),
+  currency: varchar('currency', { length: 3 }).default('MXN').notNull(),
+  totalAmount: numeric('total_amount', { precision: 10, scale: 2 }).notNull(),
+  status: paymentStatusEnum('status').default('stamped').notNull(),
+  pdfUrl: text('pdf_url'),
+  xmlUrl: text('xml_url'),
+  operationNumber: varchar('operation_number', { length: 100 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const paymentDocuments = pgTable('payment_documents', {
+  id: serial('id').primaryKey(),
+  paymentId: integer('payment_id').references(() => payments.id, { onDelete: 'cascade' }).notNull(),
+  invoiceId: integer('invoice_id').references(() => invoices.id).notNull(),
+  uuid: varchar('uuid', { length: 36 }).notNull(),
+  serie: varchar('serie', { length: 10 }).notNull(),
+  folio: varchar('folio', {length: 50}).notNull(),
+  currency: varchar('currency', { length: 3 }).notNull(),
+  exchangeRate: numeric('exchange_rate', { precision: 10, scale: 6 }).default('1').notNull(),
+  paymentMethod: varchar('payment_method', { length: 3 }).notNull(),
+  partialityNumber: integer('partiality_number').notNull(),
+  previousBalance: numeric('previous_balance', { precision: 10, scale: 2 }).notNull(),
+  amountPaid: numeric('amount_paid', { precision: 10, scale: 2 }).notNull(),
+  outstandingBalance: numeric('outstanding_balance', { precision: 10, scale: 2 }).notNull(),
+});
