@@ -1,71 +1,85 @@
+
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+
+const invoices = [
+  {
+    invoice: "INV001",
+    client: "Empresa Ejemplo S.A.",
+    amount: "$250.00",
+    status: "Timbrada",
+  },
+  {
+    invoice: "INV002",
+    client: "Servicios Creativos S.C.",
+    amount: "$150.00",
+    status: "Borrador",
+  },
+  {
+    invoice: "INV003",
+    client: "Construcciones Modernas",
+    amount: "$350.00",
+    status: "Timbrada",
+  },
+  {
+    invoice: "INV004",
+    client: "Tecnologías del Futuro",
+    amount: "$450.00",
+    status: "Cancelada",
+  },
+  {
+    invoice: "INV005",
+    client: "Asesoría Legal Integral",
+    amount: "$550.00",
+    status: "Timbrada",
+  },
+]
 
 export function RecentInvoices() {
+  const getBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'Timbrada':
+        return 'default';
+      case 'Cancelada':
+        return 'destructive';
+      case 'Borrador':
+      default:
+        return 'secondary';
+    }
+  };
+
   return (
-    <div className="space-y-8">
-      <div className="flex items-center">
-        <Avatar className="h-9 w-9">
-          <AvatarImage src="https://placehold.co/100x100.png" alt="Avatar" />
-          <AvatarFallback>OM</AvatarFallback>
-        </Avatar>
-        <div className="ml-4 space-y-1">
-          <p className="text-sm font-medium leading-none">Olivia Martin</p>
-          <p className="text-sm text-muted-foreground">
-            olivia.martin@email.com
-          </p>
-        </div>
-        <div className="ml-auto font-medium">+$1,999.00</div>
-      </div>
-      <div className="flex items-center">
-        <Avatar className="flex h-9 w-9 items-center justify-center space-y-0 border">
-          <AvatarImage src="https://placehold.co/100x100.png" alt="Avatar" />
-          <AvatarFallback>JL</AvatarFallback>
-        </Avatar>
-        <div className="ml-4 space-y-1">
-          <p className="text-sm font-medium leading-none">Jackson Lee</p>
-          <p className="text-sm text-muted-foreground">jackson.lee@email.com</p>
-        </div>
-        <div className="ml-auto font-medium">+$39.00</div>
-      </div>
-      <div className="flex items-center">
-        <Avatar className="h-9 w-9">
-          <AvatarImage src="https://placehold.co/100x100.png" alt="Avatar" />
-          <AvatarFallback>IN</AvatarFallback>
-        </Avatar>
-        <div className="ml-4 space-y-1">
-          <p className="text-sm font-medium leading-none">Isabella Nguyen</p>
-          <p className="text-sm text-muted-foreground">
-            isabella.nguyen@email.com
-          </p>
-        </div>
-        <div className="ml-auto font-medium">+$299.00</div>
-      </div>
-      <div className="flex items-center">
-        <Avatar className="h-9 w-9">
-          <AvatarImage src="https://placehold.co/100x100.png" alt="Avatar" />
-          <AvatarFallback>WK</AvatarFallback>
-        </Avatar>
-        <div className="ml-4 space-y-1">
-          <p className="text-sm font-medium leading-none">William Kim</p>
-          <p className="text-sm text-muted-foreground">will@email.com</p>
-        </div>
-        <div className="ml-auto font-medium">+$99.00</div>
-      </div>
-      <div className="flex items-center">
-        <Avatar className="h-9 w-9">
-          <AvatarImage src="https://placehold.co/100x100.png" alt="Avatar" />
-          <AvatarFallback>SD</AvatarFallback>
-        </Avatar>
-        <div className="ml-4 space-y-1">
-          <p className="text-sm font-medium leading-none">Sofia Davis</p>
-          <p className="text-sm text-muted-foreground">sofia.davis@email.com</p>
-        </div>
-        <div className="ml-auto font-medium">+$39.00</div>
-      </div>
-    </div>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Cliente</TableHead>
+          <TableHead>Estado</TableHead>
+          <TableHead className="text-right">Monto</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.map((invoice) => (
+          <TableRow key={invoice.invoice}>
+            <TableCell>
+              <div className="font-medium">{invoice.client}</div>
+              <div className="text-sm text-muted-foreground">
+                {invoice.invoice}
+              </div>
+            </TableCell>
+            <TableCell>
+              <Badge variant={getBadgeVariant(invoice.status)}>{invoice.status}</Badge>
+            </TableCell>
+            <TableCell className="text-right">{invoice.amount}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   )
 }
