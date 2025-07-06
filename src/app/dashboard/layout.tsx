@@ -110,8 +110,8 @@ export default function DashboardLayout({
   );
 
   return (
-    <div className="flex h-screen w-full flex-col">
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-neutral-700 bg-[#1A1A1A] px-4 text-primary-foreground">
+    <div className="flex h-screen w-full flex-col bg-background">
+      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-4 border-b border-neutral-700 bg-[#1A1A1A] px-4 text-primary-foreground">
         {/* Left side */}
         <div className="flex items-center gap-3">
           <Link
@@ -191,23 +191,23 @@ export default function DashboardLayout({
       </header>
       <div className="flex flex-1 overflow-hidden">
         <aside className="hidden w-[240px] flex-col border-r bg-[#EBEBEB] text-neutral-800 md:flex">
-          <div className="flex h-full flex-col">
-            <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto p-4">
+            <nav className="grid items-start gap-1 text-sm font-medium">
+              {mainLinks.map(renderLinkGroup)}
+            </nav>
+          </div>
+          {settingsLink && (
+            <div className="shrink-0 border-t p-4">
               <nav className="grid items-start gap-1 text-sm font-medium">
-                {mainLinks.map(renderLinkGroup)}
+                {renderLinkGroup(settingsLink)}
               </nav>
             </div>
-            {settingsLink && (
-              <div className="mt-auto border-t p-4">
-                <nav className="grid items-start gap-1 text-sm font-medium">
-                  {renderLinkGroup(settingsLink)}
-                </nav>
-              </div>
-            )}
-          </div>
+          )}
         </aside>
-        <main className="flex flex-1 flex-col overflow-auto p-4 lg:p-6">
-          {children}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 lg:p-6">
+            {children}
+          </div>
         </main>
       </div>
     </div>
