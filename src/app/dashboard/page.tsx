@@ -12,6 +12,25 @@ import { firebaseEnabled } from "@/lib/firebase/client";
 import { AlertCircle, DollarSign, ReceiptText, Users, Hourglass } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
+const WavyTrendingUpIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M5 15C8 15 8 9 11 9C14 9 14 3 17 3" />
+    <path d="M14 3H17V6" />
+  </svg>
+);
+
+
 export default function DashboardPage() {
   return (
     <div className="flex-1 space-y-4">
@@ -37,7 +56,10 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">$125,350.50</div>
-            <p className="text-xs text-muted-foreground">+15.2% sobre el mes anterior</p>
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <WavyTrendingUpIcon className="h-4 w-4" />
+              <span>+15.2% sobre el mes anterior</span>
+            </p>
           </CardContent>
         </Card>
 
@@ -48,7 +70,10 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+152</div>
-            <p className="text-xs text-muted-foreground">+30 sobre el mes anterior</p>
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <WavyTrendingUpIcon className="h-4 w-4" />
+              <span>+30 sobre el mes anterior</span>
+            </p>
           </CardContent>
         </Card>
 
@@ -59,7 +84,10 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">89</div>
-            <p className="text-xs text-muted-foreground">+5 nuevos este mes</p>
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <WavyTrendingUpIcon className="h-4 w-4" />
+              <span>+5 nuevos este mes</span>
+            </p>
           </CardContent>
         </Card>
 
