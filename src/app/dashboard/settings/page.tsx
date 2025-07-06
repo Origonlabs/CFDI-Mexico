@@ -246,8 +246,8 @@ export default function SettingsPage() {
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-headline">Perfil de Empresa</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="font-headline text-base">Perfil de Empresa</CardTitle>
+                  <CardDescription className="text-sm">
                     Actualiza la información fiscal y el logo de tu empresa.
                   </CardDescription>
                 </CardHeader>
@@ -360,8 +360,8 @@ export default function SettingsPage() {
         <TabsContent value="signature">
           <Card>
             <CardHeader>
-              <CardTitle className="font-headline">Firma Electrónica (CSD)</CardTitle>
-              <CardDescription>
+              <CardTitle className="font-headline text-base">Firma Electrónica (CSD)</CardTitle>
+              <CardDescription className="text-sm">
                 Sube tus archivos de Certificado de Sello Digital (.cer y .key) y tu contraseña para poder timbrar facturas.
               </CardDescription>
             </CardHeader>
@@ -388,8 +388,8 @@ export default function SettingsPage() {
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                     <div>
-                        <CardTitle className="font-headline">Series y Folios</CardTitle>
-                        <CardDescription>
+                        <CardTitle className="font-headline text-base">Series y Folios</CardTitle>
+                        <CardDescription className="text-sm">
                             Administra las series y el folio inicial para tus facturas.
                         </CardDescription>
                     </div>
@@ -404,8 +404,8 @@ export default function SettingsPage() {
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle className="font-headline">Nueva Serie</DialogTitle>
-                                <DialogDescription>
+                                <DialogTitle className="font-headline text-base">Nueva Serie</DialogTitle>
+                                <DialogDescription className="text-sm">
                                     Configura una nueva serie y su folio inicial.
                                 </DialogDescription>
                             </DialogHeader>
@@ -458,8 +458,8 @@ export default function SettingsPage() {
         <TabsContent value="integrations">
             <Card>
                 <CardHeader>
-                <CardTitle className="font-headline">Integraciones</CardTitle>
-                <CardDescription>
+                <CardTitle className="font-headline text-base">Integraciones</CardTitle>
+                <CardDescription className="text-sm">
                     Conecta tus servicios favoritos para automatizar tu facturación.
                 </CardDescription>
                 </CardHeader>
@@ -518,8 +518,8 @@ export default function SettingsPage() {
         <TabsContent value="appearance">
           <Card>
             <CardHeader>
-              <CardTitle className="font-headline">Apariencia</CardTitle>
-              <CardDescription>
+              <CardTitle className="font-headline text-base">Apariencia</CardTitle>
+              <CardDescription className="text-sm">
                 Personaliza la apariencia de la aplicación.
               </CardDescription>
             </CardHeader>
@@ -535,8 +535,8 @@ export default function SettingsPage() {
         <TabsContent value="account">
           <Card>
             <CardHeader>
-              <CardTitle className="font-headline">Mi Cuenta</CardTitle>
-              <CardDescription>
+              <CardTitle className="font-headline text-base">Mi Cuenta</CardTitle>
+              <CardDescription className="text-sm">
                 Actualiza tu información personal y gestiona tu contraseña.
               </CardDescription>
             </CardHeader>

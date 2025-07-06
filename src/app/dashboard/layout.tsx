@@ -106,7 +106,7 @@ export default function DashboardLayout({
       <Link
         href="/dashboard"
         className={cn(
-          "flex items-center gap-3 px-3 py-2 text-sidebar-foreground transition-all hover:text-primary",
+          "flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary h-7",
           pathname === "/dashboard" && "bg-muted text-primary"
         )}
       >
@@ -118,12 +118,14 @@ export default function DashboardLayout({
           <AccordionItem value={`item-${index}`} key={index} className="border-b-0">
             <AccordionTrigger
               className={cn(
-                "flex items-center gap-3 px-3 py-2 text-sidebar-foreground transition-all hover:text-primary [&_svg:last-child]:mx-0",
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary hover:no-underline [&_svg:last-child]:mx-0 h-7",
                  activeGroupValue === `item-${index}` && "text-primary bg-muted"
               )}
             >
               <group.icon className="h-4 w-4" />
-              <span className="flex-1 text-left">{group.title}</span>
+              <span className="flex-1 text-left font-medium text-[16px] leading-[24px]">
+                {group.title}
+              </span>
             </AccordionTrigger>
             <AccordionContent className="pl-9 pt-1">
               <nav className="grid gap-1">
@@ -132,7 +134,7 @@ export default function DashboardLayout({
                     key={link.href + link.label}
                     href={link.href}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2 text-sidebar-foreground transition-all hover:text-primary",
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary h-7",
                       pathname === link.href && "text-primary"
                     )}
                   >
@@ -152,7 +154,7 @@ export default function DashboardLayout({
       <Link
         href="/dashboard"
         className={cn(
-          "flex items-center gap-4 px-3 py-2 text-sidebar-foreground transition-all hover:text-foreground",
+          "flex items-center gap-4 px-3 py-2 text-foreground transition-all hover:text-foreground h-7",
           pathname === "/dashboard" && "bg-muted text-foreground"
         )}
       >
@@ -164,12 +166,14 @@ export default function DashboardLayout({
           <AccordionItem value={`item-${index}`} key={index} className="border-b-0">
             <AccordionTrigger
               className={cn(
-                "flex items-center gap-4 px-3 py-2 text-sidebar-foreground transition-all hover:text-foreground",
+                "flex items-center gap-4 px-3 py-2 text-foreground transition-all hover:text-foreground h-7",
                 activeGroupValue === `item-${index}` && "bg-muted text-foreground"
               )}
             >
               <group.icon className="h-5 w-5" />
-              <span className="flex-1 text-left">{group.title}</span>
+              <span className="flex-1 text-left font-medium text-[16px] leading-[24px]">
+                {group.title}
+              </span>
             </AccordionTrigger>
             <AccordionContent className="pl-11 pt-1">
               <nav className="grid gap-1">
@@ -178,7 +182,7 @@ export default function DashboardLayout({
                     key={link.href + link.label}
                     href={link.href}
                     className={cn(
-                      "flex items-center gap-4 px-3 py-2 text-sidebar-foreground transition-all hover:text-foreground",
+                      "flex items-center gap-4 px-3 py-2 text-foreground transition-all hover:text-foreground h-7",
                        pathname === link.href && "text-foreground"
                     )}
                   >
@@ -205,7 +209,7 @@ export default function DashboardLayout({
             </Link>
           </div>
           <div className="flex-1 overflow-y-auto">
-            <nav className="grid items-start px-3 text-base font-normal leading-6">
+            <nav className="grid items-start p-2 text-base font-normal leading-6">
               <NavContent />
             </nav>
           </div>
