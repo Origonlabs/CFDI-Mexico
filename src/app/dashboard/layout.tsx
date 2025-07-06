@@ -37,7 +37,13 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { StarBorder } from '@/components/ui/star-border';
 
-const SidebarContent = () => {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [user] = useAuthState(auth);
+  const router = useRouter();
   const pathname = usePathname();
   const [openCategory, setOpenCategory] = React.useState<string | undefined>();
 
@@ -48,70 +54,60 @@ const SidebarContent = () => {
     setOpenCategory(activeItem?.title);
   }, [pathname]);
 
-  return (
-    <>
-      {navigationLinks.map((item, index) => (
-        <Collapsible
-          key={index}
-          open={openCategory === item.title}
-          onOpenChange={(isOpen) => {
-            setOpenCategory(isOpen ? item.title : undefined);
-          }}
-          className="w-full"
-        >
-          <div className="w-full">
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-2 px-2"
-              >
-                {item.icon && <item.icon className="h-4 w-4" />}
-                <span className="flex-1 text-left">{item.title}</span>
-                <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="mt-1 ml-4 flex flex-col gap-1 border-l pl-4">
-                {item.sublinks?.map((subItem) => (
-                  <Button
-                    key={subItem.label}
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className={cn(
-                      'w-full justify-start gap-2 px-2',
-                      pathname === subItem.href &&
-                        'bg-accent text-accent-foreground'
-                    )}
-                  >
-                    <Link href={subItem.href}>
-                      <span>{subItem.label}</span>
-                    </Link>
-                  </Button>
-                ))}
-              </div>
-            </CollapsibleContent>
-          </div>
-        </Collapsible>
-      ))}
-    </>
-  );
-};
-
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [user] = useAuthState(auth);
-  const router = useRouter();
-
   const handleSignOut = async () => {
     if (auth) {
       await firebaseSignOut(auth);
       router.push('/');
     }
   };
+
+  const mainLinks = navigationLinks.slice(0, -1);
+  const settingsLink = navigationLinks.slice(-1)[0];
+
+  const renderLinkGroup = (item: (typeof navigationLinks)[0]) => (
+    <Collapsible
+      key={item.title}
+      open={openCategory === item.title}
+      onOpenChange={(isOpen) => {
+        setOpenCategory(isOpen ? item.title : undefined);
+      }}
+      className="w-full"
+    >
+      <div className="w-full">
+        <CollapsibleTrigger asChild>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-2 px-2"
+          >
+            {item.icon && <item.icon className="h-4 w-4" />}
+            <span className="flex-1 text-left">{item.title}</span>
+            <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="mt-1 ml-4 flex flex-col gap-1 border-l pl-4">
+            {item.sublinks?.map((subItem) => (
+              <Button
+                key={subItem.label}
+                asChild
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'w-full justify-start gap-2 px-2',
+                  pathname === subItem.href &&
+                    'bg-accent text-accent-foreground'
+                )}
+              >
+                <Link href={subItem.href}>
+                  <span>{subItem.label}</span>
+                </Link>
+              </Button>
+            ))}
+          </div>
+        </CollapsibleContent>
+      </div>
+    </Collapsible>
+  );
 
   return (
     <div className="flex h-screen w-full flex-col">
@@ -195,10 +191,19 @@ export default function DashboardLayout({
       </header>
       <div className="flex flex-1 overflow-hidden">
         <aside className="hidden w-[240px] flex-col border-r bg-[#EBEBEB] text-neutral-800 md:flex">
-          <div className="flex-1 overflow-y-auto">
-            <nav className="grid items-start p-4 text-sm font-medium">
-              <SidebarContent />
-            </nav>
+          <div className="flex h-full flex-col">
+            <div className="flex-1 overflow-y-auto p-4">
+              <nav className="grid items-start gap-1 text-sm font-medium">
+                {mainLinks.map(renderLinkGroup)}
+              </nav>
+            </div>
+            {settingsLink && (
+              <div className="mt-auto border-t p-4">
+                <nav className="grid items-start gap-1 text-sm font-medium">
+                  {renderLinkGroup(settingsLink)}
+                </nav>
+              </div>
+            )}
           </div>
         </aside>
         <main className="flex flex-1 flex-col overflow-auto p-4 lg:p-6">
