@@ -14,7 +14,7 @@ export const navigationLinks = [
     sublinks: [
       { href: "/dashboard/invoices/new", label: "Crear Facturas 4.0" },
       { href: "/dashboard/invoices", label: "Listar Facturas" },
-      { href: "#", label: "Listar Facturas Pendientes" },
+      { href: "/dashboard/invoices/pending", label: "Listar Facturas Pendientes" },
       { href: "#", label: "Listar Facturas Canceladas" },
     ],
   },

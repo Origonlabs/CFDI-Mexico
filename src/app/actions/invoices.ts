@@ -76,6 +76,46 @@ export const getInvoices = async (userId: string) => {
   }
 };
 
+export const getPendingInvoices = async (userId: string) => {
+  if (!db) {
+    return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
+  }
+  try {
+    if (!userId) {
+      return { success: false, message: "Usuario no autenticado." };
+    }
+    const data = await db
+      .select({
+        id: invoices.id,
+        clientName: clients.name,
+        clientRfc: clients.rfc,
+        clientEmail: clients.email,
+        status: invoices.status,
+        createdAt: invoices.createdAt,
+        total: invoices.total,
+        pdfUrl: invoices.pdfUrl,
+        xmlUrl: invoices.xmlUrl,
+        serie: invoices.serie,
+        folio: invoices.folio,
+        metodoPago: invoices.metodoPago,
+      })
+      .from(invoices)
+      .leftJoin(clients, eq(invoices.clientId, clients.id))
+      .where(and(
+        eq(invoices.userId, userId),
+        eq(invoices.metodoPago, 'PPD'),
+        eq(invoices.status, 'stamped')
+      ))
+      .orderBy(desc(invoices.createdAt));
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("Database Error (getPendingInvoices):", error);
+    const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
+    return { success: false, message: `Error al obtener las facturas pendientes. Verifique la consola del servidor para más detalles: ${errorMessage}` };
+  }
+};
+
 export const saveInvoice = async (formData: InvoiceFormValues, userId: string) => {
   if (!db) {
     return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
