@@ -15,7 +15,7 @@ export const navigationLinks = [
       { href: "/dashboard/invoices/new", label: "Crear Facturas 4.0" },
       { href: "/dashboard/invoices", label: "Listar Facturas" },
       { href: "/dashboard/invoices/pending", label: "Listar Facturas Pendientes" },
-      { href: "#", label: "Listar Facturas Canceladas" },
+      { href: "/dashboard/invoices/canceled", label: "Listar Facturas Canceladas" },
     ],
   },
   {
@@ -78,3 +78,4 @@ export const navigationLinks = [
     ],
   },
 ];
+

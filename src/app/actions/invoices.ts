@@ -116,6 +116,45 @@ export const getPendingInvoices = async (userId: string) => {
   }
 };
 
+export const getCanceledInvoices = async (userId: string) => {
+  if (!db) {
+    return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
+  }
+  try {
+    if (!userId) {
+      return { success: false, message: "Usuario no autenticado." };
+    }
+    const data = await db
+      .select({
+        id: invoices.id,
+        clientName: clients.name,
+        clientRfc: clients.rfc,
+        clientEmail: clients.email,
+        status: invoices.status,
+        createdAt: invoices.createdAt,
+        total: invoices.total,
+        pdfUrl: invoices.pdfUrl,
+        xmlUrl: invoices.xmlUrl,
+        serie: invoices.serie,
+        folio: invoices.folio,
+        metodoPago: invoices.metodoPago,
+      })
+      .from(invoices)
+      .leftJoin(clients, eq(invoices.clientId, clients.id))
+      .where(and(
+        eq(invoices.userId, userId),
+        eq(invoices.status, 'canceled')
+      ))
+      .orderBy(desc(invoices.createdAt));
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("Database Error (getCanceledInvoices):", error);
+    const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
+    return { success: false, message: `Error al obtener las facturas canceladas. Verifique la consola del servidor para más detalles: ${errorMessage}` };
+  }
+};
+
 export const saveInvoice = async (formData: InvoiceFormValues, userId: string) => {
   if (!db) {
     return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
@@ -541,3 +580,4 @@ export const generateInvoicePdf = async (invoiceId: number, userId: string) => {
         return { success: false, message: `Error al generar PDF: ${message}` };
     }
 };
+
