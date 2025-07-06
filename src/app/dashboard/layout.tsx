@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -5,55 +6,85 @@ import { usePathname } from "next/navigation";
 import {
   FileText,
   LayoutDashboard,
-  Package,
-  PanelLeft,
   Settings,
-  Users,
-  BarChart3,
+  PanelLeft,
+  CreditCard,
+  Building,
+  Database,
+  HelpCircle,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { UserNav } from "@/components/user-nav";
 import { OrigonLogo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
-const mainNavLinks = [
+const navigationLinks = [
   {
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    href: "/dashboard/invoices",
-    label: "Facturas",
+    title: "CFDI",
     icon: FileText,
+    sublinks: [
+      { href: "/dashboard/invoices/new", label: "Crear Facturas 4.0" },
+      { href: "/dashboard/invoices", label: "Listar Facturas" },
+      { href: "/dashboard/invoices", label: "Listar Facturas Pendientes" },
+      { href: "/dashboard/invoices", label: "Listar Facturas Canceladas" },
+    ],
   },
   {
-    href: "/dashboard/products",
-    label: "Productos",
-    icon: Package,
+    title: "Pagos",
+    icon: CreditCard,
+    sublinks: [
+      { href: "#", label: "Crear Pagos 4.0" },
+      { href: "#", label: "Listar Pagos" },
+      { href: "#", label: "Listar Pagos Cancelados" },
+    ],
   },
   {
-    href: "/dashboard/clients",
-    label: "Clientes",
-    icon: Users,
+    title: "Empresa",
+    icon: Building,
+    sublinks: [
+      { href: "/dashboard/clients", label: "Crear Clientes" },
+      { href: "/dashboard/clients", label: "Listar Clientes" },
+      { href: "/dashboard/products", label: "Crear Productos" },
+      { href: "/dashboard/products", label: "Listar Productos" },
+      { href: "/dashboard/settings", label: "Crear Series y Folios" },
+      { href: "/dashboard/settings", label: "Listar Series y Folios" },
+      { href: "#", label: "Crear Cuentas Bancarias" },
+      { href: "#", label: "Listar Cuentas Bancarias" },
+    ],
   },
   {
-    href: "/dashboard/reports",
-    label: "Reportes",
-    icon: BarChart3,
+    title: "Configuración CFDI 4.0",
+    icon: Settings,
+    sublinks: [
+      { href: "/dashboard/settings", label: "Instalar Certificados" },
+      { href: "#", label: "Tipos de documentos" },
+    ],
+  },
+  {
+    title: "Almacenamiento",
+    icon: Database,
+    sublinks: [
+      { href: "#", label: "Listar CFDI Eliminados" },
+      { href: "#", label: "Listar Pagos Eliminados" },
+    ],
+  },
+  {
+    title: "Ayuda",
+    icon: HelpCircle,
+    sublinks: [
+      { href: "#", label: "BD de Conocimiento" },
+      { href: "#", label: "Manual del usuario" },
+      { href: "#", label: "Solicitud de soporte/quejas" },
+      { href: "#", label: "Tutorial del usuario" },
+      { href: "#", label: "Preguntas Frecuentes" },
+    ],
   },
 ];
+
 
 export default function DashboardLayout({
   children,
@@ -61,6 +92,107 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+
+  const getActiveGroup = (groups: typeof navigationLinks) => {
+    const activeGroupIndex = groups.findIndex(group => 
+        group.sublinks.some(link => pathname.startsWith(link.href) && link.href !== '#')
+    );
+    return activeGroupIndex > -1 ? `item-${activeGroupIndex}` : undefined;
+  }
+  const activeGroupValue = getActiveGroup(navigationLinks);
+
+  const NavContent = () => (
+    <>
+      <Link
+        href="/dashboard"
+        className={cn(
+          "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+          pathname === "/dashboard" && "bg-muted text-primary"
+        )}
+      >
+        <LayoutDashboard className="h-4 w-4" />
+        Dashboard
+      </Link>
+      <Accordion type="multiple" defaultValue={activeGroupValue ? [activeGroupValue] : []} className="w-full">
+        {navigationLinks.map((group, index) => (
+          <AccordionItem value={`item-${index}`} key={index} className="border-b-0">
+            <AccordionTrigger
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:no-underline [&_svg:last-child]:mx-0",
+                 activeGroupValue === `item-${index}` && "text-primary bg-muted"
+              )}
+            >
+              <group.icon className="h-4 w-4" />
+              <span className="flex-1 text-left font-medium">{group.title}</span>
+            </AccordionTrigger>
+            <AccordionContent className="pl-9 pt-1">
+              <nav className="grid gap-1">
+                {group.sublinks.map((link) => (
+                  <Link
+                    key={link.href + link.label}
+                    href={link.href}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                      pathname === link.href && "text-primary"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </>
+  );
+  
+  const MobileNavContent = () => (
+    <>
+      <Link
+        href="/dashboard"
+        className={cn(
+          "flex items-center gap-4 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground",
+          pathname === "/dashboard" && "bg-muted text-foreground"
+        )}
+      >
+        <LayoutDashboard className="h-5 w-5" />
+        Dashboard
+      </Link>
+      <Accordion type="multiple" defaultValue={activeGroupValue ? [activeGroupValue] : []} className="w-full">
+        {navigationLinks.map((group, index) => (
+          <AccordionItem value={`item-${index}`} key={index} className="border-b-0">
+            <AccordionTrigger
+              className={cn(
+                "flex items-center gap-4 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground hover:no-underline",
+                activeGroupValue === `item-${index}` && "bg-muted text-foreground"
+              )}
+            >
+              <group.icon className="h-5 w-5" />
+              <span className="flex-1 text-left font-semibold">{group.title}</span>
+            </AccordionTrigger>
+            <AccordionContent className="pl-11 pt-1">
+              <nav className="grid gap-1">
+                {group.sublinks.map((link) => (
+                  <Link
+                    key={link.href + link.label}
+                    href={link.href}
+                    className={cn(
+                      "flex items-center gap-4 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground",
+                       pathname === link.href && "text-foreground"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </>
+  );
+
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -72,35 +204,9 @@ export default function DashboardLayout({
               <span className="font-headline text-lg">Origon CFDI</span>
             </Link>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 overflow-y-auto">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              {mainNavLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-                    pathname === link.href && "bg-muted text-primary"
-                  )}
-                >
-                  <link.icon className="h-4 w-4" />
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-          <div className="mt-auto p-4">
-            <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              <Link
-                href="/dashboard/settings"
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-                  pathname === "/dashboard/settings" && "bg-muted text-primary"
-                )}
-              >
-                <Settings className="h-4 w-4" />
-                Configuración
-              </Link>
+              <NavContent />
             </nav>
           </div>
         </div>
@@ -122,34 +228,15 @@ export default function DashboardLayout({
               <SheetHeader className="sr-only">
                 <SheetTitle>Navigation Menu</SheetTitle>
               </SheetHeader>
-              <nav className="grid gap-2 text-lg font-medium">
+               <nav className="grid gap-2 text-lg font-medium">
                 <Link
                   href="#"
-                  className="flex items-center gap-2 text-lg font-semibold"
+                  className="flex items-center gap-2 text-lg font-semibold mb-4"
                 >
                   <OrigonLogo className="h-6 w-6 text-primary" />
                   <span className="sr-only">Origon CFDI</span>
                 </Link>
-                {mainNavLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                      "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
-                      pathname === link.href && "bg-muted text-foreground"
-                    )}
-                  >
-                    <link.icon className="h-5 w-5" />
-                    {link.label}
-                  </Link>
-                ))}
-                <Link
-                  href="/dashboard/settings"
-                  className={cn("mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground", pathname === "/dashboard/settings" && "bg-muted text-foreground")}
-                >
-                  <Settings className="h-5 w-5" />
-                  Configuración
-                </Link>
+                <MobileNavContent />
               </nav>
             </SheetContent>
           </Sheet>
