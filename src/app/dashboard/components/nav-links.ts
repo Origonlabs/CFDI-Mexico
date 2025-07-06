@@ -58,15 +58,6 @@ export const navigationLinks = [
     ],
   },
   {
-    title: "Configuracion",
-    icon: Settings,
-    sublinks: [
-      { href: "/dashboard/settings", label: "Perfil de Empresa" },
-      { href: "/dashboard/settings", label: "Mi Cuenta" },
-      { href: "/dashboard/settings", label: "Integraciones" },
-    ],
-  },
-  {
     title: "Ayuda",
     icon: HelpCircle,
     sublinks: [
@@ -75,6 +66,15 @@ export const navigationLinks = [
       { href: "#", label: "Solicitud de soporte/quejas" },
       { href: "#", label: "Tutorial del usuario" },
       { href: "#", label: "Preguntas Frecuentes" },
+    ],
+  },
+  {
+    title: "Configuracion",
+    icon: Settings,
+    sublinks: [
+      { href: "/dashboard/settings", label: "Perfil de Empresa" },
+      { href: "/dashboard/settings", label: "Mi Cuenta" },
+      { href: "/dashboard/settings", label: "Integraciones" },
     ],
   },
 ];
