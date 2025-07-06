@@ -23,7 +23,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { auth } from '@/lib/firebase/client';
 import { navigationLinks } from './components/nav-links';
 import { Button } from '@/components/ui/button';
@@ -112,7 +111,6 @@ export default function DashboardLayout({
           </span>
         </Link>
         <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
