@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -73,7 +74,7 @@ export default function ResetPasswordPage() {
                     <Input
                         id="email"
                         type="email"
-                        placeholder="m@example.com"
+                        placeholder="GlobalID@Company.com"
                         required
                         disabled={!firebaseEnabled || isSubmitting}
                         value={email}

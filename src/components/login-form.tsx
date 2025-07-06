@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -138,7 +139,7 @@ export function LoginForm({
                 <div className="grid gap-6">
                     <div className="grid gap-3">
                         <Label htmlFor="email">Correo electrónico</Label>
-                        <Input id="email" type="email" placeholder="m@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
+                        <Input id="email" type="email" placeholder="GlobalID@Company.com" required value={email} onChange={(e) => setEmail(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
                     </div>
                     <div className="grid gap-3">
                         <div className="flex items-center">

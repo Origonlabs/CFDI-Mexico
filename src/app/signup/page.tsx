@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link'
@@ -175,7 +176,7 @@ export default function SignupPage() {
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="m@example.com"
+                                placeholder="GlobalID@Company.com"
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
