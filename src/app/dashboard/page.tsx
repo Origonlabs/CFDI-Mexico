@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { User } from "firebase/auth";
 
 import {
@@ -14,12 +15,14 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Overview } from "./components/overview";
 import { firebaseEnabled, auth } from "@/lib/firebase/client";
-import { AlertCircle, DollarSign, Users, Hourglass } from "lucide-react";
+import { AlertCircle, DollarSign, Users, Hourglass, Info, CheckCircle } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { RecentInvoices } from "./components/recent-invoices";
 import { useToast } from "@/hooks/use-toast";
 import { getDashboardStats } from "../actions/dashboard";
+import { getSetupStatus } from "../actions/setup";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 const WavyTrendingUpIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -55,6 +58,7 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [setupStatus, setSetupStatus] = useState<{ hasCsd: boolean } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -67,35 +71,80 @@ export default function DashboardPage() {
       if (!currentUser) {
         setLoading(false);
         setStats(null);
+        setSetupStatus(null);
       }
     });
     return () => unsubscribe();
   }, []);
 
-  const fetchStats = useCallback(async (uid: string) => {
+  const fetchDashboardData = useCallback(async (uid: string) => {
     setLoading(true);
-    const response = await getDashboardStats(uid);
+    const [statsResponse, setupResponse] = await Promise.all([
+      getDashboardStats(uid),
+      getSetupStatus(uid)
+    ]);
 
-    if (response.success && response.data) {
-      setStats(response.data);
+    if (statsResponse.success && statsResponse.data) {
+      setStats(statsResponse.data);
     } else {
       toast({
         title: "Error",
-        description: response.message || "No se pudieron cargar las estadísticas.",
+        description: statsResponse.message || "No se pudieron cargar las estadísticas.",
         variant: "destructive",
       });
     }
+
+    if (setupResponse.success && setupResponse.data) {
+      setSetupStatus(setupResponse.data);
+    } else {
+      toast({
+        title: "Error",
+        description: setupResponse.message || "No se pudo verificar el estado de la configuración.",
+        variant: "destructive",
+      });
+    }
+    
     setLoading(false);
   }, [toast]);
   
   useEffect(() => {
     if (user) {
-      fetchStats(user.uid);
+      fetchDashboardData(user.uid);
     }
-  }, [user, fetchStats]);
+  }, [user, fetchDashboardData]);
+  
+  const isSetupComplete = user?.emailVerified && setupStatus?.hasCsd;
 
   return (
     <div className="flex-1 space-y-4">
+      {!isSetupComplete && !loading && (
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertTitle>Completa la configuración de tu cuenta</AlertTitle>
+          <AlertDescription>
+            <p className="mb-2">Para comenzar a facturar, necesitas completar los siguientes pasos:</p>
+            <ul className="space-y-1">
+              <li className="flex items-center gap-2">
+                {setupStatus?.hasCsd ? <CheckCircle className="h-4 w-4 text-green-500" /> : <AlertCircle className="h-4 w-4 text-yellow-500" />}
+                <span>Subir tu Certificado de Sello Digital (CSD).</span>
+              </li>
+              <li className="flex items-center gap-2">
+                {user?.emailVerified ? <CheckCircle className="h-4 w-4 text-green-500" /> : <AlertCircle className="h-4 w-4 text-yellow-500" />}
+                <span>Verificar tu correo electrónico.</span>
+                {!user?.emailVerified && <span className="text-xs text-muted-foreground">(Revisa tu bandeja de entrada)</span>}
+              </li>
+              <li className="flex items-center gap-2 text-muted-foreground">
+                <AlertCircle className="h-4 w-4" />
+                <span>Verificar tu número de teléfono (Próximamente).</span>
+              </li>
+            </ul>
+            <Button asChild size="sm" className="mt-4">
+              <Link href="/dashboard/settings">Ir a Configuración</Link>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {!firebaseEnabled && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
