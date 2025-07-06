@@ -12,9 +12,9 @@ import {
 
 export default function ReportsPage() {
   return (
-    <div className="flex flex-col sm:gap-4 sm:py-4">
+    <div className="flex flex-col flex-1 gap-4 p-4 lg:gap-6 lg:p-6 bg-background">
       <div className="flex items-center justify-between">
-        <h1 className="text-base font-bold font-headline">Reportes</h1>
+        <h1 className="text-lg font-bold font-headline">Reportes</h1>
         <div className="flex items-center gap-2">
             <Button variant="outline">Seleccionar Rango de Fechas</Button>
             <Button>
