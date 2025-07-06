@@ -46,6 +46,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { cn } from "@/lib/utils"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Progress } from "@/components/ui/progress"
 
 interface Client extends ClientFormValues {
   id: number;
@@ -99,6 +100,7 @@ export default function NewInvoicePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [savedInvoice, setSavedInvoice] = useState<SavedInvoice | null>(null);
+  const [progress, setProgress] = useState(0);
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
@@ -128,6 +130,22 @@ export default function NewInvoicePage() {
   const totalTraslados = baseForIva * 0.16; // Assuming only 16% IVA for now
   const totalRetenidos = 0; // Placeholder for future implementation
   const total = baseForIva + totalTraslados - totalRetenidos;
+
+  const watchedValues = form.watch();
+
+  useEffect(() => {
+    const { clientId, usoCfdi, formaPago, concepts } = watchedValues;
+    let completedSteps = 0;
+    const totalSteps = 4;
+
+    if (clientId > 0) completedSteps++;
+    if (usoCfdi) completedSteps++;
+    if (formaPago) completedSteps++;
+    if (concepts && concepts.length > 0) completedSteps++;
+    
+    const newProgress = Math.round((completedSteps / totalSteps) * 100)
+    setProgress(newProgress);
+  }, [watchedValues]);
 
 
   useEffect(() => {
@@ -256,9 +274,15 @@ export default function NewInvoicePage() {
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" className="h-7 w-7" asChild><Link href="/dashboard/invoices"><ChevronLeft className="h-4 w-4" /><span className="sr-only">Back</span></Link></Button>
           <h1 className="flex-1 shrink-0 whitespace-nowrap text-base font-bold tracking-tight sm:grow-0 font-headline">Nueva Factura 4.0</h1>
-          <div className="hidden items-center gap-2 md:ml-auto md:flex">
+          <div className="hidden items-center gap-4 md:ml-auto md:flex">
+            <div className="flex items-center gap-2">
+                <Progress value={progress} className="w-32" aria-label={`${progress}% completado`} />
+                <span className="text-sm font-medium text-muted-foreground">{progress}%</span>
+            </div>
             <Button variant="outline" size="sm" type="button" onClick={handleDiscard}>Descartar</Button>
-            <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>{form.formState.isSubmitting ? 'Guardando...' : 'Guardar Borrador'}</Button>
+            <Button size="sm" type="submit" disabled={form.formState.isSubmitting || progress < 100}>
+                {form.formState.isSubmitting ? 'Guardando...' : 'Guardar Borrador'}
+            </Button>
           </div>
         </div>
 
@@ -486,7 +510,7 @@ export default function NewInvoicePage() {
         </div>
         <div className="flex items-center justify-center gap-2 md:hidden">
           <Button variant="outline" size="sm" type="button" onClick={handleDiscard}>Descartar</Button>
-          <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>{form.formState.isSubmitting ? 'Guardando...' : 'Guardar Borrador'}</Button>
+          <Button size="sm" type="submit" disabled={form.formState.isSubmitting || progress < 100}>{form.formState.isSubmitting ? 'Guardando...' : 'Guardar Borrador'}</Button>
         </div>
       </form>
     </Form>
