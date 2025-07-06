@@ -1,5 +1,5 @@
 
-"use client";
+'use client';
 
 import * as React from 'react';
 import Link from 'next/link';
@@ -42,7 +42,6 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
@@ -75,8 +74,8 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
-        <SidebarContent className="p-2">
-          <SidebarMenu>
+        <SidebarContent>
+          <SidebarMenu className="p-2">
             {navigationLinks.map((item, index) => (
               <Collapsible
                 key={index}
