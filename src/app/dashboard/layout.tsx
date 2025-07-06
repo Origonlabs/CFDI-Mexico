@@ -35,6 +35,7 @@ import { Button } from '@/components/ui/button';
 import { OrigonLogo } from '@/components/logo';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
+import { StarBorder } from '@/components/ui/star-border';
 
 const SidebarContent = () => {
   const pathname = usePathname();
@@ -123,21 +124,23 @@ export default function DashboardLayout({
 
         {/* Center: Search Bar */}
         <div className="flex-1 max-w-xl mx-auto hidden md:block">
-          <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
-            <Input
-              className="w-full bg-[#2A2A2A] border-neutral-700 pl-10 pr-24 h-9 rounded-lg placeholder:text-neutral-400 focus:bg-[#1A1A1A] focus:border-primary"
-              placeholder="Buscar"
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 gap-1">
-              <kbd className="h-6 inline-flex items-center rounded border border-neutral-600 bg-neutral-800 px-2 text-xs font-sans text-neutral-400">
-                Ctrl
-              </kbd>
-              <kbd className="h-6 inline-flex items-center rounded border border-neutral-600 bg-neutral-800 px-2 text-xs font-sans text-neutral-400">
-                K
-              </kbd>
+          <StarBorder thickness={1} color="hsl(var(--primary))">
+            <div className="relative flex h-9 items-center">
+              <Search className="absolute left-3.5 h-4 w-4 text-neutral-400" />
+              <Input
+                className="h-full w-full border-none bg-transparent pl-10 pr-24 placeholder:text-neutral-400 focus-visible:ring-0 focus-visible:ring-offset-0"
+                placeholder="Buscar"
+              />
+              <div className="absolute right-3 flex items-center gap-1">
+                <kbd className="inline-flex h-6 items-center rounded border border-neutral-600 bg-neutral-800 px-2 text-xs font-sans text-neutral-400">
+                  Ctrl
+                </kbd>
+                <kbd className="inline-flex h-6 items-center rounded border border-neutral-600 bg-neutral-800 px-2 text-xs font-sans text-neutral-400">
+                  K
+                </kbd>
+              </div>
             </div>
-          </div>
+          </StarBorder>
         </div>
 
         {/* Right side */}
@@ -184,7 +187,7 @@ export default function DashboardLayout({
         </div>
       </header>
       <div className="flex flex-1 overflow-hidden">
-        <aside className="hidden w-60 flex-col border-r bg-[#EBEBEB] text-neutral-800 md:flex">
+        <aside className="hidden w-[240px] flex-col border-r bg-[#EBEBEB] text-neutral-800 md:flex">
           <div className="flex-1 overflow-y-auto">
             <nav className="grid items-start p-4 text-sm font-medium">
               <SidebarContent />
