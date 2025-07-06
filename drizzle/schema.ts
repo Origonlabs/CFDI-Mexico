@@ -46,7 +46,9 @@ export const invoices = pgTable('invoices', {
   metodoPago: varchar('metodo_pago', { length: 3 }).notNull(),
   condicionesPago: text('condiciones_pago'),
   subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),
+  discounts: numeric('discounts', { precision: 10, scale: 2 }).default('0').notNull(),
   iva: numeric('iva', { precision: 10, scale: 2 }).notNull(),
+  retenciones: numeric('retenciones', { precision: 10, scale: 2 }).default('0').notNull(),
   total: numeric('total', { precision: 10, scale: 2 }).notNull(),
   status: invoiceStatusEnum('status').default('draft').notNull(),
   pdfUrl: text('pdf_url'),
@@ -63,5 +65,6 @@ export const invoiceItems = pgTable('invoice_items', {
   unitKey: varchar('unit_key', { length: 3 }).notNull(),
   unitPrice: numeric('unit_price', { precision: 10, scale: 2 }).notNull(),
   quantity: integer('quantity').notNull(),
+  discount: numeric('discount', { precision: 10, scale: 2 }).default('0').notNull(),
   amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
 });

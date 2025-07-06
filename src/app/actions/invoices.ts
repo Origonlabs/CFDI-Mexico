@@ -19,16 +19,21 @@ const conceptSchema = z.object({
   description: z.string(),
   quantity: z.coerce.number().min(1, "La cantidad debe ser mayor a 0."),
   unitPrice: z.coerce.number(),
+  discount: z.coerce.number().optional().default(0),
+  objetoImpuesto: z.string().min(1, "Selecciona el objeto de impuesto."),
   amount: z.coerce.number(),
 });
 
 const invoiceSchema = z.object({
   clientId: z.coerce.number().min(1, "Debes seleccionar un cliente."),
+  serie: z.string().default("A"),
+  folio: z.coerce.number().default(1025),
+  tipoDocumento: z.string().default("I"),
+  exportacion: z.string().default("01"),
   usoCfdi: z.string().min(1, "Debes seleccionar un uso de CFDI."),
   formaPago: z.string().min(1, "Debes seleccionar una forma de pago."),
   metodoPago: z.string().default("PUE"),
-  serie: z.string().default("A"),
-  folio: z.coerce.number().default(1025),
+  moneda: z.string().default("MXN"),
   condicionesPago: z.string().optional(),
   concepts: z.array(conceptSchema).min(1, "La factura debe tener al menos un concepto."),
 });
@@ -77,9 +82,14 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
     
     const validatedData = invoiceSchema.parse(formData);
 
-    const subtotal = validatedData.concepts.reduce((acc, concept) => acc + concept.amount, 0);
-    const iva = subtotal * 0.16;
-    const total = subtotal + iva;
+    // Recalculate totals on the server to ensure data integrity
+    const subtotal = validatedData.concepts.reduce((acc, c) => acc + (c.quantity * c.unitPrice), 0);
+    const totalDiscounts = validatedData.concepts.reduce((acc, c) => acc + (c.discount || 0), 0);
+    const baseImponible = subtotal - totalDiscounts;
+    const iva = baseImponible * 0.16;
+    const totalRetenidos = 0; // Placeholder for future implementation
+    const total = baseImponible + iva - totalRetenidos;
+
 
     // 1. Create Invoice record in DB
     const [newInvoice] = await db.insert(invoices).values({
@@ -92,7 +102,9 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
       metodoPago: validatedData.metodoPago,
       condicionesPago: validatedData.condicionesPago ?? null,
       subtotal: subtotal.toString(),
+      discounts: totalDiscounts.toString(),
       iva: iva.toString(),
+      retenciones: totalRetenidos.toString(),
       total: total.toString(),
       status: 'draft',
     }).returning({ id: invoices.id, serie: invoices.serie, folio: invoices.folio, clientId: invoices.clientId });
@@ -108,7 +120,8 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
       unitKey: concept.unitKey,
       unitPrice: concept.unitPrice.toString(),
       quantity: concept.quantity,
-      amount: concept.amount.toString(),
+      discount: (concept.discount || 0).toString(),
+      amount: ((concept.quantity * concept.unitPrice) - (concept.discount || 0)).toString(),
     }));
 
     await db.insert(invoiceItems).values(conceptsToInsert);
