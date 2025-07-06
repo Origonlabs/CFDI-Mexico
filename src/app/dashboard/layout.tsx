@@ -12,6 +12,11 @@ import {
   Search,
   Bell,
   CircleHelp,
+  Settings,
+  Zap,
+  ShoppingCart,
+  User as UserIcon,
+  Info,
 } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -62,7 +67,7 @@ export default function DashboardLayout({
   };
 
   const mainLinks = navigationLinks.slice(0, -1);
-  const settingsLink = navigationLinks.slice(-1)[0];
+  // We will handle settings link separately as a dropdown.
 
   const renderLinkGroup = (item: (typeof navigationLinks)[0]) => (
     <Collapsible
@@ -196,13 +201,57 @@ export default function DashboardLayout({
               {mainLinks.map(renderLinkGroup)}
             </nav>
           </div>
-          {settingsLink && (
-            <div className="shrink-0 border-t p-4">
-              <nav className="grid items-start gap-1 text-sm font-medium">
-                {renderLinkGroup(settingsLink)}
-              </nav>
-            </div>
-          )}
+          <div className="shrink-0 border-t p-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start gap-2 px-2"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span className="flex-1 text-left">Configuracion</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-64 mb-1" side="top" align="start">
+                 <DropdownMenuItem asChild>
+                  <Link href="#" className="cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Asistente de Configuración</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="#" className="cursor-pointer">
+                    <Zap className="mr-2 h-4 w-4" />
+                    <span>Incrementa la vigencia</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="#" className="cursor-pointer">
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    <span>Comprar Origon CFDI Facturación en línea</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/settings" className="cursor-pointer">
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    <span>Mi cuenta</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="#" className="cursor-pointer">
+                    <Info className="mr-2 h-4 w-4" />
+                    <span>Acerca de...</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleSignOut} className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Salir</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </aside>
         <main className="flex-1 overflow-y-auto">
           <div className="p-4 lg:p-6">
