@@ -9,7 +9,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { UserNav } from "@/components/user-nav";
 import { OrigonLogo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -31,7 +31,7 @@ const MobileNavContent = () => {
       <Link
         href="/dashboard"
         className={cn(
-          "flex items-center gap-4 px-3 text-foreground transition-all hover:text-foreground h-7",
+          "flex items-center gap-4 px-3 text-foreground transition-all hover:text-foreground h-7 text-[13px]",
           pathname === "/dashboard" && "bg-muted text-foreground"
         )}
       >
@@ -43,7 +43,7 @@ const MobileNavContent = () => {
           <AccordionItem value={`item-${index}`} key={index} className="border-b-0">
             <AccordionTrigger
               className={cn(
-                "flex items-center gap-4 px-3 text-foreground transition-all hover:text-foreground h-7",
+                "flex items-center gap-4 px-3 text-foreground transition-all hover:text-foreground h-7 text-[13px] hover:no-underline",
                 activeGroupValue === `item-${index}` && "bg-muted text-foreground"
               )}
             >
@@ -59,7 +59,7 @@ const MobileNavContent = () => {
                     key={link.href + link.label}
                     href={link.href}
                     className={cn(
-                      "flex items-center gap-4 px-3 text-foreground transition-all hover:text-foreground h-7",
+                      "flex items-center gap-4 px-3 text-foreground transition-all hover:text-foreground h-7 text-[13px]",
                        pathname === link.href && "text-foreground"
                     )}
                   >
