@@ -61,6 +61,7 @@ export const getPendingInvoices = async (userId: string) => {
         serie: invoices.serie,
         folio: invoices.folio,
         metodoPago: invoices.metodoPago,
+        uuid: invoices.uuid,
       })
       .from(invoices)
       .leftJoin(clients, eq(invoices.clientId, clients.id))
@@ -101,6 +102,7 @@ export const getCanceledInvoices = async (userId: string) => {
         serie: invoices.serie,
         folio: invoices.folio,
         metodoPago: invoices.metodoPago,
+        uuid: invoices.uuid,
       })
       .from(invoices)
       .leftJoin(clients, eq(invoices.clientId, clients.id))
@@ -237,7 +239,7 @@ export const stampInvoice = async (invoiceId: number, userId: string) => {
             uuid: uuid,
             stampDate: new Date(stampDate),
             updatedAt: new Date()
-        }).where(eq(invoices.id, invoiceId));
+        }).where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)));
         
         // Update local object for PDF generation
         invoiceData.invoice.status = 'stamped';
@@ -262,7 +264,7 @@ export const stampInvoice = async (invoiceId: number, userId: string) => {
             await xmlFile.makePublic();
             const xmlUrl = xmlFile.publicUrl();
 
-            await db.update(invoices).set({ pdfUrl, xmlUrl }).where(eq(invoices.id, invoiceId));
+            await db.update(invoices).set({ pdfUrl, xmlUrl }).where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)));
         } else {
              console.warn("Firebase Admin Storage not available. Skipping file upload.");
         }
