@@ -53,7 +53,7 @@ export const navigationLinks = [
     title: "Almacenamiento",
     icon: Database,
     sublinks: [
-      { href: "#", label: "Listar CFDI Eliminados" },
+      { href: "/dashboard/storage/deleted-invoices", label: "Listar CFDI Eliminados" },
       { href: "#", label: "Listar Pagos Eliminados" },
     ],
   },

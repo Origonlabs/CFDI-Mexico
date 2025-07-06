@@ -155,6 +155,26 @@ export const getCanceledInvoices = async (userId: string) => {
   }
 };
 
+export const getDeletedInvoices = async (userId: string) => {
+  if (!db) {
+    return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
+  }
+  try {
+    if (!userId) {
+      return { success: false, message: "Usuario no autenticado." };
+    }
+    // For now, this will return no documents as there is no "deleted" state.
+    // This matches the requested UI.
+    const data: any[] = [];
+    return { success: true, data };
+  } catch (error) {
+    console.error("Database Error (getDeletedInvoices):", error);
+    const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
+    return { success: false, message: `Error al obtener las facturas eliminadas. Verifique la consola del servidor para más detalles: ${errorMessage}` };
+  }
+};
+
+
 export const saveInvoice = async (formData: InvoiceFormValues, userId: string) => {
   if (!db) {
     return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
