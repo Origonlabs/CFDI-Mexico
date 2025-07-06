@@ -9,7 +9,6 @@ import { signOut as firebaseSignOut } from 'firebase/auth';
 import {
   ChevronRight,
   LogOut,
-  ChevronDown,
   Search,
   Bell,
   CircleHelp,
@@ -151,13 +150,11 @@ export default function DashboardLayout({
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2 rounded-full h-9 px-1.5 sm:px-2 text-primary-foreground hover:bg-neutral-800">
-                    <Avatar className="h-7 w-7">
-                        <AvatarFallback className="bg-cyan-400 text-black font-semibold text-xs">
-                            MT
-                        </AvatarFallback>
-                    </Avatar>
-                    <span className="hidden sm:inline text-sm font-normal">Mi tienda</span>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="https://img.buoucoding.com/avatar/0008.png" alt="@buoooou" />
+                    <AvatarFallback>BU</AvatarFallback>
+                  </Avatar>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end">
