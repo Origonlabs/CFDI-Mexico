@@ -193,14 +193,14 @@ export default function NewInvoicePage() {
       if (clientsRes.success && clientsRes.data) {
         setClients(clientsRes.data as Client[]);
       } else {
-        toast({ title: "Error", description: "No se pudieron cargar los clientes.", variant: "destructive" });
+        toast({ title: "Error", description: clientsRes.message || "No se pudieron cargar los clientes.", variant: "destructive" });
       }
 
       if (productsRes.success && productsRes.data) {
         const productsData = productsRes.data.map((p: any) => ({ ...p, unitPrice: parseFloat(p.unitPrice) }));
         setProducts(productsData);
       } else {
-        toast({ title: "Error", description: "No se pudieron cargar los productos.", variant: "destructive" });
+        toast({ title: "Error", description: productsRes.message || "No se pudieron cargar los productos.", variant: "destructive" });
       }
     } catch (error) {
       toast({ title: "Error", description: "Ocurrió un error al cargar los datos.", variant: "destructive" });
