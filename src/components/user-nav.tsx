@@ -55,36 +55,30 @@ export function UserNav() {
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link href="/dashboard/settings">
-              <span>🧑‍🔧</span>
-              <span>Asistente de Configuración</span>
+              Asistente de Configuración
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <span>😄</span>
-            <span>Incrementa la vigencia</span>
+            Incrementa la vigencia
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <span>💵</span>
-            <span>Adquirir Origon CFDI Facturación en línea</span>
+            Adquirir Origon CFDI Facturación en línea
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link href="/dashboard/settings">
-              <span>➕</span>
-              <span>Mi cuenta</span>
+              Mi cuenta
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <span>ℹ️</span>
-            <span>Acerca de...</span>
+            Acerca de...
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
-          <span>🚪</span>
-          <span>Cerrar sesión</span>
+          Cerrar sesión
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
