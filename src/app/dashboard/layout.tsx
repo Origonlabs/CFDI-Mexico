@@ -42,6 +42,7 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
@@ -75,7 +76,7 @@ export default function DashboardLayout({
     <SidebarProvider>
       <Sidebar collapsible="icon">
         <SidebarContent>
-          <SidebarMenu className="p-2">
+          <SidebarMenu>
             {navigationLinks.map((item, index) => (
               <Collapsible
                 key={index}
