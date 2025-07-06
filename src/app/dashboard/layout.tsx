@@ -94,7 +94,7 @@ export default function DashboardLayout({
 
   const getActiveGroup = (groups: typeof navigationLinks) => {
     const activeGroupIndex = groups.findIndex(group => 
-        group.sublinks.some(link => pathname.startsWith(link.href) && link.href !== '#')
+        group.sublinks.some(link => link.href !== '#' && pathname.startsWith(link.href))
     );
     return activeGroupIndex > -1 ? `item-${activeGroupIndex}` : undefined;
   }
@@ -105,7 +105,7 @@ export default function DashboardLayout({
       <Link
         href="/dashboard"
         className={cn(
-          "flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all h-7",
+          "flex items-center gap-3 rounded-lg px-3 text-foreground transition-all h-7",
           pathname === "/dashboard" && "bg-muted text-primary"
         )}
       >
@@ -117,23 +117,23 @@ export default function DashboardLayout({
           <AccordionItem value={`item-${index}`} key={index} className="border-b-0">
             <AccordionTrigger
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary hover:no-underline [&_svg:last-child]:mx-0 h-7",
+                "flex items-center gap-3 rounded-lg px-3 text-foreground transition-all hover:text-primary hover:no-underline [&_svg:last-child]:mx-0 h-7",
                  activeGroupValue === `item-${index}` && "text-primary bg-muted"
               )}
             >
               <group.icon className="h-4 w-4" />
-              <span className="flex-1 text-left font-medium">
+              <span className="flex-1 text-left font-normal">
                 {group.title}
               </span>
             </AccordionTrigger>
-            <AccordionContent className="pl-9 pt-1">
+            <AccordionContent className="py-1">
               <nav className="grid gap-1">
                 {group.sublinks.map((link) => (
                   <Link
                     key={link.href + link.label}
                     href={link.href}
                     className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all h-7",
+                      "flex items-center gap-3 rounded-lg px-3 text-foreground transition-all h-7",
                       pathname === link.href && "text-primary"
                     )}
                   >
@@ -153,7 +153,7 @@ export default function DashboardLayout({
       <Link
         href="/dashboard"
         className={cn(
-          "flex items-center gap-4 px-3 py-2 text-foreground transition-all hover:text-foreground h-7",
+          "flex items-center gap-4 px-3 text-foreground transition-all hover:text-foreground h-7",
           pathname === "/dashboard" && "bg-muted text-foreground"
         )}
       >
@@ -165,12 +165,12 @@ export default function DashboardLayout({
           <AccordionItem value={`item-${index}`} key={index} className="border-b-0">
             <AccordionTrigger
               className={cn(
-                "flex items-center gap-4 px-3 py-2 text-foreground transition-all hover:text-foreground h-7",
+                "flex items-center gap-4 px-3 text-foreground transition-all hover:text-foreground h-7",
                 activeGroupValue === `item-${index}` && "bg-muted text-foreground"
               )}
             >
               <group.icon className="h-5 w-5" />
-              <span className="flex-1 text-left font-medium">
+              <span className="flex-1 text-left font-normal">
                 {group.title}
               </span>
             </AccordionTrigger>
@@ -181,7 +181,7 @@ export default function DashboardLayout({
                     key={link.href + link.label}
                     href={link.href}
                     className={cn(
-                      "flex items-center gap-4 px-3 py-2 text-foreground transition-all hover:text-foreground h-7",
+                      "flex items-center gap-4 px-3 text-foreground transition-all hover:text-foreground h-7",
                        pathname === link.href && "text-foreground"
                     )}
                   >
@@ -198,7 +198,7 @@ export default function DashboardLayout({
 
 
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[239px_1fr] lg:grid-cols-[239px_1fr]">
+    <div className="grid min-h-screen w-full md:grid-cols-[232px_1fr] lg:grid-cols-[232px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
