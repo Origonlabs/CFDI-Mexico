@@ -252,7 +252,7 @@ export default function NewInvoicePage() {
   return (
     <TooltipProvider>
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto grid max-w-full flex-1 auto-rows-max gap-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto grid w-full max-w-[966px] flex-1 auto-rows-max gap-4">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" className="h-7 w-7" asChild><Link href="/dashboard/invoices"><ChevronLeft className="h-4 w-4" /><span className="sr-only">Back</span></Link></Button>
           <h1 className="flex-1 shrink-0 whitespace-nowrap text-base font-bold tracking-tight sm:grow-0 font-headline">Nueva Factura 4.0</h1>
@@ -479,7 +479,7 @@ export default function NewInvoicePage() {
                     <div className="flex justify-between"><span>Total Descuentos:</span><span>-${totalDiscount.toFixed(2)}</span></div>
                     <div className="flex justify-between"><span>Total Impuestos Trasladados:</span><span>${totalTraslados.toFixed(2)}</span></div>
                      <div className="flex justify-between text-muted-foreground"><span>Total Impuestos Retenidos:</span><span>-${totalRetenidos.toFixed(2)}</span></div>
-                    <div className="flex justify-between font-bold text-lg border-t pt-2 mt-2"><span>Total:</span><span>${total.toFixed(2)}</span></div>
+                    <div className="flex justify-between font-bold text-base border-t pt-2 mt-2"><span>Total:</span><span>${total.toFixed(2)}</span></div>
                 </div>
             </CardFooter>
           </Card>
@@ -493,3 +493,5 @@ export default function NewInvoicePage() {
     </TooltipProvider>
   )
 }
+
+    
