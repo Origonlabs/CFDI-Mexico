@@ -35,7 +35,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
   SidebarInset,
   SidebarMenu,
   SidebarMenuButton,
@@ -48,9 +47,9 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { OrigonLogo } from '@/components/logo';
 import { auth } from '@/lib/firebase/client';
 import { navigationLinks } from './components/nav-links';
+import { Button } from '@/components/ui/button';
 
 export default function DashboardLayout({
   children,
@@ -124,73 +123,55 @@ export default function DashboardLayout({
             <span className='text-xs text-muted-foreground'>Tema</span>
             <ThemeToggle />
           </div>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton
-                    size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                  >
-                    <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage
-                        src={user?.photoURL ?? undefined}
-                        alt={user?.displayName ?? ''}
-                      />
-                      <AvatarFallback className="rounded-lg">
-                        {user?.email?.[0].toUpperCase() ?? 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                      <span className="truncate font-semibold">
-                        {user?.displayName ?? 'Usuario'}
-                      </span>
-                      <span className="truncate text-xs">
-                        {user?.email ?? 'usuario@email.com'}
-                      </span>
-                    </div>
-                    <ChevronsUpDown className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
-                  </SidebarMenuButton>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-[var(--sidebar-width)] min-w-56 rounded-lg"
-                  side="top"
-                  align="end"
-                  sideOffset={10}
-                >
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {user?.displayName ?? 'Usuario'}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user?.email ?? 'usuario@email.com'}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem asChild>
-                      <Link href="/dashboard/settings">Mi cuenta</Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Cerrar sesión
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          </SidebarMenu>
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>
 
       <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-muted/40 px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 lg:h-[60px]">
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-muted/40 px-4">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            <ThemeToggle />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src={user?.photoURL ?? undefined}
+                      alt={user?.displayName ?? ''}
+                    />
+                    <AvatarFallback>
+                      {user?.email?.[0].toUpperCase() ?? 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {user?.displayName ?? 'Usuario'}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user?.email ?? 'usuario@email.com'}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                   <DropdownMenuItem asChild>
+                      <Link href="/dashboard/settings">Mi cuenta</Link>
+                    </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Cerrar sesión
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
         <main className="flex flex-1 flex-col overflow-auto">
