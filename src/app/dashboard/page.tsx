@@ -14,7 +14,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Overview } from "./components/overview";
 import { firebaseEnabled, auth } from "@/lib/firebase/client";
-import { AlertCircle, DollarSign, ReceiptText, Users, Hourglass } from "lucide-react";
+import { AlertCircle, DollarSign, Users, Hourglass } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { RecentInvoices } from "./components/recent-invoices";
 import { useToast } from "@/hooks/use-toast";
@@ -128,7 +128,6 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Facturas Timbradas (Mes)</CardTitle>
-            <ReceiptText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
              {loading ? <Skeleton className="h-7 w-1/2" /> : <div className="text-2xl font-bold">+{stats?.facturasTimbradasMes ?? 0}</div>}
