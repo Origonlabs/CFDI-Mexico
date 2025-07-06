@@ -58,6 +58,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 const profileFormSchema = z.object({
   companyName: z.string().min(1, { message: "La razón social es obligatoria." }),
@@ -372,29 +373,54 @@ export default function SettingsPage() {
         </TabsContent>
         <TabsContent value="signature">
           <Card>
-            <CardHeader>
-              <CardTitle className="font-headline text-base">Firma Electrónica (CSD)</CardTitle>
-              <CardDescription className="text-sm">
-                Sube tus archivos de Certificado de Sello Digital (.cer y .key) y tu contraseña para poder timbrar facturas.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="cer-file">Archivo .cer</Label>
-                <Input id="cer-file" type="file" />
+            <CardContent className="space-y-6 pt-6">
+              <div>
+                <h3 className="text-base font-semibold mb-2">Certificado de Sello Digital Instalado</h3>
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>No. de certificado</TableHead>
+                        <TableHead>Fecha Inicial</TableHead>
+                        <TableHead>Fecha Final</TableHead>
+                        <TableHead>Estado de certificado</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell colSpan={4} className="h-24 text-center">
+                          No hay ningún certificado instalado.
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="key-file">Archivo .key</Label>
-                <Input id="key-file" type="file" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Contraseña de la clave privada</Label>
-                <Input id="password" type="password" />
+              
+              <Separator/>
+
+              <div>
+                <h3 className="text-base font-semibold mb-4">Instalar Nuevo Certificado de Sello Digital</h3>
+                <div className="space-y-4 max-w-md">
+                  <div className="space-y-2">
+                    <Label htmlFor="key-file">*Archivo clave privada:</Label>
+                    <Input id="key-file" type="file" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cer-file">*Certificado:</Label>
+                    <Input id="cer-file" type="file" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">*Contraseña de Clave Privada:</Label>
+                    <Input id="password" type="password" />
+                  </div>
+                  <div className="flex gap-2 pt-2">
+                    <Button type="button">Subir</Button>
+                    <Button type="button" variant="outline">Borrar</Button>
+                  </div>
+                </div>
               </div>
             </CardContent>
-            <CardFooter>
-              <Button>Validar y Guardar</Button>
-            </CardFooter>
           </Card>
         </TabsContent>
         <TabsContent value="folios">
@@ -552,3 +578,5 @@ export default function SettingsPage() {
     </div>
   )
 }
+
+    
