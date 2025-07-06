@@ -50,6 +50,12 @@ export const companies = pgTable('companies', {
     fax: varchar('fax', { length: 20 }),
     contadorEmail: varchar('contador_email', { length: 256 }),
     web: varchar('web', { length: 256 }),
+    commercialMessage: text('commercial_message'),
+    logoUrl: varchar('logo_url', { length: 256 }),
+    defaultEmailMessage: text('default_email_message'),
+    templateCfdi33: varchar('template_cfdi_33', { length: 50 }),
+    templateCfdi40: varchar('template_cfdi_40', { length: 50 }),
+    templateRep: varchar('template_rep', { length: 50 }),
 });
 
 export const products = pgTable('products', {

@@ -7,7 +7,7 @@ import { companies } from "../../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-const profileFormSchema = z.object({
+export const profileFormSchema = z.object({
   companyName: z.string().min(1, { message: "La razón social es obligatoria." }),
   rfc: z.string()
     .min(12, { message: "El RFC debe tener 12 o 13 caracteres." })
@@ -27,6 +27,12 @@ const profileFormSchema = z.object({
   fax: z.string().optional(),
   contadorEmail: z.string().email({ message: "El correo del contador no es válido." }).optional().or(z.literal('')),
   web: z.string().url({ message: "La URL del sitio web no es válida." }).optional().or(z.literal('')),
+  commercialMessage: z.string().optional(),
+  logoUrl: z.string().url({ message: "Por favor, introduce una URL válida para el logo."}).optional().or(z.literal('')),
+  defaultEmailMessage: z.string().optional(),
+  templateCfdi33: z.string().optional(),
+  templateCfdi40: z.string().optional(),
+  templateRep: z.string().optional(),
 });
 
 
