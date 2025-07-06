@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -106,7 +105,7 @@ export default function DashboardLayout({
       <Link
         href="/dashboard"
         className={cn(
-          "flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary h-7",
+          "flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all h-7",
           pathname === "/dashboard" && "bg-muted text-primary"
         )}
       >
@@ -123,7 +122,7 @@ export default function DashboardLayout({
               )}
             >
               <group.icon className="h-4 w-4" />
-              <span className="flex-1 text-left font-medium text-[16px] leading-[24px]">
+              <span className="flex-1 text-left font-medium">
                 {group.title}
               </span>
             </AccordionTrigger>
@@ -134,7 +133,7 @@ export default function DashboardLayout({
                     key={link.href + link.label}
                     href={link.href}
                     className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary h-7",
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all h-7",
                       pathname === link.href && "text-primary"
                     )}
                   >
@@ -171,7 +170,7 @@ export default function DashboardLayout({
               )}
             >
               <group.icon className="h-5 w-5" />
-              <span className="flex-1 text-left font-medium text-[16px] leading-[24px]">
+              <span className="flex-1 text-left font-medium">
                 {group.title}
               </span>
             </AccordionTrigger>
@@ -209,7 +208,7 @@ export default function DashboardLayout({
             </Link>
           </div>
           <div className="flex-1 overflow-y-auto">
-            <nav className="grid items-start p-2 text-base font-normal leading-6">
+            <nav className="grid items-start p-2 text-[13px] font-normal">
               <NavContent />
             </nav>
           </div>
@@ -232,7 +231,7 @@ export default function DashboardLayout({
               <SheetHeader className="sr-only">
                 <SheetTitle>Navigation Menu</SheetTitle>
               </SheetHeader>
-               <nav className="grid gap-2 text-base font-normal leading-6">
+               <nav className="grid gap-2 text-[13px] font-normal">
                 <Link
                   href="#"
                   className="flex items-center gap-2 font-semibold mb-4"
