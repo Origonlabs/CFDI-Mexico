@@ -142,7 +142,7 @@ export default function DashboardLayout({
 
         {/* Right side */}
         <div className="flex items-center gap-1">
-           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-neutral-800 hover:text-white">
+           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-neutral-800 hover:text-white -mr-1">
             <CircleHelp className="h-5 w-5" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-neutral-800 hover:text-white">
