@@ -26,7 +26,6 @@ import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { CalendarIcon, PlusCircle, Trash2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
-import { Checkbox } from "@/components/ui/checkbox"
 
 // Data structures
 interface Client extends ClientFormValues {
@@ -48,6 +47,10 @@ interface PendingInvoice {
 }
 
 // Schemas
+const relatedCfdiSchema = z.object({
+  uuid: z.string().uuid("Debe ser un UUID válido."),
+});
+
 const relatedDocumentSchema = z.object({
   invoiceId: z.number(),
   uuid: z.string(),
@@ -77,7 +80,18 @@ const paymentSchema = z.object({
   moneda: z.string().default("MXN"),
   totalPago: z.coerce.number().min(0.01, "El total debe ser mayor a cero."),
   relatedDocuments: z.array(relatedDocumentSchema).min(1, "Debe haber al menos un documento relacionado."),
+  relationType: z.string().optional(),
+  relatedCfdis: z.array(relatedCfdiSchema).optional(),
+}).refine(data => {
+    if (data.relatedCfdis && data.relatedCfdis.length > 0) {
+        return !!data.relationType;
+    }
+    return true;
+}, {
+    message: "Debes seleccionar un tipo de relación si agregas CFDI relacionados.",
+    path: ["relationType"],
 });
+
 
 type PaymentFormValues = z.infer<typeof paymentSchema>;
 
@@ -89,6 +103,7 @@ export default function NewPaymentPage() {
   const [pendingInvoices, setPendingInvoices] = useState<PendingInvoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDocsDialogOpen, setIsDocsDialogOpen] = useState(false);
+  const [tempUuid, setTempUuid] = useState("");
   
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),
@@ -102,12 +117,18 @@ export default function NewPaymentPage() {
       moneda: "MXN",
       totalPago: 0,
       relatedDocuments: [],
+      relatedCfdis: [],
     },
   });
 
   const { fields, append, remove, update } = useFieldArray({
     control: form.control,
     name: "relatedDocuments",
+  });
+
+  const { fields: cfdiFields, append: cfdiAppend, remove: cfdiRemove } = useFieldArray({
+      control: form.control,
+      name: "relatedCfdis"
   });
   
   const watchedClientId = form.watch("clientId");
@@ -227,7 +248,6 @@ export default function NewPaymentPage() {
         <h1 className="text-xl font-bold font-headline">Nuevo Complemento de Pago (REP) 4.0</h1>
 
         <div className="grid grid-cols-12 gap-4">
-          {/* Main Content */}
           <div className="col-span-12">
             <Card>
               <CardContent className="pt-6 grid grid-cols-4 gap-4">
@@ -295,7 +315,7 @@ export default function NewPaymentPage() {
                 {/* Row 3 */}
                 <FormItem>
                     <FormLabel>* Código Postal del Receptor</FormLabel>
-                    <Input value={selectedClient?.zip || ''} disabled placeholder="Escribe para buscar Código Postal"/>
+                    <Input value={selectedClient?.zip || ''} disabled placeholder="Se llena al seleccionar cliente"/>
                 </FormItem>
                 <FormItem>
                     <FormLabel>* Régimen Fiscal</FormLabel>
@@ -304,73 +324,146 @@ export default function NewPaymentPage() {
               </CardContent>
             </Card>
 
-            <Accordion type="multiple" defaultValue={['cfdi-relacionados']} className="w-full space-y-4 mt-4">
-              <AccordionItem value="cfdi-relacionados">
-                <AccordionTrigger className="text-base">CFDI Relacionados</AccordionTrigger>
-                <AccordionContent className="space-y-4">
-                  <Accordion type="multiple" defaultValue={['bancaria', 'busqueda']} className="w-full space-y-4">
-                    <AccordionItem value="bancaria">
-                      <AccordionTrigger>Información Bancaria</AccordionTrigger>
-                      <AccordionContent>
-                        <div className="grid md:grid-cols-4 gap-4 p-4 border border-t-0 rounded-b-lg">
-                           <FormField control={form.control} name="formaPago" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>* Forma de Pago</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl><SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger></FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="01">01 - Efectivo</SelectItem>
-                                            <SelectItem value="03">03 - Transferencia electrónica</SelectItem>
-                                            <SelectItem value="04">04 - Tarjeta de crédito</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
-                            <FormField control={form.control} name="numeroOperacion" render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Número de operación</FormLabel>
-                                <FormControl><Input placeholder="Opcional" {...field} /></FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )} />
-                            <FormField control={form.control} name="moneda" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>* Moneda</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                                        <SelectContent><SelectItem value="MXN">MXN - Peso Mexicano</SelectItem></SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
-                            <FormField control={form.control} name="totalPago" render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>* Total del pago</FormLabel>
-                                <FormControl><Input type="number" {...field} disabled /></FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )} />
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="busqueda">
-                      <AccordionTrigger>Filtros de búsqueda</AccordionTrigger>
-                      <AccordionContent>
-                         <div className="grid md:grid-cols-4 gap-4 p-4 border border-t-0 rounded-b-lg items-end">
-                           <FormItem>
-                             <FormLabel>Mes</FormLabel>
-                             <Select><SelectTrigger><SelectValue placeholder="Seleccionar Mes"/></SelectTrigger><SelectContent/></Select>
-                           </FormItem>
-                           <FormItem>
-                             <FormLabel>Año</FormLabel>
-                             <Select><SelectTrigger><SelectValue placeholder="Seleccionar Año"/></SelectTrigger><SelectContent/></Select>
-                           </FormItem>
-                           <Button type="button" variant="outline" disabled>Filtrar</Button>
-                         </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
+            <Accordion type="multiple" defaultValue={['bancaria']} className="w-full space-y-4 mt-4">
+               <AccordionItem value="cfdi-relacionados">
+                <AccordionTrigger className="text-base bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">CFDI Relacionados</AccordionTrigger>
+                <AccordionContent className="p-4 border border-t-0 rounded-b-lg space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="relationType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo Relación</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl><SelectTrigger><SelectValue placeholder="Seleccionar tipo de relación..." /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            <SelectItem value="04">04 - Sustitución de los CFDI previos</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex gap-2 items-end">
+                    <div className="flex-grow">
+                          <Label htmlFor="uuid-input">UUID a relacionar</Label>
+                          <Input 
+                              id="uuid-input"
+                              placeholder="Escribe o pega un UUID válido y presiona Agregar"
+                              value={tempUuid}
+                              onChange={(e) => setTempUuid(e.target.value)}
+                          />
+                    </div>
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      size="sm" 
+                      onClick={() => {
+                          if (tempUuid.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+                              cfdiAppend({ uuid: tempUuid });
+                              setTempUuid("");
+                          } else {
+                              toast({
+                                  title: "UUID Inválido",
+                                  description: "El formato del UUID no es correcto.",
+                                  variant: "destructive"
+                              })
+                          }
+                      }}
+                      disabled={!tempUuid || !form.watch("relationType")}
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4"/>
+                      Agregar
+                    </Button>
+                  </div>
+                  <FormMessage>{form.formState.errors.relatedCfdis?.message}</FormMessage>
+
+                  {cfdiFields.length > 0 && (
+                    <div className="rounded-md border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>UUID Relacionado</TableHead>
+                            <TableHead className="w-[50px] text-right">Acción</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {cfdiFields.map((field, index) => (
+                            <TableRow key={field.id}>
+                              <TableCell className="font-mono text-xs">{field.uuid}</TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="icon" type="button" className="h-8 w-8" onClick={() => cfdiRemove(index)}>
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                  <span className="sr-only">Eliminar UUID</span>
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="bancaria">
+                <AccordionTrigger className="text-base bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Información Bancaria</AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid md:grid-cols-4 gap-4 p-4 border border-t-0 rounded-b-lg">
+                      <FormField control={form.control} name="formaPago" render={({ field }) => (
+                          <FormItem>
+                              <FormLabel>* Forma de Pago</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl><SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger></FormControl>
+                                  <SelectContent>
+                                      <SelectItem value="01">01 - Efectivo</SelectItem>
+                                      <SelectItem value="03">03 - Transferencia electrónica</SelectItem>
+                                      <SelectItem value="04">04 - Tarjeta de crédito</SelectItem>
+                                  </SelectContent>
+                              </Select>
+                              <FormMessage />
+                          </FormItem>
+                      )} />
+                      <FormField control={form.control} name="numeroOperacion" render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>Número de operación</FormLabel>
+                          <FormControl><Input placeholder="Opcional" {...field} /></FormControl>
+                          <FormMessage />
+                          </FormItem>
+                      )} />
+                      <FormField control={form.control} name="moneda" render={({ field }) => (
+                          <FormItem>
+                              <FormLabel>* Moneda</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                                  <SelectContent><SelectItem value="MXN">MXN - Peso Mexicano</SelectItem></SelectContent>
+                              </Select>
+                              <FormMessage />
+                          </FormItem>
+                      )} />
+                      <FormField control={form.control} name="totalPago" render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>* Total del pago</FormLabel>
+                          <FormControl><Input type="number" {...field} disabled /></FormControl>
+                          <FormMessage />
+                          </FormItem>
+                      )} />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="busqueda">
+                <AccordionTrigger className="text-base bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Filtros de búsqueda</AccordionTrigger>
+                <AccordionContent>
+                    <div className="grid md:grid-cols-4 gap-4 p-4 border border-t-0 rounded-b-lg items-end">
+                      <FormItem>
+                        <FormLabel>Mes</FormLabel>
+                        <Select disabled><SelectTrigger><SelectValue placeholder="Seleccionar Mes"/></SelectTrigger><SelectContent/></Select>
+                      </FormItem>
+                      <FormItem>
+                        <FormLabel>Año</FormLabel>
+                        <Select disabled><SelectTrigger><SelectValue placeholder="Seleccionar Año"/></SelectTrigger><SelectContent/></Select>
+                      </FormItem>
+                      <Button type="button" variant="outline" disabled>Filtrar</Button>
+                    </div>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -403,7 +496,7 @@ export default function NewPaymentPage() {
                                         {clientPendingInvoices.map(inv => (
                                             <TableRow key={inv.id}>
                                                 <TableCell>
-                                                    <Button size="sm" onClick={() => handleAddDocument(inv)} disabled={fields.some(f => f.invoiceId === inv.id)}>
+                                                    <Button size="sm" onClick={() => { handleAddDocument(inv); setIsDocsDialogOpen(false); }} disabled={fields.some(f => f.invoiceId === inv.id)}>
                                                         {fields.some(f => f.invoiceId === inv.id) ? 'Agregado' : 'Agregar'}
                                                     </Button>
                                                 </TableCell>
@@ -494,5 +587,3 @@ export default function NewPaymentPage() {
     </Form>
   )
 }
-
-    
