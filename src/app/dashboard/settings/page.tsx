@@ -231,7 +231,7 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto w-full max-w-4xl">
-      <h1 className="text-3xl font-bold font-headline mb-6">Configuración</h1>
+      <h1 className="text-base font-bold font-headline mb-6">Configuración</h1>
       <Tabs defaultValue="profile">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6">
           <TabsTrigger value="profile">Perfil Empresa</TabsTrigger>
@@ -468,7 +468,7 @@ export default function SettingsPage() {
                         <div className="flex items-center gap-4">
                             <Workflow className="h-8 w-8 text-indigo-500" />
                             <div className="grid gap-0.5">
-                                <h3 className="font-medium">Stripe</h3>
+                                <h3 className="text-base font-medium">Stripe</h3>
                                 <p className="text-sm text-muted-foreground">
                                     Sincroniza pagos y genera facturas automáticamente.
                                 </p>
@@ -480,7 +480,7 @@ export default function SettingsPage() {
                         <div className="flex items-center gap-4">
                             <Workflow className="h-8 w-8 text-green-500" />
                             <div className="grid gap-0.5">
-                                <h3 className="font-medium">Shopify</h3>
+                                <h3 className="text-base font-medium">Shopify</h3>
                                 <p className="text-sm text-muted-foreground">
                                     Crea facturas para cada venta en tu tienda.
                                 </p>
@@ -492,7 +492,7 @@ export default function SettingsPage() {
                         <div className="flex items-center gap-4">
                             <Workflow className="h-8 w-8 text-purple-500" />
                             <div className="grid gap-0.5">
-                                <h3 className="font-medium">WooCommerce</h3>
+                                <h3 className="text-base font-medium">WooCommerce</h3>
                                 <p className="text-sm text-muted-foreground">
                                     Conecta tu tienda de WordPress para facturar.
                                 </p>
@@ -504,7 +504,7 @@ export default function SettingsPage() {
                         <div className="flex items-center gap-4">
                             <Building className="h-8 w-8 text-red-700" />
                             <div className="grid gap-0.5">
-                                <h3 className="font-medium">SAT Directo</h3>
+                                <h3 className="text-base font-medium">SAT Directo</h3>
                                 <p className="text-sm text-muted-foreground">
                                     Consulta CFDI emitidos por terceros directamente.
                                 </p>
@@ -558,7 +558,7 @@ export default function SettingsPage() {
               </form>
               <Separator />
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Contraseña</h3>
+                <h3 className="text-base font-medium">Contraseña</h3>
                 <p className="text-sm text-muted-foreground">
                   Recibirás un correo electrónico con un enlace para restablecer tu contraseña.
                 </p>

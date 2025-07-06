@@ -110,7 +110,7 @@ export default function LoginPage() {
           <div className="grid gap-2 text-center">
             <div className="flex justify-center items-center gap-2">
                 <OrigonLogo className="h-8 w-8 text-primary" />
-                <h1 className="text-3xl font-bold font-headline">Origon CFDI</h1>
+                <h1 className="text-base font-bold font-headline">Origon CFDI</h1>
             </div>
             <p className="text-balance text-muted-foreground">
               Ingresa tu correo para acceder a tu panel
@@ -118,7 +118,7 @@ export default function LoginPage() {
           </div>
           <Card>
             <CardHeader>
-                <CardTitle className="text-2xl font-headline">Iniciar Sesión</CardTitle>
+                <CardTitle className="font-headline">Iniciar Sesión</CardTitle>
                 <CardDescription>
                     Bienvenido de nuevo.
                 </CardDescription>

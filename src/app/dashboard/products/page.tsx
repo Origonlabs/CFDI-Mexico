@@ -159,7 +159,7 @@ export default function ProductsPage() {
   return (
     <div className="flex flex-col sm:gap-4 sm:py-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold font-headline">Productos y Servicios</h1>
+        <h1 className="text-base font-bold font-headline">Productos y Servicios</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="gap-1" disabled={!firebaseEnabled}>

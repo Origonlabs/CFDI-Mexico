@@ -201,7 +201,7 @@ export default function DashboardLayout({
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <OrigonLogo className="h-6 w-6 text-primary" />
-              <span className="font-headline text-lg">Origon CFDI</span>
+              <span className="font-headline text-base">Origon CFDI</span>
             </Link>
           </div>
           <div className="flex-1 overflow-y-auto">
@@ -228,10 +228,10 @@ export default function DashboardLayout({
               <SheetHeader className="sr-only">
                 <SheetTitle>Navigation Menu</SheetTitle>
               </SheetHeader>
-               <nav className="grid gap-2 text-lg font-medium">
+               <nav className="grid gap-2 text-base font-medium">
                 <Link
                   href="#"
-                  className="flex items-center gap-2 text-lg font-semibold mb-4"
+                  className="flex items-center gap-2 font-semibold mb-4"
                 >
                   <OrigonLogo className="h-6 w-6 text-primary" />
                   <span className="sr-only">Origon CFDI</span>

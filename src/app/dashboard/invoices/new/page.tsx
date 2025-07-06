@@ -65,9 +65,9 @@ interface SavedInvoice {
 
 const conceptSchema = z.object({
   productId: z.number(),
-  satKey: z.string().min(1, "Requerido"),
-  unitKey: z.string().min(1, "Requerido"),
-  description: z.string().min(1, "Requerido"),
+  satKey: z.string(),
+  unitKey: z.string(),
+  description: z.string(),
   quantity: z.coerce.number().min(1, "La cantidad debe ser mayor a 0."),
   unitPrice: z.coerce.number(),
   discount: z.coerce.number().optional().default(0),
@@ -223,7 +223,7 @@ export default function NewInvoicePage() {
       <div className="flex flex-col items-center justify-center gap-6 flex-1 py-12">
         <Card className="w-full max-w-lg">
           <CardHeader>
-            <CardTitle className="text-center font-headline text-2xl">¡Factura Guardada!</CardTitle>
+            <CardTitle className="text-center font-headline">¡Factura Guardada!</CardTitle>
             <CardDescription className="text-center">
               La factura borrador con folio <strong>{savedInvoice.serie}-{savedInvoice.folio}</strong> ha sido creada exitosamente.
             </CardDescription>
@@ -255,7 +255,7 @@ export default function NewInvoicePage() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto grid max-w-full flex-1 auto-rows-max gap-4">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" className="h-7 w-7" asChild><Link href="/dashboard/invoices"><ChevronLeft className="h-4 w-4" /><span className="sr-only">Back</span></Link></Button>
-          <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0 font-headline">Nueva Factura 4.0</h1>
+          <h1 className="flex-1 shrink-0 whitespace-nowrap text-base font-bold tracking-tight sm:grow-0 font-headline">Nueva Factura 4.0</h1>
           <div className="hidden items-center gap-2 md:ml-auto md:flex">
             <Button variant="outline" size="sm" type="button" onClick={handleDiscard}>Descartar</Button>
             <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>{form.formState.isSubmitting ? 'Guardando...' : 'Guardar Borrador'}</Button>
