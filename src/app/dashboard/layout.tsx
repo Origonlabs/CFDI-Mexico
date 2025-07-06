@@ -106,7 +106,7 @@ export default function DashboardLayout({
       <Link
         href="/dashboard"
         className={cn(
-          "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+          "flex items-center gap-3 rounded-lg px-3 h-[21px] text-muted-foreground transition-all hover:text-primary",
           pathname === "/dashboard" && "bg-muted text-primary"
         )}
       >
@@ -118,7 +118,7 @@ export default function DashboardLayout({
           <AccordionItem value={`item-${index}`} key={index} className="border-b-0">
             <AccordionTrigger
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:no-underline [&_svg:last-child]:mx-0",
+                "flex items-center gap-3 rounded-lg px-3 h-[21px] text-muted-foreground transition-all hover:text-primary hover:no-underline [&_svg:last-child]:mx-0",
                  activeGroupValue === `item-${index}` && "text-primary bg-muted"
               )}
             >
@@ -132,7 +132,7 @@ export default function DashboardLayout({
                     key={link.href + link.label}
                     href={link.href}
                     className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                      "flex items-center gap-3 rounded-lg px-3 h-[21px] text-muted-foreground transition-all hover:text-primary",
                       pathname === link.href && "text-primary"
                     )}
                   >
@@ -152,7 +152,7 @@ export default function DashboardLayout({
       <Link
         href="/dashboard"
         className={cn(
-          "flex items-center gap-4 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground",
+          "flex items-center gap-4 rounded-lg px-3 h-[21px] text-muted-foreground transition-all hover:text-foreground",
           pathname === "/dashboard" && "bg-muted text-foreground"
         )}
       >
@@ -164,7 +164,7 @@ export default function DashboardLayout({
           <AccordionItem value={`item-${index}`} key={index} className="border-b-0">
             <AccordionTrigger
               className={cn(
-                "flex items-center gap-4 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground hover:no-underline",
+                "flex items-center gap-4 rounded-lg px-3 h-[21px] text-muted-foreground transition-all hover:text-foreground hover:no-underline",
                 activeGroupValue === `item-${index}` && "bg-muted text-foreground"
               )}
             >
@@ -178,7 +178,7 @@ export default function DashboardLayout({
                     key={link.href + link.label}
                     href={link.href}
                     className={cn(
-                      "flex items-center gap-4 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground",
+                      "flex items-center gap-4 rounded-lg px-3 h-[21px] text-muted-foreground transition-all hover:text-foreground",
                        pathname === link.href && "text-foreground"
                     )}
                   >
