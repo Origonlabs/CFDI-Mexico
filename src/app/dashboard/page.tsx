@@ -15,7 +15,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Overview } from "./components/overview";
 import { firebaseEnabled, auth } from "@/lib/firebase/client";
-import { AlertCircle, DollarSign, Users, Hourglass, Info, CheckCircle } from "lucide-react";
+import { AlertCircle, DollarSign, Users, Hourglass, Info, CheckCircle, ShieldCheck } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { RecentInvoices } from "./components/recent-invoices";
 import { useToast } from "@/hooks/use-toast";
@@ -113,16 +113,19 @@ export default function DashboardPage() {
     }
   }, [user, fetchDashboardData]);
   
-  const isSetupComplete = user?.emailVerified && setupStatus?.hasCsd;
+  const isCoreSetupComplete = setupStatus?.hasCsd && user?.emailVerified;
+  const is2faEnabled = user?.multiFactor?.enrolledFactors?.length > 0;
+  const showSetupAlert = !isCoreSetupComplete || !is2faEnabled;
+
 
   return (
     <div className="flex-1 space-y-4">
-      {!isSetupComplete && !loading && (
+      {showSetupAlert && !loading && (
         <Alert>
           <Info className="h-4 w-4" />
           <AlertTitle>Completa la configuración de tu cuenta</AlertTitle>
           <AlertDescription>
-            <p className="mb-2">Para comenzar a facturar, necesitas completar los siguientes pasos:</p>
+            <p className="mb-2">Para una experiencia completa y segura, te recomendamos completar los siguientes pasos:</p>
             <ul className="space-y-1">
               <li className="flex items-center gap-2">
                 {setupStatus?.hasCsd ? <CheckCircle className="h-4 w-4 text-green-500" /> : <AlertCircle className="h-4 w-4 text-yellow-500" />}
@@ -133,9 +136,9 @@ export default function DashboardPage() {
                 <span>Verificar tu correo electrónico.</span>
                 {!user?.emailVerified && <span className="text-xs text-muted-foreground">(Revisa tu bandeja de entrada)</span>}
               </li>
-              <li className="flex items-center gap-2 text-muted-foreground">
-                <AlertCircle className="h-4 w-4" />
-                <span>Verificar tu número de teléfono (Próximamente).</span>
+               <li className="flex items-center gap-2">
+                {is2faEnabled ? <CheckCircle className="h-4 w-4 text-green-500" /> : <ShieldCheck className="h-4 w-4 text-yellow-500" />}
+                <span>Habilitar la Verificación de 2 Pasos (Recomendado).</span>
               </li>
             </ul>
             <Button asChild size="sm" className="mt-4">
