@@ -35,7 +35,7 @@ export const getPayments = async (userId: string) => {
       })
       .from(payments)
       .leftJoin(clients, eq(payments.clientId, clients.id))
-      .where(eq(payments.userId, userId))
+      .where(and(eq(payments.userId, userId), eq(clients.userId, userId)))
       .orderBy(desc(payments.createdAt));
       
     return { success: true, data };
@@ -85,6 +85,7 @@ export const savePayment = async (formData: PaymentFormValues, userId: string) =
 
         const documentsToInsert = restOfData.relatedDocuments.map(doc => ({
             paymentId: newPayment.id,
+            userId,
             invoiceId: doc.invoiceId,
             uuid: doc.uuid,
             serie: doc.serie,
@@ -142,6 +143,7 @@ export const getCanceledPayments = async (userId: string) => {
       .leftJoin(clients, eq(payments.clientId, clients.id))
       .where(and(
           eq(payments.userId, userId),
+          eq(clients.userId, userId),
           eq(payments.status, 'canceled')
       ))
       .orderBy(desc(payments.createdAt));

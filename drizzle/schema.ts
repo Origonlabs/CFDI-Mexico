@@ -32,6 +32,7 @@ export const clients = pgTable('clients', {
 
 export const clientBankAccounts = pgTable('client_bank_accounts', {
   id: serial('id').primaryKey(),
+  userId: varchar('user_id', { length: 256 }).notNull(),
   clientId: integer('client_id').references(() => clients.id, { onDelete: 'cascade' }).notNull(),
   bankRfc: varchar('bank_rfc', { length: 13 }).notNull(),
   bankName: text('bank_name').notNull(),
@@ -136,6 +137,7 @@ export const invoices = pgTable('invoices', {
 export const invoiceItems = pgTable('invoice_items', {
   id: serial('id').primaryKey(),
   invoiceId: integer('invoice_id').references(() => invoices.id, { onDelete: 'cascade' }).notNull(),
+  userId: varchar('user_id', { length: 256 }).notNull(),
   description: text('description').notNull(),
   satKey: varchar('sat_key', { length: 8 }).notNull(),
   unitKey: varchar('unit_key', { length: 3 }).notNull(),
@@ -171,6 +173,7 @@ export const payments = pgTable('payments', {
 export const paymentDocuments = pgTable('payment_documents', {
   id: serial('id').primaryKey(),
   paymentId: integer('payment_id').references(() => payments.id, { onDelete: 'cascade' }).notNull(),
+  userId: varchar('user_id', { length: 256 }).notNull(),
   invoiceId: integer('invoice_id').references(() => invoices.id).notNull(),
   uuid: varchar('uuid', { length: 36 }).notNull(),
   serie: varchar('serie', { length: 10 }).notNull(),

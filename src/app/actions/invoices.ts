@@ -27,7 +27,7 @@ export const getInvoices = async (userId: string) => {
       .select()
       .from(invoices)
       .leftJoin(clients, eq(invoices.clientId, clients.id))
-      .where(eq(invoices.userId, userId))
+      .where(and(eq(invoices.userId, userId), eq(clients.userId, userId)))
       .orderBy(desc(invoices.createdAt))
       .then(res => res.map(r => ({...r.invoices, clientName: r.clients?.name, clientRfc: r.clients?.rfc, clientEmail: r.clients?.email })));
 
@@ -67,6 +67,7 @@ export const getPendingInvoices = async (userId: string) => {
       .leftJoin(clients, eq(invoices.clientId, clients.id))
       .where(and(
         eq(invoices.userId, userId),
+        eq(clients.userId, userId),
         eq(invoices.metodoPago, 'PPD'),
         eq(invoices.status, 'stamped')
       ))
@@ -108,6 +109,7 @@ export const getCanceledInvoices = async (userId: string) => {
       .leftJoin(clients, eq(invoices.clientId, clients.id))
       .where(and(
         eq(invoices.userId, userId),
+        eq(clients.userId, userId),
         eq(invoices.status, 'canceled')
       ))
       .orderBy(desc(invoices.createdAt));
@@ -180,6 +182,7 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
     
     const conceptsToInsert = validatedData.concepts.map(concept => ({
       invoiceId: newInvoice.id,
+      userId,
       description: concept.description,
       satKey: concept.satKey,
       unitKey: concept.unitKey,
@@ -286,10 +289,10 @@ async function getInvoiceForDownload(invoiceId: number, userId: string) {
     const [invoice] = await db.select().from(invoices).where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)));
     if (!invoice) return null;
 
-    const [client] = await db.select().from(clients).where(eq(clients.id, invoice.clientId));
+    const [client] = await db.select().from(clients).where(and(eq(clients.id, invoice.clientId), eq(clients.userId, userId)));
     if (!client) return null;
 
-    const items = await db.select().from(invoiceItems).where(eq(invoiceItems.invoiceId, invoice.id));
+    const items = await db.select().from(invoiceItems).where(and(eq(invoiceItems.invoiceId, invoice.id), eq(invoiceItems.userId, userId)));
 
     const [company] = await db.select().from(companies).where(eq(companies.userId, userId));
     if (!company) return null;
