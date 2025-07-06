@@ -348,7 +348,7 @@ async function _generateXmlString(data: NonNullable<Awaited<ReturnType<typeof ge
             '@TipoDeComprobante': 'I',
             '@Exportacion': '01',
             '@MetodoPago': invoice.metodoPago,
-            '@LugarExpedicion': company.address.split(',').pop()?.trim().substring(0, 5) || '00000',
+            '@LugarExpedicion': company.zip || '00000',
             'cfdi:Emisor': {
                 '@Rfc': company.rfc,
                 '@Nombre': company.companyName,
@@ -434,7 +434,17 @@ async function _generatePdfBuffer(data: NonNullable<Awaited<ReturnType<typeof ge
     leftY -= 12;
     drawText(company.rfc, margin, leftY);
     leftY -= 12;
-    leftY = drawTextBlock(company.address, margin, leftY, columnWidth);
+
+    const companyAddress = [
+      company.street,
+      company.exteriorNumber,
+      company.interiorNumber ? `Int. ${company.interiorNumber}` : null,
+      company.neighborhood,
+      company.municipality,
+      company.state,
+      company.zip
+    ].filter(Boolean).join(', ');
+    leftY = drawTextBlock(companyAddress, margin, leftY, columnWidth);
     
     page.drawRectangle({x: rightColumnX - 10, y: y - 110, width: columnWidth + 20, height: 130, borderColor: lightGray, borderWidth: 1});
     drawText(`Factura #${invoice.serie}-${invoice.folio}`, rightColumnX, y, boldFont, 12, rgb(0,0,0));

@@ -165,7 +165,7 @@ export default function SettingsPage() {
                           <FormField control={profileForm.control} name="municipality" render={({ field }) => ( <FormItem><FormLabel>Municipio</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccionar"/></SelectTrigger></FormControl><SelectContent></SelectContent></Select><FormMessage /></FormItem> )} />
                           <FormField control={profileForm.control} name="sector" render={({ field }) => ( <FormItem><FormLabel>Sector</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccionar"/></SelectTrigger></FormControl><SelectContent></SelectContent></Select><FormMessage /></FormItem> )} />
                           <FormField control={profileForm.control} name="neighborhood" render={({ field }) => ( <FormItem><FormLabel>Colonia</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
-                          <FormField control={profileForm.control} name="contadorEmail" render={({ field }) => ( <FormItem><FormLabel>Email contador</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                          <FormField control={profileForm.control} name="contadorEmail" render={({ field }) => ( <FormItem><FormLabel>Email contador</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem> )} />
                       </div>
                       {/* Right Column */}
                       <div className="space-y-4">
@@ -186,7 +186,7 @@ export default function SettingsPage() {
                             <Label>*Email</Label>
                             <Input value={user?.email || ''} disabled/>
                           </div>
-                          <FormField control={profileForm.control} name="web" render={({ field }) => ( <FormItem><FormLabel>Web</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+                          <FormField control={profileForm.control} name="web" render={({ field }) => ( <FormItem><FormLabel>Web</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem> )} />
                       </div>
                   </div>
                 </AccordionContent>
@@ -217,10 +217,10 @@ export default function SettingsPage() {
                               </FormItem>
                           )} />
                           <FormField control={profileForm.control} name="commercialMessage" render={({ field }) => ( <FormItem><FormLabel>Mensaje comercial</FormLabel><FormControl><Input placeholder="Mensaje para el pie de factura" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                          <FormField control={profileForm.control} name="logoUrl" render={({ field }) => ( 
+                           <FormField control={profileForm.control} name="logoUrl" render={({ field }) => ( 
                               <FormItem>
-                                  <FormLabel>Cargar Logotipo</FormLabel>
-                                  <FormControl><Input type="file" /></FormControl>
+                                  <FormLabel>URL del Logotipo</FormLabel>
+                                  <FormControl><Input placeholder="https://example.com/logo.png" {...field} value={field.value ?? ''} /></FormControl>
                                   <FormMessage />
                               </FormItem>
                           )} />
