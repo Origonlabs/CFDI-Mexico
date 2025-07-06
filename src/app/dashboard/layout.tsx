@@ -74,26 +74,7 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
-        <SidebarHeader className="p-0 border-b">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                size="lg"
-                className="h-14 w-full justify-start rounded-none p-4 lg:h-[60px]"
-                asChild
-              >
-                <Link href="/" className="flex items-center gap-2 font-semibold">
-                  <OrigonLogo className="h-6 w-6 text-primary" />
-                  <span className="font-headline text-base group-data-[collapsible=icon]:hidden">
-                    Origon CFDI
-                  </span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarHeader>
-
-        <SidebarContent className="p-2">
+        <SidebarContent className="p-2 pt-8">
           <SidebarMenu>
             {navigationLinks.map((item, index) => (
               <Collapsible
