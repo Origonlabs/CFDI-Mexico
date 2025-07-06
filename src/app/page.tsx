@@ -3,11 +3,10 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { OrigonLogo } from '@/components/logo';
 import { auth, firebaseEnabled } from '@/lib/firebase/client';
 import { useToast } from "@/hooks/use-toast";
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
@@ -108,101 +107,84 @@ export default function LoginPage() {
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
-            <div className="flex justify-center items-center gap-2">
-                <OrigonLogo className="h-8 w-8 text-primary" />
-                <h1 className="text-base font-bold font-headline">Origon CFDI</h1>
-            </div>
+            <h1 className="text-3xl font-bold font-headline">Iniciar Sesión</h1>
             <p className="text-balance text-muted-foreground">
               Ingresa tu correo para acceder a tu panel
             </p>
           </div>
-          <Card>
-            <CardHeader>
-                <CardTitle className="font-headline">Iniciar Sesión</CardTitle>
-                <CardDescription>
-                    Bienvenido de nuevo.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleEmailSignIn} className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Correo electrónico</Label>
+          <form onSubmit={handleEmailSignIn}>
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Correo electrónico</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  disabled={!firebaseEnabled || isSubmitting}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Contraseña</Label>
+                  <Link
+                    href="/reset-password"
+                    className="ml-auto inline-block text-sm underline"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </Link>
+                </div>
+                <div className="relative">
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="GlobalID@company.com"
+                    id="password"
+                    type={showPassword ? "text" : "password"}
                     required
                     disabled={!firebaseEnabled || isSubmitting}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
-                <div className="grid gap-2">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Contraseña</Label>
-                  </div>
-                  <div className="relative">
-                    <Input 
-                      id="password" 
-                      type={showPassword ? "text" : "password"} 
-                      required 
-                      disabled={!firebaseEnabled || isSubmitting}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                  <div className="text-right">
-                    <Link
-                      href="/reset-password"
-                      className="text-sm underline"
-                    >
-                      ¿Olvidaste tu contraseña?
-                    </Link>
-                  </div>
-                </div>
-                <Button type="submit" className="w-full" disabled={!firebaseEnabled || isSubmitting}>
-                  {isSubmitting ? 'Iniciando...' : 'Iniciar Sesión'}
-                </Button>
-                <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignIn} disabled={!firebaseEnabled || isSubmitting}>
-                  <GoogleIcon />
-                  Iniciar con Google
-                </Button>
-              </form>
+              </div>
+              <Button type="submit" className="w-full" disabled={!firebaseEnabled || isSubmitting}>
+                {isSubmitting ? 'Iniciando...' : 'Iniciar Sesión'}
+              </Button>
+              <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignIn} disabled={!firebaseEnabled || isSubmitting}>
+                <GoogleIcon />
+                Iniciar con Google
+              </Button>
               {!firebaseEnabled && (
-                <p className="text-center text-xs text-destructive pt-4">
+                <p className="text-center text-xs text-destructive pt-2">
                   La configuración de Firebase está incompleta. La autenticación está deshabilitada.
                 </p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </form>
           <div className="mt-4 text-center text-sm">
             ¿No tienes una cuenta?{' '}
             <Link href="/signup" className="underline">
               Regístrate
             </Link>
           </div>
-          <div className="mt-8 text-center text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Opendex Corporation. Todos los derechos reservados.
-          </div>
         </div>
       </div>
       <div className="hidden bg-muted lg:block">
-        <div className="h-full w-full bg-gradient-to-br from-primary/10 to-accent/10 relative">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <OrigonLogo className="h-48 w-48 text-primary opacity-20" />
-            </div>
-             <div className="absolute bottom-8 right-8 text-right">
-                <h2 className="text-2xl font-bold font-headline text-foreground/80">Facturación sin complicaciones.</h2>
-                <p className="text-muted-foreground">La plataforma moderna para tu negocio.</p>
-            </div>
-        </div>
+        <Image
+          src="https://placehold.co/1000x1200.png"
+          alt="Image"
+          width="1000"
+          height="1200"
+          data-ai-hint="abstract texture"
+          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+        />
       </div>
     </div>
   );

@@ -2,17 +2,10 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { OrigonLogo } from '@/components/logo'
 import { auth, firebaseEnabled } from '@/lib/firebase/client';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -151,26 +144,16 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="w-full h-screen flex items-center justify-center py-12 px-4">
-       <div className="mx-auto grid w-[380px] gap-6">
+    <div className="w-full h-screen lg:grid lg:grid-cols-2">
+      <div className="flex items-center justify-center py-12">
+        <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
-            <div className="flex justify-center items-center gap-2">
-                <OrigonLogo className="h-8 w-8 text-primary" />
-                <h1 className="text-base font-bold font-headline">Origon CFDI</h1>
-            </div>
+            <h1 className="text-3xl font-bold font-headline">Crear una cuenta</h1>
             <p className="text-balance text-muted-foreground">
-              Crea tu cuenta para empezar a facturar
+                Ingresa tus datos para empezar a facturar
             </p>
           </div>
-        <Card>
-            <CardHeader>
-            <CardTitle className="font-headline">Crear una cuenta</CardTitle>
-            <CardDescription>
-                Ingresa tus datos para registrarte.
-            </CardDescription>
-            </CardHeader>
-            <CardContent>
-            <form onSubmit={handleEmailSignUp}>
+          <form onSubmit={handleEmailSignUp}>
               <div className="grid gap-4">
                   <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
@@ -187,7 +170,7 @@ export default function SignupPage() {
                     <Input
                         id="email"
                         type="email"
-                        placeholder="GlobalID@company.com"
+                        placeholder="m@example.com"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -245,24 +228,30 @@ export default function SignupPage() {
                       <GoogleIcon />
                       Registrarse con Google
                   </Button>
+                  {!firebaseEnabled && (
+                    <p className="text-center text-xs text-destructive pt-2">
+                      La configuración de Firebase está incompleta. La autenticación está deshabilitada.
+                    </p>
+                  )}
               </div>
             </form>
-             {!firebaseEnabled && (
-                <p className="text-center text-xs text-destructive pt-4">
-                  La configuración de Firebase está incompleta. La autenticación está deshabilitada.
-                </p>
-              )}
-            </CardContent>
-        </Card>
-        <div className="mt-4 text-center text-sm">
-            ¿Ya tienes una cuenta?{' '}
-            <Link href="/" className="underline">
-            Iniciar sesión
-            </Link>
+          <div className="mt-4 text-center text-sm">
+              ¿Ya tienes una cuenta?{' '}
+              <Link href="/" className="underline">
+              Iniciar sesión
+              </Link>
+          </div>
         </div>
-        <div className="mt-8 text-center text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Opendex Corporation. Todos los derechos reservados.
-        </div>
+      </div>
+      <div className="hidden bg-muted lg:block">
+        <Image
+          src="https://placehold.co/1000x1200.png"
+          alt="Image"
+          width="1000"
+          height="1200"
+          data-ai-hint="abstract texture"
+          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+        />
       </div>
     </div>
   )
