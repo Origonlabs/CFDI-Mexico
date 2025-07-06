@@ -162,7 +162,7 @@ export default function ProductsPage() {
         <h1 className="text-2xl font-bold font-headline">Productos y Servicios</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="h-8 gap-1" disabled={!firebaseEnabled}>
+            <Button size="sm" className="gap-1" disabled={!firebaseEnabled}>
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Nuevo Producto

@@ -35,7 +35,7 @@ export function UserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+        <Button variant="ghost" className="relative h-7 w-7 rounded-full">
           <Avatar className="h-8 w-8">
             <AvatarImage src={user?.photoURL ?? "https://placehold.co/100x100.png"} alt={user?.displayName ?? "User"} />
             <AvatarFallback>{user?.email?.[0].toUpperCase() ?? "U"}</AvatarFallback>
