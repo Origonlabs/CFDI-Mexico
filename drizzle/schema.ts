@@ -92,6 +92,8 @@ export const invoices = pgTable('invoices', {
   xmlUrl: text('xml_url'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  uuid: varchar('uuid', { length: 36 }),
+  stampDate: timestamp('stamp_date'),
 });
 
 export const invoiceItems = pgTable('invoice_items', {

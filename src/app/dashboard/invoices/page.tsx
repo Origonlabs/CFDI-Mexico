@@ -1,13 +1,13 @@
 
 "use client";
 
-import { MoreHorizontal, Download, Mail, Filter, Plus, Archive, ListFilter, XCircle, ChevronLeft, ChevronRight, Eye, Sheet, File as FileIcon, ChevronFirst, ChevronLast, ChevronDown } from "lucide-react"
+import { MoreHorizontal, Download, Mail, Filter, Plus, Archive, ListFilter, XCircle, ChevronLeft, ChevronRight, Eye, Sheet, File as FileIcon, ChevronFirst, ChevronLast, ChevronDown, Stamp } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { User } from "firebase/auth"
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client"
 import { useToast } from "@/hooks/use-toast"
-import { getInvoices, generateInvoiceXml, generateInvoicePdf } from "@/app/actions/invoices"
+import { getInvoices, generateInvoiceXml, generateInvoicePdf, stampInvoice } from "@/app/actions/invoices"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -52,6 +52,7 @@ interface Invoice {
   serie: string;
   folio: number;
   metodoPago: string | null;
+  uuid: string | null;
 }
 
 export default function InvoicesPage() {
@@ -60,6 +61,7 @@ export default function InvoicesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState<number | null>(null);
+  const [isStamping, setIsStamping] = useState<number | null>(null);
 
 
   useEffect(() => {
@@ -99,35 +101,30 @@ export default function InvoicesPage() {
     }
   }, [user, fetchInvoices]);
 
+  const handleStamp = async (invoiceId: number) => {
+    if (!user) return;
+    setIsStamping(invoiceId);
+    toast({ title: "Timbrando factura..." });
+    try {
+        const result = await stampInvoice(invoiceId, user.uid);
+        if (result.success) {
+            toast({ title: "Éxito", description: result.message });
+            // Revalidation will be handled by the server action, which re-fetches data
+            await fetchInvoices(user.uid);
+        } else {
+            toast({ title: "Error", description: result.message, variant: "destructive" });
+        }
+    } catch(e) {
+        toast({ title: "Error", description: "No se pudo timbrar la factura.", variant: "destructive" });
+    } finally {
+        setIsStamping(null);
+    }
+  };
+
   const handleDownloadXml = async (invoice: Invoice) => {
     if (invoice.xmlUrl) {
       window.open(invoice.xmlUrl, '_blank');
       return;
-    }
-
-    if (!user) return;
-    setDownloading(invoice.id);
-    toast({ title: "Generando XML..." });
-    try {
-      const result = await generateInvoiceXml(invoice.id, user.uid);
-      if (result.success && result.xml) {
-        const blob = new Blob([result.xml], { type: "application/xml" });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `factura-${invoice.id}.xml`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        a.remove();
-        toast({ title: "Éxito", description: "XML descargado correctamente." });
-      } else {
-        toast({ title: "Error", description: result.message, variant: "destructive" });
-      }
-    } catch (error) {
-      toast({ title: "Error", description: "No se pudo generar el XML.", variant: "destructive" });
-    } finally {
-      setDownloading(null);
     }
   };
 
@@ -135,37 +132,6 @@ export default function InvoicesPage() {
      if (invoice.pdfUrl) {
       window.open(invoice.pdfUrl, '_blank');
       return;
-    }
-
-    if (!user) return;
-    setDownloading(invoice.id);
-    toast({ title: "Generando PDF..." });
-    try {
-      const result = await generateInvoicePdf(invoice.id, user.uid);
-      if (result.success && result.pdf) {
-        const byteCharacters = atob(result.pdf);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: "application/pdf" });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `factura-${invoice.id}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        a.remove();
-        toast({ title: "Éxito", description: "PDF descargado correctamente." });
-      } else {
-        toast({ title: "Error", description: result.message, variant: "destructive" });
-      }
-    } catch (error) {
-      toast({ title: "Error", description: "No se pudo generar el PDF.", variant: "destructive" });
-    } finally {
-      setDownloading(null);
     }
   };
 
@@ -276,7 +242,7 @@ export default function InvoicesPage() {
                             <TableCell><Button variant="ghost" size="icon" className="h-6 w-6"><Eye className="h-4 w-4" /></Button></TableCell>
                             <TableCell>4.0</TableCell>
                             <TableCell>{invoice.folio}</TableCell>
-                            <TableCell className="font-mono text-xs">...{invoice.id.toString().padStart(8, '0')}</TableCell> 
+                            <TableCell className="font-mono text-xs">{invoice.uuid ? `...${invoice.uuid.substring(invoice.uuid.length - 8)}` : 'N/A'}</TableCell> 
                             <TableCell>N/A</TableCell>
                             <TableCell>{invoice.clientRfc}</TableCell>
                             <TableCell className="font-medium truncate max-w-32">{invoice.clientName}</TableCell>
@@ -296,24 +262,33 @@ export default function InvoicesPage() {
                             <div className="flex justify-end">
                                 <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button aria-haspopup="true" size="icon" variant="ghost" disabled={downloading === invoice.id}>
+                                    <Button aria-haspopup="true" size="icon" variant="ghost" disabled={downloading === invoice.id || isStamping === invoice.id}>
                                     <MoreHorizontal className="h-4 w-4" />
                                     <span className="sr-only">Toggle menu</span>
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                                    <DropdownMenuItem onClick={() => handleDownloadPdf(invoice)} disabled={downloading === invoice.id || !invoice.pdfUrl}>
-                                        <Download className="mr-2 h-4 w-4" />
-                                        Descargar PDF
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleDownloadXml(invoice)} disabled={downloading === invoice.id || !invoice.xmlUrl}>
-                                        <Download className="mr-2 h-4 w-4" />
-                                        Descargar XML
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem><Mail className="mr-2 h-4 w-4" />Enviar por correo</DropdownMenuItem>
-                                    <DropdownMenuItem className="text-destructive"><XCircle className="mr-2 h-4 w-4" />Cancelar CFDI</DropdownMenuItem>
+                                    {invoice.status === 'draft' ? (
+                                        <DropdownMenuItem onSelect={() => handleStamp(invoice.id)}>
+                                            <Stamp className="mr-2 h-4 w-4" />
+                                            Timbrar Factura
+                                        </DropdownMenuItem>
+                                    ) : (
+                                      <>
+                                        <DropdownMenuItem onClick={() => handleDownloadPdf(invoice)} disabled={!invoice.pdfUrl}>
+                                            <Download className="mr-2 h-4 w-4" />
+                                            Descargar PDF
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => handleDownloadXml(invoice)} disabled={!invoice.xmlUrl}>
+                                            <Download className="mr-2 h-4 w-4" />
+                                            Descargar XML
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem><Mail className="mr-2 h-4 w-4" />Enviar por correo</DropdownMenuItem>
+                                        <DropdownMenuItem className="text-destructive"><XCircle className="mr-2 h-4 w-4" />Cancelar CFDI</DropdownMenuItem>
+                                      </>
+                                    )}
                                 </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
