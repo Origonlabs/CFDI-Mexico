@@ -39,17 +39,24 @@ import { StarBorder } from '@/components/ui/star-border';
 
 const SidebarContent = () => {
   const pathname = usePathname();
-  const isSublinkActive = (sublinks: any[], path: string) => {
-    return sublinks.some((link) => link.href !== '#' && path.startsWith(link.href));
-  };
+  const [openCategory, setOpenCategory] = React.useState<string | undefined>();
+
+  React.useEffect(() => {
+    const activeItem = navigationLinks.find((item) =>
+      item.sublinks.some((link) => link.href !== '#' && pathname.startsWith(link.href))
+    );
+    setOpenCategory(activeItem?.title);
+  }, [pathname]);
 
   return (
     <>
       {navigationLinks.map((item, index) => (
         <Collapsible
           key={index}
-          asChild
-          defaultOpen={isSublinkActive(item.sublinks, pathname)}
+          open={openCategory === item.title}
+          onOpenChange={(isOpen) => {
+            setOpenCategory(isOpen ? item.title : undefined);
+          }}
           className="w-full"
         >
           <div className="w-full">
