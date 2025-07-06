@@ -58,6 +58,15 @@ export const navigationLinks = [
     ],
   },
   {
+    title: "Configuracion",
+    icon: Settings,
+    sublinks: [
+      { href: "/dashboard/settings", label: "Perfil de Empresa" },
+      { href: "/dashboard/settings", label: "Mi Cuenta" },
+      { href: "/dashboard/settings", label: "Integraciones" },
+    ],
+  },
+  {
     title: "Ayuda",
     icon: HelpCircle,
     sublinks: [
