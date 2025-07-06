@@ -74,7 +74,7 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
-        <SidebarContent>
+        <SidebarContent className="pt-14">
           <SidebarMenu>
             {navigationLinks.map((item, index) => (
               <Collapsible
@@ -123,6 +123,61 @@ export default function DashboardLayout({
             <span className='text-xs text-muted-foreground'>Tema</span>
             <ThemeToggle />
           </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="flex h-auto w-full items-center justify-start gap-2 p-2"
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarImage
+                    src={user?.photoURL ?? undefined}
+                    alt={user?.displayName ?? ''}
+                  />
+                  <AvatarFallback>
+                    {user?.email?.[0].toUpperCase() ?? 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
+                  <span className="truncate font-semibold">
+                    {user?.displayName ?? 'Usuario'}
+                  </span>
+                  <span className="truncate text-xs">
+                    {user?.email ?? 'usuario@email.com'}
+                  </span>
+                </div>
+                <ChevronsUpDown className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+              side="right"
+              align="end"
+              sideOffset={12}
+            >
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    {user?.displayName ?? 'Usuario'}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user?.email ?? 'usuario@email.com'}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                 <DropdownMenuItem asChild>
+                    <Link href="/dashboard/settings">Mi cuenta</Link>
+                  </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Cerrar sesión
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>
@@ -131,47 +186,6 @@ export default function DashboardLayout({
         <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-muted/40 px-4">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <ThemeToggle />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={user?.photoURL ?? undefined}
-                      alt={user?.displayName ?? ''}
-                    />
-                    <AvatarFallback>
-                      {user?.email?.[0].toUpperCase() ?? 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {user?.displayName ?? 'Usuario'}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user?.email ?? 'usuario@email.com'}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                   <DropdownMenuItem asChild>
-                      <Link href="/dashboard/settings">Mi cuenta</Link>
-                    </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Cerrar sesión
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </header>
         <main className="flex flex-1 flex-col overflow-auto">
