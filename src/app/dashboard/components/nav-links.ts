@@ -33,7 +33,7 @@ export const navigationLinks = [
     sublinks: [
       { href: "/dashboard/clients/new", label: "Crear Clientes" },
       { href: "/dashboard/clients", label: "Listar Clientes" },
-      { href: "/dashboard/products", label: "Crear Productos" },
+      { href: "/dashboard/products/new", label: "Crear Productos" },
       { href: "/dashboard/products", label: "Listar Productos" },
       { href: "/dashboard/settings", label: "Crear Series y Folios" },
       { href: "/dashboard/settings", label: "Listar Series y Folios" },

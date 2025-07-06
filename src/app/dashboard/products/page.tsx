@@ -2,9 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import Link from "next/link";
 import { PlusCircle, MoreHorizontal } from "lucide-react";
 import { User } from "firebase/auth";
 
@@ -33,36 +31,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getProducts, addProduct, type ProductFormValues } from "@/app/actions/products";
-
-const productSchema = z.object({
-  description: z.string().min(1, { message: "La descripción es obligatoria." }),
-  satKey: z.string().length(8, { message: "La clave SAT debe tener 8 caracteres." }),
-  unitKey: z.string().min(1, { message: "La clave de unidad es obligatoria." }).max(3, { message: "La clave de unidad no puede tener más de 3 caracteres." }),
-  unitPrice: z.coerce.number().min(0.01, { message: "El precio debe ser mayor a cero." }),
-});
+import { getProducts, type ProductFormValues } from "@/app/actions/products";
 
 interface Product extends ProductFormValues {
   id: string;
+  unitPrice: number;
 }
 
 export default function ProductsPage() {
@@ -70,18 +44,6 @@ export default function ProductsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const form = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
-    defaultValues: {
-      description: "",
-      satKey: "",
-      unitKey: "",
-      unitPrice: 0,
-    },
-  });
 
   useEffect(() => {
     if (!firebaseEnabled || !auth) {
@@ -126,121 +88,18 @@ export default function ProductsPage() {
     }
   }, [user, fetchProducts]);
 
-  async function onSubmit(data: ProductFormValues) {
-    if (!user) {
-      toast({
-        title: "Error",
-        description: "Debes iniciar sesión para agregar un producto.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setIsSubmitting(true);
-    const result = await addProduct(data, user.uid);
-    setIsSubmitting(false);
-
-    if (result.success) {
-      toast({
-        title: "Éxito",
-        description: "El producto se ha guardado correctamente.",
-      });
-      form.reset();
-      setIsDialogOpen(false);
-      fetchProducts();
-    } else {
-      toast({
-        title: "Error al guardar",
-        description: result.message || "No se pudo guardar la información del producto.",
-        variant: "destructive",
-      });
-    }
-  }
-
   return (
     <div className="flex flex-col flex-1 gap-4">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-bold font-headline">Productos y Servicios</h1>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="gap-1" disabled={!firebaseEnabled}>
-              <PlusCircle className="h-3.5 w-3.5" />
-              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Nuevo Producto
-              </span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)}>
-                <DialogHeader>
-                  <DialogTitle className="font-headline">Agregar Nuevo Producto</DialogTitle>
-                  <DialogDescription>
-                    Completa los datos para registrar un nuevo producto o servicio.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Descripción</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Servicios de Desarrollo" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="satKey"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Clave SAT</FormLabel>
-                        <FormControl>
-                          <Input placeholder="81111500" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="unitKey"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Clave Unidad</FormLabel>
-                        <FormControl>
-                          <Input placeholder="E48" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="unitPrice"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Precio Unitario</FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="100.00" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <DialogFooter>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Guardando..." : "Guardar Producto"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+        <Button asChild size="sm" className="gap-1" disabled={!firebaseEnabled}>
+          <Link href="/dashboard/products/new">
+            <PlusCircle className="h-3.5 w-3.5" />
+            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+              Nuevo Producto
+            </span>
+          </Link>
+        </Button>
       </div>
       <Card>
         <CardHeader>

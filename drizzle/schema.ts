@@ -41,10 +41,12 @@ export const companies = pgTable('companies', {
 export const products = pgTable('products', {
   id: serial('id').primaryKey(),
   userId: varchar('user_id', { length: 256 }).notNull(),
+  code: varchar('code', { length: 50 }),
   description: text('description').notNull(),
   satKey: varchar('sat_key', { length: 8 }).notNull(),
   unitKey: varchar('unit_key', { length: 3 }).notNull(),
   unitPrice: numeric('unit_price', { precision: 10, scale: 2 }).notNull(),
+  objetoImpuesto: varchar('objeto_impuesto', { length: 2 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
