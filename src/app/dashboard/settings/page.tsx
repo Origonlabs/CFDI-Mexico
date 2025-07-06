@@ -390,17 +390,7 @@ export default function SettingsPage() {
                       </Form>
                   </AccordionContent>
               </AccordionItem>
-
-              {/* 2FA Accordion Item Temporarily Disabled */}
-              {/*
-              <AccordionItem value="2fa">
-                <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Verificación de 2 Pasos (2FA)</AccordionTrigger>
-                <AccordionContent className="p-4 border border-t-0 rounded-b-lg space-y-4">
-                    ... 2FA Content ...
-                </AccordionContent>
-              </AccordionItem>
-              */}
-
+              
               <AccordionItem value="eliminacion">
                   <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Eliminación de la Cuenta</AccordionTrigger>
                   <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
