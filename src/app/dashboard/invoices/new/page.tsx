@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import { ChevronLeft, PlusCircle, Trash2, Download } from "lucide-react"
+import { ChevronLeft, PlusCircle, Trash2, Download, HelpCircle } from "lucide-react"
 import { useForm, useFieldArray, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -16,7 +16,6 @@ import { getClients, type ClientFormValues } from "@/app/actions/clients"
 import { getProducts, type ProductFormValues } from "@/app/actions/products"
 import { saveInvoice } from "@/app/actions/invoices";
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -43,12 +42,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { cn } from "@/lib/utils"
-
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface Client extends ClientFormValues {
   id: number;
+  taxRegime: string;
 }
 interface Product extends ProductFormValues {
   id: number;
@@ -69,22 +70,26 @@ const conceptSchema = z.object({
   description: z.string(),
   quantity: z.coerce.number().min(1, "La cantidad debe ser mayor a 0."),
   unitPrice: z.coerce.number(),
+  discount: z.coerce.number().optional().default(0),
+  objetoImpuesto: z.string().min(1, "Selecciona el objeto de impuesto."),
   amount: z.coerce.number(),
 });
 
 const invoiceSchema = z.object({
   clientId: z.coerce.number().min(1, "Debes seleccionar un cliente."),
+  serie: z.string().default("A"),
+  folio: z.coerce.number().default(1025),
+  tipoDocumento: z.string().default("I"),
+  exportacion: z.string().default("01"),
   usoCfdi: z.string().min(1, "Debes seleccionar un uso de CFDI."),
   formaPago: z.string().min(1, "Debes seleccionar una forma de pago."),
   metodoPago: z.string().default("PUE"),
-  serie: z.string().default("A"),
-  folio: z.coerce.number().default(1025),
+  moneda: z.string().default("MXN"),
   condicionesPago: z.string().optional(),
   concepts: z.array(conceptSchema).min(1, "La factura debe tener al menos un concepto."),
 });
 
 type InvoiceFormValues = z.infer<typeof invoiceSchema>;
-
 
 export default function NewInvoicePage() {
   const { toast } = useToast();
@@ -94,29 +99,35 @@ export default function NewInvoicePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [savedInvoice, setSavedInvoice] = useState<SavedInvoice | null>(null);
+  const [companyProfile, setCompanyProfile] = useState({ rfc: '', taxRegime: '', zip: '' });
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: {
       clientId: 0,
+      serie: "A",
+      folio: 1025,
+      tipoDocumento: "I",
+      exportacion: "01",
       usoCfdi: "",
       formaPago: "",
       metodoPago: "PUE",
-      serie: "A",
-      folio: 1025,
+      moneda: "MXN",
       concepts: [],
     },
   });
-  
+
   const { fields, append, remove, update } = useFieldArray({
     control: form.control,
     name: "concepts",
   });
 
   const watchedConcepts = form.watch("concepts");
-  const subtotal = watchedConcepts.reduce((acc, concept) => acc + concept.amount, 0);
-  const iva = subtotal * 0.16;
-  const total = subtotal + iva;
+  const subtotal = watchedConcepts.reduce((acc, concept) => acc + (concept.quantity * concept.unitPrice), 0);
+  const totalDiscount = watchedConcepts.reduce((acc, concept) => acc + (concept.discount || 0), 0);
+  const baseForIva = subtotal - totalDiscount;
+  const iva = baseForIva * 0.16;
+  const total = baseForIva + iva;
 
   useEffect(() => {
     if (!firebaseEnabled || !auth) {
@@ -163,17 +174,18 @@ export default function NewInvoicePage() {
     }
   }, [user, fetchData]);
 
+  const updateConcept = (index: number, newValues: Partial<InvoiceFormValues['concepts'][0]>) => {
+    const concept = { ...fields[index], ...newValues };
+    const amount = (concept.quantity * concept.unitPrice) - (concept.discount || 0);
+    update(index, { ...concept, amount });
+  };
+
   const addProductToConcepts = (productId: string) => {
     const product = products.find(p => p.id.toString() === productId);
     if (product) {
       const existingConceptIndex = fields.findIndex(c => c.productId === product.id);
-      if (existingConceptIndex !== -1) {
-        const existingConcept = fields[existingConceptIndex];
-        update(existingConceptIndex, {
-          ...existingConcept,
-          quantity: existingConcept.quantity + 1,
-          amount: (existingConcept.quantity + 1) * existingConcept.unitPrice,
-        });
+      if (false && existingConceptIndex !== -1) { // Disabled quantity increment for better control
+        // ...
       } else {
         append({
           productId: product.id,
@@ -182,47 +194,25 @@ export default function NewInvoicePage() {
           unitKey: product.unitKey,
           quantity: 1,
           unitPrice: product.unitPrice,
+          discount: 0,
+          objetoImpuesto: '02',
           amount: product.unitPrice,
         });
       }
     }
   };
 
-  const updateQuantity = (index: number, quantity: number) => {
-    const concept = fields[index];
-    if (quantity > 0) {
-      update(index, {
-        ...concept,
-        quantity,
-        amount: quantity * concept.unitPrice,
-      });
-    }
-  };
-  
   async function onSubmit(data: InvoiceFormValues) {
     if (!user) {
-      toast({
-        title: "Error",
-        description: "Debes iniciar sesión para guardar una factura.",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Debes iniciar sesión para guardar una factura.", variant: "destructive" });
       return;
     }
-    
     const result = await saveInvoice(data, user.uid);
-
     if (result.success && result.data) {
-      toast({
-        title: "Éxito",
-        description: "La factura se ha guardado como borrador.",
-      });
+      toast({ title: "Éxito", description: "La factura se ha guardado como borrador." });
       setSavedInvoice(result.data);
     } else {
-       toast({
-        title: "Error al guardar",
-        description: result.message || "No se pudo guardar la factura.",
-        variant: "destructive",
-      });
+      toast({ title: "Error al guardar", description: result.message || "No se pudo guardar la factura.", variant: "destructive" });
     }
   }
 
@@ -243,139 +233,144 @@ export default function NewInvoicePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-             <p className="text-sm text-muted-foreground text-center">
-               Tus archivos han sido generados y guardados. Ahora puedes descargarlos o crear una nueva factura.
-             </p>
-             <div className="flex justify-center gap-4">
-                <Button asChild disabled={!savedInvoice.pdfUrl}>
-                  <a href={savedInvoice.pdfUrl ?? '#'} target="_blank" rel="noopener noreferrer">
-                    <Download className="mr-2 h-4 w-4" />
-                    Descargar PDF
-                  </a>
-                </Button>
-                <Button asChild disabled={!savedInvoice.xmlUrl}>
-                  <a href={savedInvoice.xmlUrl ?? '#'} target="_blank" rel="noopener noreferrer">
-                    <Download className="mr-2 h-4 w-4" />
-                    Descargar XML
-                  </a>
-                </Button>
+            <p className="text-sm text-muted-foreground text-center">
+              Tus archivos han sido generados y guardados. Ahora puedes descargarlos o crear una nueva factura.
+            </p>
+            <div className="flex justify-center gap-4">
+              <Button asChild disabled={!savedInvoice.pdfUrl}><a href={savedInvoice.pdfUrl ?? '#'} target="_blank" rel="noopener noreferrer"><Download className="mr-2 h-4 w-4" />Descargar PDF</a></Button>
+              <Button asChild disabled={!savedInvoice.xmlUrl}><a href={savedInvoice.xmlUrl ?? '#'} target="_blank" rel="noopener noreferrer"><Download className="mr-2 h-4 w-4" />Descargar XML</a></Button>
             </div>
-             {!savedInvoice.pdfUrl && <p className="text-xs text-center text-muted-foreground">La subida de archivos está en proceso o no está configurada.</p>}
+            {!savedInvoice.pdfUrl && <p className="text-xs text-center text-muted-foreground">La subida de archivos está en proceso o no está configurada.</p>}
           </CardContent>
           <CardFooter className="flex-col gap-4 pt-6">
-            <Button variant="outline" className="w-full" onClick={() => { form.reset(); setSavedInvoice(null); }}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Crear Nueva Factura
-            </Button>
-            <Button variant="ghost" asChild>
-                <Link href="/dashboard/invoices">
-                    Volver al listado de facturas
-                </Link>
-            </Button>
+            <Button variant="outline" className="w-full" onClick={() => { form.reset(); setSavedInvoice(null); }}><PlusCircle className="mr-2 h-4 w-4" />Crear Nueva Factura</Button>
+            <Button variant="ghost" asChild><Link href="/dashboard/invoices">Volver al listado de facturas</Link></Button>
           </CardFooter>
         </Card>
       </div>
     );
   }
+  
+  const selectedClient = clients.find(c => c.id === form.getValues('clientId'));
+
 
   return (
+    <TooltipProvider>
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto grid max-w-6xl flex-1 auto-rows-max gap-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto grid max-w-7xl flex-1 auto-rows-max gap-4">
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" className="h-7 w-7" asChild>
-            <Link href="/dashboard/invoices">
-              <ChevronLeft className="h-4 w-4" />
-              <span className="sr-only">Back</span>
-            </Link>
-          </Button>
-          <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0 font-headline">
-            Nueva Factura de Ingreso
-          </h1>
-          <Badge variant="outline" className="ml-auto sm:ml-0">
-            Borrador
-          </Badge>
+          <Button variant="outline" size="icon" className="h-7 w-7" asChild><Link href="/dashboard/invoices"><ChevronLeft className="h-4 w-4" /><span className="sr-only">Back</span></Link></Button>
+          <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0 font-headline">Nueva Factura 4.0</h1>
           <div className="hidden items-center gap-2 md:ml-auto md:flex">
-            <Button variant="outline" size="sm" type="button" onClick={handleDiscard}>
-              Descartar
-            </Button>
-            <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? 'Guardando...' : 'Guardar Borrador'}
-            </Button>
+            <Button variant="outline" size="sm" type="button" onClick={handleDiscard}>Descartar</Button>
+            <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>{form.formState.isSubmitting ? 'Guardando...' : 'Guardar Borrador'}</Button>
           </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
-          <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-headline">Detalles del Cliente</CardTitle>
-                <CardDescription>
-                  Selecciona el cliente para esta factura.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-6">
-                  <FormField
-                    control={form.control}
-                    name="clientId"
-                    render={({ field }) => (
+
+        <div className="grid gap-4">
+          {/* Top Level Info */}
+          <Card>
+            <CardContent className="pt-6 grid md:grid-cols-4 gap-4">
+              <FormField control={form.control} name="serie" render={({ field }) => ( <FormItem><FormLabel>Serie</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )} />
+              <FormField control={form.control} name="folio" render={({ field }) => ( <FormItem><FormLabel>Folio</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem> )} />
+              <FormField control={form.control} name="tipoDocumento" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo de Documento</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                    <SelectContent><SelectItem value="I">I - Ingreso</SelectItem></SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="exportacion" render={({ field }) => (
+                <FormItem>
+                    <FormLabel className="flex items-center gap-1">Exportación <Tooltip><TooltipTrigger asChild><button type="button"><HelpCircle className="h-3 w-3"/></button></TooltipTrigger><TooltipContent><p>Clave para identificar si la operación es de exportación.</p></TooltipContent></Tooltip></FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent><SelectItem value="01">01 - No aplica</SelectItem></SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+              )} />
+            </CardContent>
+          </Card>
+
+          <Accordion type="multiple" defaultValue={['receptor', 'pago']} className="w-full">
+            <AccordionItem value="receptor">
+              <AccordionTrigger className="bg-muted px-4 rounded-t-lg">Información del receptor</AccordionTrigger>
+              <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <FormField control={form.control} name="clientId" render={({ field }) => (
+                    <FormItem className="lg:col-span-2">
+                      <FormLabel>* Nombre o Razón Social</FormLabel>
+                      <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
+                        <FormControl><SelectTrigger disabled={loading}><SelectValue placeholder={loading ? "Cargando..." : "Seleccionar cliente"} /></SelectTrigger></FormControl>
+                        <SelectContent>{clients.map((c) => (<SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>))}</SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormItem>
+                    <FormLabel>* Código Postal del Receptor</FormLabel>
+                    <Input value={selectedClient?.zip || ''} disabled placeholder="Se llena al seleccionar cliente" />
+                  </FormItem>
+                  <FormItem>
+                    <FormLabel>* Régimen Fiscal</FormLabel>
+                    <Input value={selectedClient?.taxRegime || ''} disabled placeholder="Se llena al seleccionar cliente" />
+                  </FormItem>
+                  <FormField control={form.control} name="usoCfdi" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>* Uso del CFDI</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Seleccionar Uso CFDI" /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="G01">G01 - Adquisición de mercancías</SelectItem>
+                          <SelectItem value="G03">G03 - Gastos en general</SelectItem>
+                          <SelectItem value="I01">I01 - Construcciones</SelectItem>
+                          <SelectItem value="S01">S01 - Sin efectos fiscales</SelectItem>
+                          <SelectItem value="CP01">CP01 - Pagos</SelectItem>
+                          <SelectItem value="CN01">CN01 - Nómina</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="pago">
+              <AccordionTrigger className="bg-muted px-4 rounded-t-lg mt-4">Datos de Pago</AccordionTrigger>
+              <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <FormField control={form.control} name="moneda" render={({ field }) => (
                       <FormItem>
-                        <Label htmlFor="customer">Cliente</Label>
-                        <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
-                          <FormControl>
-                            <SelectTrigger id="customer" aria-label="Seleccionar cliente" disabled={loading}>
-                              <SelectValue placeholder={loading ? "Cargando clientes..." : "Seleccionar cliente"} />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {clients.map((client) => (
-                              <SelectItem key={client.id} value={client.id.toString()}>
-                                {client.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
+                          <FormLabel>* Moneda</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                            <SelectContent><SelectItem value="MXN">MXN - Peso Mexicano</SelectItem></SelectContent>
+                          </Select>
+                          <FormMessage />
                       </FormItem>
-                    )}
-                  />
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="usoCfdi"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label htmlFor="uso-cfdi">Uso CFDI</Label>
-                           <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger id="uso-cfdi" aria-label="Uso CFDI">
-                                  <SelectValue placeholder="Seleccionar Uso CFDI" />
-                                </SelectTrigger>
-                              </FormControl>
+                  )} />
+                   <FormField control={form.control} name="metodoPago" render={({ field }) => (
+                      <FormItem>
+                          <FormLabel className="flex items-center gap-1">* Método de Pago<Tooltip><TooltipTrigger asChild><button type="button"><HelpCircle className="h-3 w-3" /></button></TooltipTrigger><TooltipContent><p>PUE: Pago en una sola exhibición<br/>PPD: Pago en parcialidades o diferido</p></TooltipContent></Tooltip></FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                               <SelectContent>
-                                  <SelectItem value="G01">G01 - Adquisición de mercancías</SelectItem>
-                                  <SelectItem value="G03">G03 - Gastos en general</SelectItem>
-                                  <SelectItem value="I01">I01 - Construcciones</SelectItem>
-                                  <SelectItem value="S01">S01 - Sin efectos fiscales</SelectItem>
-                                  <SelectItem value="CP01">CP01 - Pagos</SelectItem>
-                                  <SelectItem value="CN01">CN01 - Nómina</SelectItem>
+                                  <SelectItem value="PUE">PUE - Pago en una sola exhibición</SelectItem>
+                                  <SelectItem value="PPD">PPD - Pago en parcialidades o diferido</SelectItem>
                               </SelectContent>
                           </Select>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField
-                      control={form.control}
-                      name="formaPago"
-                      render={({ field }) => (
+                      </FormItem>
+                   )} />
+                   <FormField control={form.control} name="formaPago" render={({ field }) => (
                         <FormItem>
-                          <Label htmlFor="forma-pago">Forma de Pago</Label>
+                          <FormLabel>* Forma de Pago</FormLabel>
                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                  <SelectTrigger id="forma-pago" aria-label="Forma de Pago">
-                                      <SelectValue placeholder="Forma de Pago" />
-                                  </SelectTrigger>
-                              </FormControl>
+                              <FormControl><SelectTrigger><SelectValue placeholder="Forma de Pago" /></SelectTrigger></FormControl>
                               <SelectContent>
                                   <SelectItem value="01">01 - Efectivo</SelectItem>
                                   <SelectItem value="03">03 - Transferencia electrónica</SelectItem>
@@ -388,181 +383,101 @@ export default function NewInvoicePage() {
                         </FormItem>
                       )}
                     />
-                  </div>
-                   <FormField
-                      control={form.control}
-                      name="metodoPago"
-                      render={({ field }) => (
+                     <FormField control={form.control} name="condicionesPago" render={({ field }) => (
                         <FormItem>
-                          <Label htmlFor="metodo-pago">Método de Pago</Label>
-                           <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                  <SelectTrigger id="metodo-pago" aria-label="Método de Pago">
-                                      <SelectValue placeholder="Método de Pago" />
-                                  </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                  <SelectItem value="PUE">PUE - Pago en una sola exhibición</SelectItem>
-                                  <SelectItem value="PPD">PPD - Pago en parcialidades o diferido</SelectItem>
-                              </SelectContent>
-                          </Select>
-                           <FormMessage />
+                          <FormLabel>Condiciones de Pago</FormLabel>
+                          <FormControl><Input placeholder="Pago de contado" {...field} /></FormControl>
+                          <FormMessage />
                         </FormItem>
-                      )}
-                    />
+                     )} />
+                    <FormItem>
+                      <FormLabel>* Código Postal de Expedición</FormLabel>
+                      <Input value={"66064"} disabled />
+                    </FormItem>
                 </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-headline">Conceptos</CardTitle>
-                 <FormMessage className={cn(!form.formState.errors.concepts?.message && "hidden")}>
-                  {form.formState.errors.concepts?.root?.message}
-                </FormMessage>
-              </CardHeader>
-              <CardContent>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          {/* Concepts Table */}
+          <Card className="mt-4">
+            <CardHeader className="flex-row items-center justify-between">
+              <CardTitle className="font-headline">Conceptos</CardTitle>
+              <div className="flex items-center gap-2">
+                <Label>Agregar Producto:</Label>
+                <Select onValueChange={addProductToConcepts} disabled={loading}>
+                    <SelectTrigger className="w-[250px]"><SelectValue placeholder={loading ? "Cargando..." : "Seleccionar producto..."} /></SelectTrigger>
+                    <SelectContent>{products.map(p => (<SelectItem key={p.id} value={p.id.toString()}><span className="font-medium">{p.description}</span> - <span>${p.unitPrice.toFixed(2)}</span></SelectItem>))}</SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent>
+               <FormMessage className={cn(!form.formState.errors.concepts?.root?.message && "hidden")}>{form.formState.errors.concepts?.root?.message}</FormMessage>
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Producto/Servicio</TableHead>
-                      <TableHead className="w-[100px]">Cantidad</TableHead>
-                      <TableHead className="text-right w-[120px]">Precio Unit.</TableHead>
-                      <TableHead className="text-right w-[120px]">Importe</TableHead>
                       <TableHead className="w-[40px]"><span className="sr-only">Eliminar</span></TableHead>
+                      <TableHead className="min-w-[250px]">Descripción</TableHead>
+                      <TableHead className="min-w-[120px]">Clave SAT</TableHead>
+                      <TableHead className="min-w-[120px]">Clave Unidad</TableHead>
+                      <TableHead className="w-[120px] text-right">Precio Unit.</TableHead>
+                      <TableHead className="w-[100px] text-right">Cantidad</TableHead>
+                      <TableHead className="w-[120px] text-right">Descuento</TableHead>
+                      <TableHead className="w-[150px]">Obj. Impuesto</TableHead>
+                      <TableHead className="w-[120px] text-right">Importe</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {fields.map((field, index) => (
                       <TableRow key={field.id}>
-                        <TableCell className="font-medium">
-                          {field.description}
-                          <p className="text-xs text-muted-foreground">SAT: {field.satKey} / Unidad: {field.unitKey}</p>
-                        </TableCell>
-                        <TableCell>
-                          <Controller
-                            control={form.control}
-                            name={`concepts.${index}.quantity`}
-                            render={({ field: controllerField }) => (
-                              <Input
-                                type="number"
-                                {...controllerField}
-                                onChange={e => {
-                                  const quantity = Number(e.target.value);
-                                  controllerField.onChange(quantity);
-                                  updateQuantity(index, quantity);
-                                }}
-                                className="w-20"
-                              />
-                            )}
-                          />
-                        </TableCell>
+                        <TableCell><Button variant="ghost" size="icon" type="button" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                        <TableCell>{field.description}</TableCell>
+                        <TableCell>{field.satKey}</TableCell>
+                        <TableCell>{field.unitKey}</TableCell>
                         <TableCell className="text-right">${field.unitPrice.toFixed(2)}</TableCell>
-                        <TableCell className="text-right">${field.amount.toFixed(2)}</TableCell>
                         <TableCell>
-                          <Button variant="ghost" size="icon" type="button" onClick={() => remove(index)}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
+                          <Input type="number" value={field.quantity} onChange={e => updateConcept(index, { quantity: Number(e.target.value) })} className="w-20 text-right" />
                         </TableCell>
+                         <TableCell>
+                          <Input type="number" value={field.discount} onChange={e => updateConcept(index, { discount: Number(e.target.value) })} className="w-24 text-right" />
+                        </TableCell>
+                        <TableCell>
+                          <FormField control={form.control} name={`concepts.${index}.objetoImpuesto`} render={({ field }) => (
+                            <Select onValueChange={(value) => { field.onChange(value); updateConcept(index, { objetoImpuesto: value }); }} defaultValue={field.value}>
+                              <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                              <SelectContent>
+                                <SelectItem value="01">01 - No objeto</SelectItem>
+                                <SelectItem value="02">02 - Sí objeto</SelectItem>
+                                <SelectItem value="03">03 - Sí objeto y no obligado</SelectItem>
+                              </SelectContent>
+                            </Select>
+                           )} />
+                        </TableCell>
+                        <TableCell className="text-right font-medium">${field.amount.toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
-                     {fields.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={5} className="text-center h-24">
-                            Agrega productos del catálogo.
-                          </TableCell>
-                        </TableRow>
-                      )}
+                    {fields.length === 0 && (<TableRow><TableCell colSpan={9} className="text-center h-24">Agrega productos del catálogo.</TableCell></TableRow>)}
                   </TableBody>
                 </Table>
-              </CardContent>
-              <CardFooter className="flex-col items-start gap-2">
-                 <Label>Agregar Producto del Catálogo</Label>
-                  <Select onValueChange={addProductToConcepts} disabled={loading}>
-                    <SelectTrigger>
-                        <SelectValue placeholder={loading ? "Cargando productos..." : "Seleccionar producto..."} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {products.map(p => (
-                            <SelectItem key={p.id} value={p.id.toString()}>
-                                <span className="font-medium">{p.description}</span> - <span>${p.unitPrice.toFixed(2)}</span>
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-              </CardFooter>
-            </Card>
-          </div>
-          <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-headline">Detalles Adicionales</CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-6">
-                 <div className="grid gap-3">
-                  <Label htmlFor="serie-folio">Serie y Folio</Label>
-                  <div className="flex gap-2">
-                    <FormField
-                      control={form.control}
-                      name="serie"
-                      render={({ field }) => (
-                        <FormItem><FormControl><Input className="w-[60px]" {...field} /></FormControl></FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="folio"
-                      render={({ field }) => (
-                         <FormItem><FormControl><Input type="number" {...field} /></FormControl></FormItem>
-                      )}
-                    />
-                  </div>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-end">
+                <div className="w-full max-w-sm space-y-2">
+                    <div className="flex justify-between"><span>Subtotal:</span><span>${subtotal.toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>Descuentos:</span><span>-${totalDiscount.toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>IVA (16%):</span><span>${iva.toFixed(2)}</span></div>
+                    <div className="flex justify-between font-bold text-lg border-t pt-2"><span>Total:</span><span>${total.toFixed(2)}</span></div>
                 </div>
-                 <FormField
-                  control={form.control}
-                  name="condicionesPago"
-                  render={({ field }) => (
-                    <FormItem className="grid gap-3">
-                      <Label htmlFor="condiciones">Condiciones de Pago</Label>
-                      <FormControl>
-                        <Input id="condiciones" placeholder="Pago de contado" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-            <Card className="overflow-hidden">
-              <CardHeader>
-                <CardTitle className="font-headline">Resumen</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4">
-                  <div className="flex items-center justify-between">
-                      <span>Subtotal</span>
-                      <span>${subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                      <span>IVA (16%)</span>
-                      <span>${iva.toFixed(2)}</span>
-                  </div>
-                  <div className="flex items-center justify-between font-semibold text-lg">
-                      <span>Total</span>
-                      <span>${total.toFixed(2)}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+            </CardFooter>
+          </Card>
         </div>
         <div className="flex items-center justify-center gap-2 md:hidden">
-           <Button variant="outline" size="sm" type="button" onClick={handleDiscard}>
-              Descartar
-          </Button>
-          <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>
-             {form.formState.isSubmitting ? 'Guardando...' : 'Guardar Borrador'}
-          </Button>
+          <Button variant="outline" size="sm" type="button" onClick={handleDiscard}>Descartar</Button>
+          <Button size="sm" type="submit" disabled={form.formState.isSubmitting}>{form.formState.isSubmitting ? 'Guardando...' : 'Guardar Borrador'}</Button>
         </div>
       </form>
     </Form>
+    </TooltipProvider>
   )
 }
