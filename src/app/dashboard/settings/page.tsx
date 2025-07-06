@@ -367,22 +367,22 @@ export default function SettingsPage() {
                   <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Datos de Usuario</AccordionTrigger>
                   <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
                       <Form {...passwordForm}>
-                          <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-6">
-                          <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
-                              <div className="space-y-2">
-                                  <Label>Usuario</Label>
-                                  <Input value={user?.email || ''} disabled />
-                              </div>
-                              <div></div>
-                              <FormField control={passwordForm.control} name="currentPassword" render={({ field }) => ( <FormItem><FormLabel>*Contraseña Anterior</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                              <div></div>
-                              <FormField control={passwordForm.control} name="newPassword" render={({ field }) => ( <FormItem><FormLabel>*Nueva Contraseña</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                              <FormField control={passwordForm.control} name="confirmPassword" render={({ field }) => ( <FormItem><FormLabel>*Repetir Contraseña</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                          <div className="space-y-6">
+                            <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
+                                <div className="space-y-2">
+                                    <Label>Usuario</Label>
+                                    <Input value={user?.email || ''} disabled />
+                                </div>
+                                <div></div>
+                                <FormField control={passwordForm.control} name="currentPassword" render={({ field }) => ( <FormItem><FormLabel>*Contraseña Anterior</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                <div></div>
+                                <FormField control={passwordForm.control} name="newPassword" render={({ field }) => ( <FormItem><FormLabel>*Nueva Contraseña</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                <FormField control={passwordForm.control} name="confirmPassword" render={({ field }) => ( <FormItem><FormLabel>*Repetir Contraseña</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            </div>
+                            <div className="flex justify-end pt-4">
+                                <Button type="button" onClick={passwordForm.handleSubmit(onPasswordSubmit)} disabled={isLoading}>Actualizar Contraseña</Button>
+                            </div>
                           </div>
-                          <div className="flex justify-end pt-4">
-                              <Button type="submit" disabled={isLoading}>Actualizar Contraseña</Button>
-                          </div>
-                          </form>
                       </Form>
                   </AccordionContent>
               </AccordionItem>
