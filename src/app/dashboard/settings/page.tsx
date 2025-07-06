@@ -62,7 +62,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
@@ -233,12 +232,11 @@ export default function SettingsPage() {
     <div className="mx-auto w-full max-w-4xl p-4 md:p-8">
       <h1 className="text-lg font-bold font-headline mb-6">Configuración</h1>
       <Tabs defaultValue="profile">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
           <TabsTrigger value="profile">Perfil Empresa</TabsTrigger>
           <TabsTrigger value="signature">Firma</TabsTrigger>
           <TabsTrigger value="folios">Folios</TabsTrigger>
           <TabsTrigger value="integrations">Integraciones</TabsTrigger>
-          <TabsTrigger value="appearance">Apariencia</TabsTrigger>
           <TabsTrigger value="account">Cuenta</TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
@@ -514,23 +512,6 @@ export default function SettingsPage() {
                     </div>
                 </CardContent>
             </Card>
-        </TabsContent>
-        <TabsContent value="appearance">
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-headline text-base">Apariencia</CardTitle>
-              <CardDescription className="text-sm">
-                Personaliza la apariencia de la aplicación.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="space-y-2">
-                    <Label>Tema de Color</Label>
-                    <p className="text-sm text-muted-foreground">Selecciona el tema para el dashboard.</p>
-                </div>
-                <ThemeToggle />
-            </CardContent>
-          </Card>
         </TabsContent>
         <TabsContent value="account">
           <Card>
