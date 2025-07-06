@@ -7,6 +7,7 @@ import * as z from "zod";
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { onAuthStateChanged, User, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
+import { Check } from "lucide-react";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -296,7 +297,10 @@ export default function SettingsPage() {
                               <TableCell>02/02/2023</TableCell>
                               <TableCell>02/02/2027</TableCell>
                               <TableCell>
-                                <Badge variant="default">Activo</Badge>
+                                <Badge variant="default">
+                                    <Check className="mr-1 h-4 w-4" />
+                                    Activo
+                                </Badge>
                               </TableCell>
                             </TableRow>
                           </TableBody>

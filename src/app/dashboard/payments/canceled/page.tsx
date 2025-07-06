@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { User } from "firebase/auth";
-import { Eye, Filter, ListFilter, Download, ChevronDown, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, File as FileIcon, Sheet, MoreHorizontal } from "lucide-react";
+import { Eye, Filter, ListFilter, Download, ChevronDown, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, File as FileIcon, Sheet, MoreHorizontal, AlertCircle } from "lucide-react";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -163,7 +163,12 @@ export default function CanceledPaymentsPage() {
                     <TableCell>{payment.currency}</TableCell>
                     <TableCell className="text-right">{formatCurrency(payment.total)}</TableCell>
                     <TableCell>{payment.paymentForm}</TableCell>
-                    <TableCell><Badge variant={getBadgeVariant(payment.status)}>{getStatusLabel(payment.status)}</Badge></TableCell>
+                    <TableCell>
+                      <Badge variant={getBadgeVariant(payment.status)}>
+                        <AlertCircle className="mr-1 h-3 w-3" />
+                        {getStatusLabel(payment.status)}
+                      </Badge>
+                    </TableCell>
                     <TableCell>{payment.operationNumber || 'N/A'}</TableCell>
                     <TableCell>N/A</TableCell>
                     <TableCell>N/A</TableCell>

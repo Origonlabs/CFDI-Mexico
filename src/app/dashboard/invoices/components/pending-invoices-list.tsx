@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreHorizontal, Download, Mail, Filter, Plus, ListFilter, XCircle, ChevronLeft, ChevronRight, Eye, File as FileIcon, ChevronFirst, ChevronLast } from "lucide-react"
+import { MoreHorizontal, Download, Mail, Filter, Plus, ListFilter, XCircle, ChevronLeft, ChevronRight, Eye, File as FileIcon, ChevronFirst, ChevronLast, BadgeCheck } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { User } from "firebase/auth"
 
@@ -194,7 +194,12 @@ export function PendingInvoicesList() {
                             <TableCell>{formatDate(invoice.createdAt)}</TableCell>
                             <TableCell>N/A</TableCell> {/* Referencia */}
                             <TableCell><Badge variant="secondary">Pendiente</Badge></TableCell> {/* Estado REP */}
-                            <TableCell><Badge variant={getBadgeVariant(invoice.status)}>{getStatusLabel(invoice.status)}</Badge></TableCell> {/* Estado CFDI */}
+                            <TableCell>
+                                <Badge variant={getBadgeVariant(invoice.status)}>
+                                    <BadgeCheck className="mr-1 h-3 w-3" />
+                                    {getStatusLabel(invoice.status)}
+                                </Badge>
+                            </TableCell> {/* Estado CFDI */}
                             <TableCell>
                             <div className="flex justify-end">
                                 <DropdownMenu>

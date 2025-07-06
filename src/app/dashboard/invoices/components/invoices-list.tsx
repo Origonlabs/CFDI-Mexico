@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreHorizontal, Download, Mail, Filter, Plus, Archive, ListFilter, XCircle, ChevronLeft, ChevronRight, Eye, Sheet, File as FileIcon, ChevronFirst, ChevronLast, ChevronDown, Stamp } from "lucide-react"
+import { MoreHorizontal, Download, Mail, Filter, Plus, Archive, ListFilter, XCircle, ChevronLeft, ChevronRight, Eye, Sheet, File as FileIcon, ChevronFirst, ChevronLast, ChevronDown, Stamp, BadgeCheck, AlertCircle } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { User } from "firebase/auth"
 
@@ -247,7 +247,13 @@ export function InvoicesList() {
                             <TableCell>MXN</TableCell>
                             <TableCell>{formatDate(invoice.createdAt)}</TableCell>
                             <TableCell className="text-right">{invoice.metodoPago === 'PPD' ? formatCurrency(invoice.total) : formatCurrency("0")}</TableCell>
-                            <TableCell><Badge variant={getBadgeVariant(invoice.status)}>{getStatusLabel(invoice.status)}</Badge></TableCell>
+                            <TableCell>
+                                <Badge variant={getBadgeVariant(invoice.status)}>
+                                    {invoice.status === 'stamped' && <BadgeCheck className="mr-1 h-3 w-3" />}
+                                    {invoice.status === 'canceled' && <AlertCircle className="mr-1 h-3 w-3" />}
+                                    {getStatusLabel(invoice.status)}
+                                </Badge>
+                            </TableCell>
                             <TableCell><Badge variant="secondary">N/A</Badge></TableCell>
                             <TableCell>{invoice.metodoPago === 'PUE' ? 'SI' : 'NO'}</TableCell>
                             <TableCell>N/A</TableCell>

@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreHorizontal, Download, Mail, Filter, ListFilter, Eye, Sheet, File as FileIcon, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react"
+import { MoreHorizontal, Download, Mail, Filter, ListFilter, Eye, Sheet, File as FileIcon, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, ChevronDown, AlertCircle } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { User } from "firebase/auth"
 
@@ -209,7 +209,12 @@ export function CanceledInvoicesList() {
                         <TableCell className="font-medium truncate max-w-32">{invoice.clientName}</TableCell>
                         <TableCell>Factura</TableCell>
                         <TableCell className="text-right">{formatCurrency(invoice.total)}</TableCell>
-                        <TableCell><Badge variant={getBadgeVariant(invoice.status)}>{getStatusLabel(invoice.status)}</Badge></TableCell>
+                        <TableCell>
+                            <Badge variant={getBadgeVariant(invoice.status)}>
+                                <AlertCircle className="mr-1 h-3 w-3" />
+                                {getStatusLabel(invoice.status)}
+                            </Badge>
+                        </TableCell>
                         <TableCell>{formatDate(invoice.createdAt)}</TableCell>
                         <TableCell>{invoice.serie}</TableCell>
                         <TableCell>{invoice.folio}</TableCell>
