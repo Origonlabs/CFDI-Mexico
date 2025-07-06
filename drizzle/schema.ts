@@ -121,3 +121,12 @@ export const paymentDocuments = pgTable('payment_documents', {
   amountPaid: numeric('amount_paid', { precision: 10, scale: 2 }).notNull(),
   outstandingBalance: numeric('outstanding_balance', { precision: 10, scale: 2 }).notNull(),
 });
+
+export const series = pgTable('series', {
+  id: serial('id').primaryKey(),
+  userId: varchar('user_id', { length: 256 }).notNull(),
+  serie: varchar('serie', { length: 10 }).notNull(),
+  folio: integer('folio').notNull(),
+  documentType: varchar('document_type', { length: 50 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});

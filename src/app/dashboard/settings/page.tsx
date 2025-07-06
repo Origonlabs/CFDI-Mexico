@@ -8,10 +8,12 @@ import { useEffect, useState, useCallback } from "react";
 import { onAuthStateChanged, User, sendPasswordResetEmail, updateProfile } from "firebase/auth";
 import { UploadCloud, PlusCircle, Building, Workflow } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getCompanyProfile, saveCompanyProfile, type ProfileFormValues } from "@/app/actions/companies";
+import { getSeries } from "@/app/actions/series";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -46,15 +48,6 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   Table,
   TableBody,
   TableCell,
@@ -75,6 +68,12 @@ const profileFormSchema = z.object({
   taxRegime: z.string().min(1, { message: "El régimen fiscal es obligatorio." }),
 });
 
+interface Serie {
+  id: number;
+  serie: string;
+  folio: number;
+  documentType: string;
+}
 
 export default function SettingsPage() {
   const { toast } = useToast();
@@ -87,6 +86,10 @@ export default function SettingsPage() {
   const [lastName, setLastName] = useState("");
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isSendingReset, setIsSendingReset] = useState(false);
+
+  const [series, setSeries] = useState<Serie[]>([]);
+  const [loadingSeries, setLoadingSeries] = useState(true);
+
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -127,10 +130,22 @@ export default function SettingsPage() {
       setLoadingProfile(false);
   }, [form, toast]);
 
+  const fetchSeries = useCallback(async (uid: string) => {
+      setLoadingSeries(true);
+      const response = await getSeries(uid);
+      if (response.success && response.data) {
+        setSeries(response.data as Serie[]);
+      } else {
+          toast({ title: "Error", description: response.message || "No se pudieron cargar las series.", variant: "destructive" });
+      }
+      setLoadingSeries(false);
+  }, [toast]);
+
 
   useEffect(() => {
     if (user) {
       fetchProfile(user.uid);
+      fetchSeries(user.uid);
        if (user.displayName) {
         const nameParts = user.displayName.split(" ");
         const lName = nameParts.length > 1 ? nameParts.pop() || "" : "";
@@ -142,7 +157,7 @@ export default function SettingsPage() {
       // User is not logged in, finished loading
       setLoadingProfile(false);
     }
-  }, [user, loadingAuth, fetchProfile]);
+  }, [user, loadingAuth, fetchProfile, fetchSeries]);
 
   async function onSubmit(data: ProfileFormValues) {
     if (!user) {
@@ -391,37 +406,14 @@ export default function SettingsPage() {
                             Administra las series y el folio inicial para tus facturas.
                         </CardDescription>
                     </div>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button size="sm" className="gap-1">
-                                <PlusCircle className="h-3.5 w-3.5" />
-                                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                                    Agregar Serie
-                                </span>
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle className="font-headline text-base">Nueva Serie</DialogTitle>
-                                <DialogDescription className="text-sm">
-                                    Configura una nueva serie y su folio inicial.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="serie" className="text-right">Serie</Label>
-                                    <Input id="serie" placeholder="A" className="col-span-3" />
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="folio-inicial" className="text-right">Folio Inicial</Label>
-                                    <Input id="folio-inicial" type="number" placeholder="1" className="col-span-3" />
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button type="submit">Guardar Serie</Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                    <Button asChild size="sm" className="gap-1">
+                        <Link href="/dashboard/settings/series">
+                           <PlusCircle className="h-3.5 w-3.5" />
+                           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                               Agregar Serie
+                           </span>
+                        </Link>
+                    </Button>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -433,21 +425,27 @@ export default function SettingsPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow>
-                                <TableCell className="font-medium">A</TableCell>
-                                <TableCell>1024</TableCell>
-                                <TableCell>Factura de Ingreso</TableCell>
-                            </TableRow>
-                             <TableRow>
-                                <TableCell className="font-medium">B</TableCell>
-                                <TableCell>512</TableCell>
-                                <TableCell>Nota de Crédito</TableCell>
-                            </TableRow>
-                             <TableRow>
-                                <TableCell className="font-medium">P</TableCell>
-                                <TableCell>256</TableCell>
-                                <TableCell>Complemento de Pago</TableCell>
-                            </TableRow>
+                            {loadingSeries ? (
+                                <TableRow>
+                                    <TableCell colSpan={3} className="h-24 text-center">
+                                      Cargando series...
+                                    </TableCell>
+                                </TableRow>
+                            ) : series.length > 0 ? (
+                                series.map((s) => (
+                                    <TableRow key={s.id}>
+                                        <TableCell className="font-medium">{s.serie}</TableCell>
+                                        <TableCell>{s.folio}</TableCell>
+                                        <TableCell>{s.documentType}</TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={3} className="text-center h-24">
+                                        No has agregado ninguna serie.
+                                    </TableCell>
+                                </TableRow>
+                            )}
                         </TableBody>
                     </Table>
                 </CardContent>

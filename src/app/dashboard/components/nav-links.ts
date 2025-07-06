@@ -35,7 +35,7 @@ export const navigationLinks = [
       { href: "/dashboard/clients", label: "Listar Clientes" },
       { href: "/dashboard/products/new", label: "Crear Productos" },
       { href: "/dashboard/products", label: "Listar Productos" },
-      { href: "/dashboard/settings", label: "Crear Series y Folios" },
+      { href: "/dashboard/settings/series", label: "Crear Series y Folios" },
       { href: "/dashboard/settings", label: "Listar Series y Folios" },
       { href: "#", label: "Crear Cuentas Bancarias" },
       { href: "#", label: "Listar Cuentas Bancarias" },
