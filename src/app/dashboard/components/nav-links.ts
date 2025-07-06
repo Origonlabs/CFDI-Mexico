@@ -37,8 +37,8 @@ export const navigationLinks = [
       { href: "/dashboard/products", label: "Listar Productos" },
       { href: "/dashboard/settings/series/new", label: "Crear Series y Folios" },
       { href: "/dashboard/settings/series", label: "Listar Series y Folios" },
-      { href: "#", label: "Crear Cuentas Bancarias" },
-      { href: "#", label: "Listar Cuentas Bancarias" },
+      { href: "/dashboard/settings/bank-accounts/new", label: "Crear Cuentas Bancarias" },
+      { href: "/dashboard/settings/bank-accounts", label: "Listar Cuentas Bancarias" },
     ],
   },
   {

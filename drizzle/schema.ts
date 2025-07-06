@@ -130,3 +130,13 @@ export const series = pgTable('series', {
   documentType: varchar('document_type', { length: 50 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+export const bankAccounts = pgTable('bank_accounts', {
+  id: serial('id').primaryKey(),
+  userId: varchar('user_id', { length: 256 }).notNull(),
+  bankRfc: varchar('bank_rfc', { length: 13 }).notNull(),
+  bankName: text('bank_name').notNull(),
+  shortName: text('short_name').notNull(),
+  accountNumber: varchar('account_number', { length: 50 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
