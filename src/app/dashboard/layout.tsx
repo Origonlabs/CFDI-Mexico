@@ -124,7 +124,7 @@ export default function DashboardLayout({
 
         {/* Center: Search Bar */}
         <div className="flex-1 max-w-xl mx-auto hidden md:block">
-          <StarBorder thickness={5} borderRadius={15} color="hsl(var(--primary))">
+          <StarBorder thickness={3} borderRadius={15} color="hsl(var(--primary))">
             <div className="relative flex h-9 items-center">
               <Search className="absolute left-3.5 h-4 w-4 text-neutral-400" />
               <Input
