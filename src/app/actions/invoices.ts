@@ -11,8 +11,8 @@ import { create } from 'xmlbuilder2';
 import QRCode from 'qrcode';
 import { adminStorage } from "@/lib/firebase/admin";
 import { Buffer } from 'buffer';
-import crypto from 'crypto';
 import { numeroALetras } from 'numero-a-letras';
+import { stampWithFacturaLoPlus } from "@/lib/pac";
 
 
 const conceptSchema = z.object({
@@ -165,47 +165,6 @@ export const getDeletedInvoices = async (userId: string) => {
   }
 };
 
-async function _regenerateFiles(invoiceId: number, userId: string) {
-    if (adminStorage) {
-      const invoiceData = await getInvoiceForDownload(invoiceId, userId);
-      if (!invoiceData) {
-        throw new Error("No se pudieron obtener los datos de la factura.");
-      }
-
-      const xmlString = await _generateXmlString(invoiceData);
-      const pdfBytes = await _generatePdfBuffer(invoiceData);
-
-      const bucket = adminStorage.bucket();
-      const basePath = `invoices/${userId}/${invoiceData.invoice.clientId}`;
-      const pdfFileName = `${invoiceData.invoice.serie}-${invoiceData.invoice.folio}.pdf`;
-      const xmlFileName = `${invoiceData.invoice.serie}-${invoiceData.invoice.folio}.xml`;
-      const pdfFilePath = `${basePath}/${pdfFileName}`;
-      const xmlFilePath = `${basePath}/${xmlFileName}`;
-
-      const pdfFile = bucket.file(pdfFilePath);
-      await pdfFile.save(Buffer.from(pdfBytes), {
-        metadata: { contentType: 'application/pdf' },
-      });
-      await pdfFile.makePublic();
-      const pdfUrl = pdfFile.publicUrl();
-
-      const xmlFile = bucket.file(xmlFilePath);
-      await xmlFile.save(xmlString, {
-        metadata: { contentType: 'application/xml' },
-      });
-      await xmlFile.makePublic();
-      const xmlUrl = xmlFile.publicUrl();
-
-      await db.update(invoices).set({ pdfUrl, xmlUrl }).where(eq(invoices.id, invoiceId));
-      
-      return { pdfUrl, xmlUrl };
-    } else {
-      console.warn("Firebase Admin Storage not available. Skipping file upload.");
-      return { pdfUrl: '', xmlUrl: '' };
-    }
-}
-
-
 export const saveInvoice = async (formData: InvoiceFormValues, userId: string) => {
   if (!db) {
     return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
@@ -217,16 +176,13 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
     
     const validatedData = invoiceSchema.parse(formData);
 
-    // Recalculate totals on the server to ensure data integrity
     const subtotal = validatedData.concepts.reduce((acc, c) => acc + (c.quantity * c.unitPrice), 0);
     const totalDiscounts = validatedData.concepts.reduce((acc, c) => acc + (c.discount || 0), 0);
     const baseImponible = subtotal - totalDiscounts;
     const iva = baseImponible * 0.16;
-    const totalRetenidos = 0; // Placeholder for future implementation
+    const totalRetenidos = 0;
     const total = baseImponible + iva - totalRetenidos;
 
-
-    // 1. Create Invoice record in DB
     const [newInvoice] = await db.insert(invoices).values({
       userId,
       clientId: validatedData.clientId,
@@ -261,12 +217,9 @@ export const saveInvoice = async (formData: InvoiceFormValues, userId: string) =
 
     await db.insert(invoiceItems).values(conceptsToInsert);
 
-    // 2. Generate DRAFT PDF and XML and upload to Storage
-    const { pdfUrl, xmlUrl } = await _regenerateFiles(newInvoice.id, userId);
-
     revalidatePath("/dashboard/invoices");
     
-    return { success: true, data: { ...newInvoice, pdfUrl, xmlUrl } };
+    return { success: true, data: { ...newInvoice } };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false, message: "Datos del formulario no válidos.", errors: error.flatten().fieldErrors };
@@ -287,30 +240,63 @@ export const stampInvoice = async (invoiceId: number, userId: string) => {
             return { success: false, message: "Usuario no autenticado." };
         }
 
-        const [invoiceToStamp] = await db.select().from(invoices).where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)));
+        const invoiceData = await getInvoiceForDownload(invoiceId, userId);
         
-        if (!invoiceToStamp) {
-            return { success: false, message: "Factura no encontrada." };
+        if (!invoiceData) {
+            return { success: false, message: "Factura no encontrada o datos de empresa/cliente incompletos." };
         }
 
-        if (invoiceToStamp.status !== 'draft') {
+        if (invoiceData.invoice.status !== 'draft') {
             return { success: false, message: "La factura ya ha sido timbrada o está cancelada." };
         }
+        
+        const unsignedXmlString = await _generateXmlString(invoiceData);
 
-        const stampDate = new Date();
-        const uuid = crypto.randomUUID();
+        const pacResult = await stampWithFacturaLoPlus(unsignedXmlString);
+
+        if (!pacResult.success) {
+            return { success: false, message: pacResult.message };
+        }
+
+        const { stampedXml, uuid, stampDate } = pacResult;
 
         await db.update(invoices).set({
             status: 'stamped',
             uuid: uuid,
-            stampDate: stampDate,
+            stampDate: new Date(stampDate),
             updatedAt: new Date()
         }).where(eq(invoices.id, invoiceId));
+        
+        // Update local object for PDF generation
+        invoiceData.invoice.status = 'stamped';
+        invoiceData.invoice.uuid = uuid;
+        invoiceData.invoice.stampDate = new Date(stampDate);
 
-        await _regenerateFiles(invoiceId, userId);
+        const pdfBytes = await _generatePdfBuffer(invoiceData);
+
+        if (adminStorage) {
+            const bucket = adminStorage.bucket();
+            const basePath = `invoices/${userId}/${invoiceData.invoice.clientId}`;
+            const pdfFileName = `${invoiceData.invoice.serie}-${invoiceData.invoice.folio}.pdf`;
+            const xmlFileName = `${invoiceData.invoice.serie}-${invoiceData.invoice.folio}.xml`;
+            
+            const pdfFile = bucket.file(`${basePath}/${pdfFileName}`);
+            await pdfFile.save(Buffer.from(pdfBytes), { metadata: { contentType: 'application/pdf' } });
+            await pdfFile.makePublic();
+            const pdfUrl = pdfFile.publicUrl();
+
+            const xmlFile = bucket.file(`${basePath}/${xmlFileName}`);
+            await xmlFile.save(stampedXml, { metadata: { contentType: 'application/xml' } });
+            await xmlFile.makePublic();
+            const xmlUrl = xmlFile.publicUrl();
+
+            await db.update(invoices).set({ pdfUrl, xmlUrl }).where(eq(invoices.id, invoiceId));
+        } else {
+             console.warn("Firebase Admin Storage not available. Skipping file upload.");
+        }
+
 
         revalidatePath("/dashboard/invoices");
-
         return { success: true, message: "Factura timbrada exitosamente." };
     } catch (error) {
         console.error("Database Error (stampInvoice):", error);
@@ -339,13 +325,14 @@ async function getInvoiceForDownload(invoiceId: number, userId: string) {
 
 async function _generateXmlString(data: NonNullable<Awaited<ReturnType<typeof getInvoiceForDownload>>>) {
     const { invoice, client, items, company } = data;
-    const isStamped = invoice.status === 'stamped';
     const date = new Date(invoice.createdAt!).toISOString().slice(0, -5);
 
-    // Realistic fake data for stamped invoices
-    const fakeNoCertificado = '30001000000500001234';
-    const fakeCertificado = 'MIIF...[TRUNCATED]...'; // This would be the full Base64 CSD certificate
-    const fakeSello = 'aVd...[TRUNCATED]...='; // This would be the full Base64 signature
+    // This is a placeholder. In a real scenario, this would be a cryptographic signature.
+    const fakeSello = 'aVd...[SELLO_DE_PRUEBA]...='; 
+    // This is the CSD public certificate as a Base64 string.
+    const fakeCertificado = 'MIIF...[CERTIFICADO_DE_PRUEBA]...';
+    // This should come from the user's CSD, provided in the email for testing.
+    const noCertificado = company.templateCfdi33 || '30001000000500003416'; // Using templateCfdi33 as a placeholder for noCertificado for now
     
     const concepts = items.map(item => ({
         'cfdi:Concepto': {
@@ -380,10 +367,10 @@ async function _generateXmlString(data: NonNullable<Awaited<ReturnType<typeof ge
             '@Serie': invoice.serie,
             '@Folio': invoice.folio,
             '@Fecha': date,
-            '@Sello': isStamped ? fakeSello : 'PENDIENTE_DE_TIMBRADO',
+            '@Sello': fakeSello,
             '@FormaPago': invoice.formaPago,
-            '@NoCertificado': isStamped ? fakeNoCertificado : 'PENDIENTE_DE_TIMBRADO',
-            '@Certificado': isStamped ? fakeCertificado : 'PENDIENTE_DE_TIMBRADO',
+            '@NoCertificado': noCertificado,
+            '@Certificado': fakeCertificado,
             '@SubTotal': parseFloat(invoice.subtotal).toFixed(2),
             '@Moneda': 'MXN',
             '@Total': parseFloat(invoice.total).toFixed(2),
@@ -419,22 +406,6 @@ async function _generateXmlString(data: NonNullable<Awaited<ReturnType<typeof ge
         }
     };
     
-    if (isStamped) {
-        xmlObject['cfdi:Comprobante']['cfdi:Complemento'] = {
-            'tfd:TimbreFiscalDigital': {
-                '@xmlns:tfd': 'http://www.sat.gob.mx/TimbreFiscalDigital',
-                '@xsi:schemaLocation': 'http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd',
-                '@Version': '1.1',
-                '@UUID': invoice.uuid,
-                '@FechaTimbrado': invoice.stampDate!.toISOString(),
-                '@RfcProvCertif': 'PAC000000000', // Fake PAC RFC
-                '@SelloCFD': fakeSello.substring(0, 100) + '...',
-                '@NoCertificadoSAT': '20001000000500001234',
-                '@SelloSAT': 'bCD...[TRUNCATED_SAT_SEAL]...='
-            }
-        };
-    }
-
     const doc = create({ version: '1.0', encoding: 'UTF-8' }, xmlObject);
     return doc.end({ prettyPrint: true });
 }
@@ -532,7 +503,7 @@ async function _generatePdfBuffer(data: NonNullable<Awaited<ReturnType<typeof ge
     drawText(isStamped ? '20001000000500001234' : 'PENDIENTE', rightColumnX + 70, rightY);
     rightY -= 15;
     drawText('CSD del Emisor:', rightColumnX, rightY, boldFont);
-    drawText(isStamped ? '30001000000500001234' : 'PENDIENTE', rightColumnX + 70, rightY);
+    drawText(isStamped ? '30001000000500003416' : 'PENDIENTE', rightColumnX + 70, rightY);
     rightY -= 15;
     drawText('Tipo de Comprobante:', rightColumnX, rightY, boldFont);
     drawText('I - Ingreso', rightColumnX + 100, rightY);
