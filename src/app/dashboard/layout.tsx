@@ -102,7 +102,10 @@ export default function DashboardLayout({
   return (
     <div className="flex h-screen w-full flex-col">
       <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-neutral-700 bg-[#1A1A1A] px-4 text-primary-foreground">
-        <Link href="/" className="flex items-center gap-2 font-semibold">
+        <Link
+          href="/"
+          className="flex items-center gap-2 font-semibold text-current"
+        >
           <OrigonLogo className="h-6 w-6" />
           <span className="font-headline text-base hidden sm:inline-block">
             Origon CFDI
@@ -154,7 +157,7 @@ export default function DashboardLayout({
         </div>
       </header>
       <div className="flex flex-1 overflow-hidden">
-        <aside className="hidden w-56 flex-col border-r bg-background md:flex">
+        <aside className="hidden w-56 flex-col border-r bg-[#EBEBEB] text-neutral-800 md:flex">
           <div className="flex-1 overflow-y-auto">
             <nav className="grid items-start p-4 text-sm font-medium">
               <SidebarContent />
