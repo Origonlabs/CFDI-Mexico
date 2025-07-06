@@ -16,7 +16,7 @@ const StarBorder = React.forwardRef<HTMLDivElement, StarBorderProps>(
     {
       className,
       color = 'hsl(var(--primary))',
-      speed = '6s',
+      speed = '4s',
       thickness = 1,
       borderRadius = 12,
       children,
@@ -42,19 +42,12 @@ const StarBorder = React.forwardRef<HTMLDivElement, StarBorderProps>(
         {...props}
       >
         <div
-          className="absolute w-[300%] h-[50%] opacity-70 bottom-[-11px] right-[-250%] rounded-full animate-star-movement-bottom z-0"
+          className="absolute inset-[-1000%] animate-border-spin"
           style={{
-            background: `radial-gradient(circle, ${color}, transparent 10%)`,
+            background: `conic-gradient(from 90deg at 50% 50%, #2A2A2A, ${color}, #2A2A2A)`,
             animationDuration: speed,
           }}
-        ></div>
-        <div
-          className="absolute w-[300%] h-[50%] opacity-70 top-[-10px] left-[-250%] rounded-full animate-star-movement-top z-0"
-          style={{
-            background: `radial-gradient(circle, ${color}, transparent 10%)`,
-            animationDuration: speed,
-          }}
-        ></div>
+        />
         <div
           className="relative z-10 h-full w-full bg-[#2A2A2A] focus-within:bg-[#1A1A1A] transition-colors"
           style={{
