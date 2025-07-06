@@ -7,11 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { User } from "firebase/auth"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client"
 import { useToast } from "@/hooks/use-toast"
 import { getClients, type ClientFormValues } from "@/app/actions/clients"
 import { getPendingInvoices } from "@/app/actions/invoices"
+import { savePayment } from "@/app/actions/payments"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
@@ -25,7 +27,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
-import { CalendarIcon, PlusCircle, Trash2 } from "lucide-react"
+import { CalendarIcon, PlusCircle, Trash2, Download } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 
 // Data structures
@@ -43,8 +45,15 @@ interface PendingInvoice {
   serie: string;
   total: string;
   createdAt: Date;
-  uuidPlaceholder: string; 
+  uuid: string; // Now using real UUID
   metodoPago: string | null;
+}
+interface SavedPayment {
+  id: number;
+  serie: string;
+  folio: number;
+  pdfUrl?: string | null;
+  xmlUrl?: string | null;
 }
 
 // Schemas
@@ -105,6 +114,7 @@ export default function NewPaymentPage() {
   const [loading, setLoading] = useState(true);
   const [isDocsDialogOpen, setIsDocsDialogOpen] = useState(false);
   const [tempUuid, setTempUuid] = useState("");
+  const [savedPayment, setSavedPayment] = useState<SavedPayment | null>(null);
   
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),
@@ -168,13 +178,9 @@ export default function NewPaymentPage() {
       }
 
       if (invoicesRes.success && invoicesRes.data) {
-        const mappedInvoices = invoicesRes.data.map(inv => ({
-            ...inv,
-            uuidPlaceholder: `UUID-${inv.id}-${Date.now()}` // Mock UUID
-        }))
-        setPendingInvoices(mappedInvoices as PendingInvoice[]);
+        setPendingInvoices(invoicesRes.data as PendingInvoice[]);
       } else {
-            toast({ title: "Error", description: "No se pudieron cargar las facturas pendientes.", variant: "destructive" });
+        toast({ title: "Error", description: "No se pudieron cargar las facturas pendientes.", variant: "destructive" });
       }
     } catch (error) {
       toast({ title: "Error", description: "Ocurrió un error al cargar los datos.", variant: "destructive" });
@@ -193,11 +199,17 @@ export default function NewPaymentPage() {
   const clientPendingInvoices = pendingInvoices.filter(inv => inv.clientRfc === selectedClient?.rfc);
 
   async function onSubmit(data: PaymentFormValues) {
-    console.log(data);
-    toast({
-      title: "Función no implementada",
-      description: "La creación de complementos de pago está en desarrollo.",
-    });
+    if (!user) {
+      toast({ title: "Error", description: "Debes iniciar sesión para guardar un pago.", variant: "destructive" });
+      return;
+    }
+    const result = await savePayment(data, user.uid);
+    if (result.success && result.data) {
+        toast({ title: "Éxito", description: "El pago se ha guardado como borrador." });
+        setSavedPayment(result.data);
+    } else {
+        toast({ title: "Error al guardar", description: result.message || "No se pudo guardar el pago.", variant: "destructive" });
+    }
   }
   
   const handleAddDocument = (invoice: PendingInvoice) => {
@@ -214,7 +226,7 @@ export default function NewPaymentPage() {
 
       append({
           invoiceId: invoice.id,
-          uuid: invoice.uuidPlaceholder,
+          uuid: invoice.uuid,
           fecha: format(new Date(invoice.createdAt), "yyyy-MM-dd"),
           serie: invoice.serie,
           folio: invoice.folio.toString(),
@@ -241,6 +253,34 @@ export default function NewPaymentPage() {
   const handleBorrar = () => {
     form.reset();
     toast({ title: "Formulario limpiado."});
+  }
+
+  if (savedPayment) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-6 flex-1 py-12">
+        <Card className="w-full max-w-lg">
+          <CardHeader>
+            <CardTitle className="text-center font-headline">¡Pago Guardado!</CardTitle>
+            <CardDescription className="text-center">
+              El pago borrador con folio <strong>{savedPayment.serie}-{savedPayment.folio}</strong> ha sido creado exitosamente.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <p className="text-sm text-muted-foreground text-center">
+              Aún no puedes descargar los archivos hasta que el pago sea timbrado.
+            </p>
+             <div className="flex justify-center gap-4">
+              <Button asChild disabled={!savedPayment.pdfUrl}><a href={savedPayment.pdfUrl ?? '#'} target="_blank" rel="noopener noreferrer"><Download className="mr-2 h-4 w-4" />Descargar PDF</a></Button>
+              <Button asChild disabled={!savedPayment.xmlUrl}><a href={savedPayment.xmlUrl ?? '#'} target="_blank" rel="noopener noreferrer"><Download className="mr-2 h-4 w-4" />Descargar XML</a></Button>
+            </div>
+          </CardContent>
+          <CardFooter className="flex-col gap-4 pt-6">
+            <Button variant="outline" className="w-full" onClick={() => { form.reset(); setSavedPayment(null); }}><PlusCircle className="mr-2 h-4 w-4" />Crear Nuevo Pago</Button>
+            <Button variant="ghost" asChild><Link href="/dashboard/payments">Volver al listado de pagos</Link></Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -578,7 +618,7 @@ export default function NewPaymentPage() {
 
             <div className="flex justify-end gap-2 mt-4">
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Creando...' : 'Crear'}
+                {form.formState.isSubmitting ? 'Guardando...' : 'Crear'}
               </Button>
               <Button variant="outline" type="button" onClick={handleBorrar}>Borrar</Button>
             </div>

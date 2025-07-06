@@ -108,7 +108,7 @@ export const invoiceItems = pgTable('invoice_items', {
   amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
 });
 
-export const paymentStatusEnum = pgEnum('payment_status', ['stamped', 'canceled']);
+export const paymentStatusEnum = pgEnum('payment_status', ['draft', 'stamped', 'canceled']);
 
 export const payments = pgTable('payments', {
   id: serial('id').primaryKey(),
@@ -120,7 +120,7 @@ export const payments = pgTable('payments', {
   paymentForm: varchar('payment_form', { length: 3 }).notNull(),
   currency: varchar('currency', { length: 3 }).default('MXN').notNull(),
   totalAmount: numeric('total_amount', { precision: 10, scale: 2 }).notNull(),
-  status: paymentStatusEnum('status').default('stamped').notNull(),
+  status: paymentStatusEnum('status').default('draft').notNull(),
   pdfUrl: text('pdf_url'),
   xmlUrl: text('xml_url'),
   operationNumber: varchar('operation_number', { length: 100 }),

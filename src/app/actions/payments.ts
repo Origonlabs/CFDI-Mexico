@@ -1,10 +1,58 @@
 
 "use server";
 
+import * as z from "zod";
 import db from "@/lib/db";
-import { payments, clients } from "../../../drizzle/schema";
+import { payments, paymentDocuments, clients } from "../../../drizzle/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+
+const relatedCfdiSchema = z.object({
+  uuid: z.string().uuid("Debe ser un UUID válido."),
+});
+
+const relatedDocumentSchema = z.object({
+  invoiceId: z.number(),
+  uuid: z.string(),
+  fecha: z.string(),
+  serie: z.string(),
+  folio: z.string(),
+  moneda: z.string(),
+  tipoCambio: z.coerce.number().default(1),
+  metodoPago: z.string(),
+  numParcialidad: z.coerce.number(),
+  saldoAnterior: z.coerce.number(),
+  montoPago: z.coerce.number(),
+  importePagado: z.coerce.number(),
+  saldoInsoluto: z.coerce.number(),
+  totalDocumento: z.coerce.number(),
+  objetoImpuesto: z.string(),
+});
+
+const paymentSchema = z.object({
+  clientId: z.coerce.number().min(1, "Debes seleccionar un cliente."),
+  serie: z.string().default("P"),
+  folio: z.coerce.number().default(1),
+  fechaPago: z.date({ required_error: "La fecha de pago es obligatoria." }),
+  horaPago: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Formato de hora inválido (HH:mm)"),
+  formaPago: z.string().min(1, "Debes seleccionar una forma de pago."),
+  numeroOperacion: z.string().optional(),
+  moneda: z.string().default("MXN"),
+  totalPago: z.coerce.number().min(0.01, "El total debe ser mayor a cero."),
+  relatedDocuments: z.array(relatedDocumentSchema).min(1, "Debe haber al menos un documento relacionado."),
+  relationType: z.string().optional(),
+  relatedCfdis: z.array(relatedCfdiSchema).optional(),
+}).refine(data => {
+    if (data.relatedCfdis && data.relatedCfdis.length > 0) {
+        return !!data.relationType;
+    }
+    return true;
+}, {
+    message: "Debes seleccionar un tipo de relación si agregas CFDI relacionados.",
+    path: ["relationType"],
+});
+
+export type PaymentFormValues = z.infer<typeof paymentSchema>;
 
 export const getPayments = async (userId: string) => {
   if (!db) {
@@ -42,6 +90,69 @@ export const getPayments = async (userId: string) => {
     const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
     return { success: false, message: `Error al obtener los pagos. Verifique la consola del servidor para más detalles: ${errorMessage}` };
   }
+};
+
+export const savePayment = async (formData: PaymentFormValues, userId: string) => {
+    if (!db) {
+        return { success: false, message: "Error de configuración: La conexión con la base de datos no está disponible." };
+    }
+    try {
+        if (!userId) {
+            return { success: false, message: "Usuario no autenticado." };
+        }
+
+        const validatedData = paymentSchema.parse(formData);
+
+        const { fechaPago, horaPago, ...restOfData } = validatedData;
+        const [hours, minutes] = horaPago.split(':').map(Number);
+        const paymentDateTime = new Date(fechaPago);
+        paymentDateTime.setHours(hours, minutes);
+
+        const [newPayment] = await db.insert(payments).values({
+            userId,
+            clientId: restOfData.clientId,
+            serie: restOfData.serie,
+            folio: restOfData.folio,
+            paymentDate: paymentDateTime,
+            paymentForm: restOfData.formaPago,
+            currency: restOfData.moneda,
+            totalAmount: restOfData.totalPago.toString(),
+            operationNumber: restOfData.numeroOperacion,
+            status: 'draft',
+        }).returning({ id: payments.id, serie: payments.serie, folio: payments.folio });
+
+        if (!newPayment) {
+            throw new Error("No se pudo crear el complemento de pago.");
+        }
+
+        const documentsToInsert = restOfData.relatedDocuments.map(doc => ({
+            paymentId: newPayment.id,
+            invoiceId: doc.invoiceId,
+            uuid: doc.uuid,
+            serie: doc.serie,
+            folio: doc.folio,
+            currency: doc.moneda,
+            exchangeRate: doc.tipoCambio.toString(),
+            paymentMethod: doc.metodoPago,
+            partialityNumber: doc.numParcialidad,
+            previousBalance: doc.saldoAnterior.toString(),
+            amountPaid: doc.importePagado.toString(),
+            outstandingBalance: doc.saldoInsoluto.toString(),
+        }));
+        
+        await db.insert(paymentDocuments).values(documentsToInsert);
+
+        revalidatePath("/dashboard/payments");
+        
+        return { success: true, data: newPayment };
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+          return { success: false, message: "Datos del formulario no válidos.", errors: error.flatten().fieldErrors };
+        }
+        console.error("Database Error (savePayment):", error);
+        const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido al guardar el pago.";
+        return { success: false, message: `${errorMessage}` };
+    }
 };
 
 export const getCanceledPayments = async (userId: string) => {
