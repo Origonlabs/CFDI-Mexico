@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { PlusCircle, MoreHorizontal } from "lucide-react";
+import { PlusCircle, MoreHorizontal, RefreshCw } from "lucide-react";
 import { User } from "firebase/auth";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
@@ -13,16 +13,22 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 import { getBankAccounts, type BankAccountFormValues } from "@/app/actions/bank-accounts";
+import { getCompanyProfile } from "@/app/actions/companies";
 
 interface BankAccount extends BankAccountFormValues {
   id: number;
+  isActive: boolean;
+  isDefault: boolean;
+  createdAt: string;
 }
 
 export default function BankAccountsPage() {
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [accounts, setAccounts] = useState<BankAccount[]>([]);
+  const [rfc, setRfc] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,28 +46,44 @@ export default function BankAccountsPage() {
     return () => unsubscribe();
   }, []);
 
-  const fetchAccounts = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const response = await getBankAccounts(user.uid);
+    const [accountsResponse, profileResponse] = await Promise.all([
+        getBankAccounts(user.uid),
+        getCompanyProfile(user.uid)
+    ]);
 
-    if (response.success && response.data) {
-      setAccounts(response.data as BankAccount[]);
+    if (accountsResponse.success && accountsResponse.data) {
+      setAccounts(accountsResponse.data as BankAccount[]);
     } else {
       toast({
         title: "Error",
-        description: response.message || "No se pudieron cargar las cuentas.",
+        description: accountsResponse.message || "No se pudieron cargar las cuentas.",
         variant: "destructive",
       });
     }
+
+    if (profileResponse.success && profileResponse.data) {
+        setRfc(profileResponse.data.rfc);
+    }
+
     setLoading(false);
   }, [user, toast]);
 
   useEffect(() => {
     if (user) {
-      fetchAccounts();
+      fetchData();
     }
-  }, [user, fetchAccounts]);
+  }, [user, fetchData]);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  }
 
   return (
     <div className="flex flex-col flex-1 gap-4">
@@ -71,8 +93,12 @@ export default function BankAccountsPage() {
                 <Button asChild size="sm" className="h-8">
                     <Link href="/dashboard/settings/bank-accounts/new">
                         <PlusCircle className="mr-2 h-4 w-4" />
-                        Agregar cuenta bancaria
+                        Agregar cuentas bancarias
                     </Link>
+                </Button>
+                <Button variant="outline" size="sm" className="h-8" onClick={fetchData} disabled={loading}>
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Recargar
                 </Button>
             </div>
         </CardHeader>
@@ -81,10 +107,13 @@ export default function BankAccountsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>RFC</TableHead>
+                  <TableHead>Nombre del Banco</TableHead>
                   <TableHead>Nombre corto</TableHead>
                   <TableHead>No. de Cuenta</TableHead>
-                  <TableHead>Nombre del Banco</TableHead>
-                  <TableHead>RFC del Banco</TableHead>
+                  <TableHead>Activa</TableHead>
+                  <TableHead>Predeterminada</TableHead>
+                  <TableHead>Fecha de Creación</TableHead>
                   <TableHead>
                     <span className="sr-only">Acciones</span>
                   </TableHead>
@@ -94,16 +123,19 @@ export default function BankAccountsPage() {
                 {loading ? (
                   Array.from({ length: 3 }).map((_, index) => (
                     <TableRow key={index}>
-                      <TableCell colSpan={5}><Skeleton className="h-5 w-full" /></TableCell>
+                      <TableCell colSpan={8}><Skeleton className="h-5 w-full" /></TableCell>
                     </TableRow>
                   ))
                 ) : accounts.length > 0 ? (
                   accounts.map((account) => (
                     <TableRow key={account.id}>
+                      <TableCell>{rfc || 'N/A'}</TableCell>
+                      <TableCell>{account.bankName}</TableCell>
                       <TableCell className="font-medium">{account.shortName}</TableCell>
                       <TableCell>{account.accountNumber}</TableCell>
-                      <TableCell>{account.bankName}</TableCell>
-                      <TableCell>{account.bankRfc}</TableCell>
+                      <TableCell><Switch checked={account.isActive} disabled /></TableCell>
+                      <TableCell><Switch checked={account.isDefault} disabled /></TableCell>
+                      <TableCell>{formatDate(account.createdAt)}</TableCell>
                       <TableCell>
                         <div className="flex justify-end">
                           <DropdownMenu>
@@ -125,7 +157,7 @@ export default function BankAccountsPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center h-24">
+                    <TableCell colSpan={8} className="text-center h-24">
                       No has agregado ninguna cuenta bancaria.
                     </TableCell>
                   </TableRow>

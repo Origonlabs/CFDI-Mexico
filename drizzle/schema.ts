@@ -1,5 +1,5 @@
 
-import { pgTable, serial, text, varchar, timestamp, numeric, integer, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, varchar, timestamp, numeric, integer, pgEnum, boolean } from "drizzle-orm/pg-core";
 
 export const clients = pgTable('clients', {
   id: serial('id').primaryKey(),
@@ -139,4 +139,6 @@ export const bankAccounts = pgTable('bank_accounts', {
   shortName: text('short_name').notNull(),
   accountNumber: varchar('account_number', { length: 50 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
+  isDefault: boolean('is_default').default(false).notNull(),
 });
