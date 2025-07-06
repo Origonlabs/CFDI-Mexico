@@ -8,31 +8,48 @@ body {
 
 @layer base {
   :root {
+    /* Original Background & Text colors */
     --background: 200 100% 97%;
     --foreground: 214 84% 15%;
     --card: 200 100% 97%;
     --card-foreground: 214 84% 15%;
     --popover: 200 100% 97%;
     --popover-foreground: 214 84% 15%;
-    --primary: 217 89% 61%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217 33% 50%;
-    --secondary-foreground: 210 40% 98%;
+    
+    /* New Button Colors */
+    --primary: 243 89% 61%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 244 71% 94%;
+    --secondary-foreground: 243 89% 61%;
+    
+    /* Original Muted colors */
     --muted: 201 100% 91%;
     --muted-foreground: 215 100% 41%;
-    --accent: 217 33% 90%;
-    --accent-foreground: 217 33% 30%;
+    
+    /* New Accent Colors (often used for hover states) */
+    --accent: 244 71% 94%;
+    --accent-foreground: 243 89% 61%;
+    
+    /* Original Destructive colors */
     --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 80%;
-    --input: 217 33% 80%;
-    --ring: 217 89% 61%;
+    
+    /* New Border/Shadow/Ring colors */
+    --border: 243 45% 88%;
+    --input: 243 45% 88%;
+    --ring: 243 89% 61%;
+    
+    /* Original Radius */
+    --radius: 8px;
+    
+    /* Original Chart Colors */
     --chart-1: 217 100% 50%;
     --chart-2: 207 100% 53%;
     --chart-3: 199 100% 62%;
     --chart-4: 196 100% 74%;
     --chart-5: 202 100% 85%;
-    --radius: 8px;
+    
+    /* Original Sidebar colors */
     --sidebar-background: 200 100% 97%;
     --sidebar-foreground: 214 84% 15%;
     --sidebar-primary: 217 89% 61%;
