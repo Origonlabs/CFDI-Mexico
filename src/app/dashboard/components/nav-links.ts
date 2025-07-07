@@ -2,7 +2,8 @@
 import {
   HomeFilled,
   HomeRegular,
-  DocumentText24Regular,
+  DocumentTextFilled,
+  DocumentTextRegular,
   PaymentFilled,
   PaymentRegular,
   BuildingPeopleFilled,
@@ -25,7 +26,8 @@ export const navigationLinks = [
   },
   {
     title: "CFDI",
-    icon: DocumentText24Regular,
+    icon: DocumentTextFilled,
+    activeIcon: DocumentTextRegular,
     sublinks: [
       { href: "/dashboard/invoices/new", label: "Crear Facturas 4.0" },
       { href: "/dashboard/invoices", label: "Listar Facturas" },
