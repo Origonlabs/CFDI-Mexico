@@ -1,6 +1,6 @@
 
 import {
-  ChevronDownRegular,
+  HomeFilled,
   DocumentText24Regular,
   Payment24Regular,
   BuildingBank24Regular,
@@ -12,7 +12,7 @@ import {
 export const navigationLinks = [
   {
     title: "Inicio",
-    icon: ChevronDownRegular,
+    icon: HomeFilled,
     href: "/dashboard",
   },
   {
