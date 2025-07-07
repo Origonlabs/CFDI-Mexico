@@ -3,7 +3,7 @@ import {
   SettingsRegular,
   CreditCardRegular,
   BuildingRegular,
-  DatabaseRegular,
+  Database24Regular as DatabaseRegular,
   QuestionCircleRegular,
   HomeRegular,
 } from "@fluentui/react-icons";

@@ -14,10 +14,10 @@ import {
   BellRegular,
   QuestionCircleRegular,
   SettingsRegular,
-  FlashRegular,
-  CartRegular,
-  PersonRegular as UserIcon,
-  InfoRegular,
+  Flash24Regular as FlashRegular,
+  Cart24Regular as CartRegular,
+  Person24Regular as UserIcon,
+  Info24Regular as InfoRegular,
 } from '@fluentui/react-icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
