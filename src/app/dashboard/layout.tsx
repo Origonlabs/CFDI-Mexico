@@ -19,6 +19,21 @@ import {
   ArrowExitRegular,
   InfoRegular,
   PremiumRegular,
+  HomeFilled,
+  HomeRegular,
+  DocumentTextFilled,
+  DocumentTextRegular,
+  PaymentFilled,
+  PaymentRegular,
+  BuildingPeopleFilled,
+  BuildingPeopleRegular,
+  DocumentSettingsFilled,
+  DocumentSettingsRegular,
+  DatabaseFilled,
+  DatabaseRegular,
+  ChatFilled,
+  ChatRegular,
+  QuestionCircleRegular,
 } from '@fluentui/react-icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -90,8 +105,8 @@ export default function DashboardLayout({
   // We will handle settings link separately as a dropdown.
 
   const renderLinkGroup = (item: any) => {
-    const isActive = openCategory === item.title;
-    const Icon = isActive && item.activeIcon ? item.activeIcon : item.icon;
+    const isCategoryActive = item.sublinks?.some((link: any) => link.href !== '#' && pathname.startsWith(link.href));
+    const Icon = isCategoryActive ? item.activeIcon : item.icon;
 
     return (
       <Collapsible

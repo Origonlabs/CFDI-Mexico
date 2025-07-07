@@ -16,14 +16,14 @@ import {
   ChatRegular,
   SettingsFilled,
   SettingsRegular,
-  ChevronDownFilled
+  QuestionCircleRegular,
 } from "@fluentui/react-icons";
 
 export const navigationLinks = [
   {
     title: "Inicio",
-    icon: HomeFilled,
-    activeIcon: HomeRegular,
+    icon: HomeRegular,
+    activeIcon: HomeFilled,
     href: "/dashboard",
   },
   {
