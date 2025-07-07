@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { PlusCircle, MoreHorizontal, Filter, ListFilter } from "lucide-react";
+import { AddCircleRegular, MoreHorizontalRegular, FilterRegular } from "@fluentui/react-icons";
 import { User } from "firebase/auth";
 import Link from "next/link";
 
@@ -97,7 +97,7 @@ export default function ClientsPage() {
             <div className="flex items-center gap-2 flex-wrap">
                 <Button asChild size="sm">
                     <Link href="/dashboard/clients/new">
-                        <PlusCircle className="mr-2 h-4 w-4" />
+                        <AddCircleRegular className="mr-2 h-4 w-4" />
                         Agregar más clientes
                     </Link>
                 </Button>
@@ -105,11 +105,11 @@ export default function ClientsPage() {
                 <Input placeholder="Razón Social" className="w-64" />
                 <Input placeholder="Referencia" className="w-40" />
                 <Button variant="outline" size="sm">
-                    <Filter className="mr-2 h-4 w-4" />
+                    <FilterRegular className="mr-2 h-4 w-4" />
                     Filtrar
                 </Button>
                 <Button variant="outline" size="sm">
-                    <ListFilter className="mr-2 h-4 w-4" />
+                    <FilterRegular className="mr-2 h-4 w-4" />
                     Mostrar todos
                 </Button>
             </div>
@@ -174,7 +174,7 @@ export default function ClientsPage() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button aria-haspopup="true" size="icon" variant="ghost">
-                                <MoreHorizontal className="h-4 w-4" />
+                                <MoreHorizontalRegular className="h-4 w-4" />
                                 <span className="sr-only">Toggle menu</span>
                               </Button>
                             </DropdownMenuTrigger>

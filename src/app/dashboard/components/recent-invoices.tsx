@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { MoreHorizontal, CheckCircle, Clock, XCircle } from "lucide-react";
+import { MoreHorizontalRegular, CheckmarkCircleRegular, ClockRegular, DismissCircleRegular } from "@fluentui/react-icons";
 import { User } from "firebase/auth";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
@@ -31,17 +31,17 @@ const StatusBadge = ({ status }: { status: Invoice['status'] }) => {
     const statusConfig = {
         stamped: {
             label: "Timbrada",
-            icon: <CheckCircle className="h-3.5 w-3.5" />,
+            icon: <CheckmarkCircleRegular className="h-3.5 w-3.5" />,
             className: "bg-green-100 text-green-700 border-green-200 hover:bg-green-100",
         },
         canceled: {
             label: "Cancelada",
-            icon: <XCircle className="h-3.5 w-3.5" />,
+            icon: <DismissCircleRegular className="h-3.5 w-3.5" />,
             className: "bg-red-100 text-red-700 border-red-200 hover:bg-red-100",
         },
         draft: {
             label: "Borrador",
-            icon: <Clock className="h-3.5 w-3.5" />,
+            icon: <ClockRegular className="h-3.5 w-3.5" />,
             className: "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-100",
         },
     };
@@ -164,7 +164,7 @@ export function RecentInvoices() {
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button aria-haspopup="true" size="icon" variant="ghost">
-                                                        <MoreHorizontal className="h-4 w-4" />
+                                                        <MoreHorizontalRegular className="h-4 w-4" />
                                                         <span className="sr-only">Toggle menu</span>
                                                     </Button>
                                                 </DropdownMenuTrigger>

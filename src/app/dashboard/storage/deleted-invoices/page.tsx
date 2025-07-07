@@ -1,6 +1,6 @@
 "use client";
 
-import { Filter, ListFilter, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react"
+import { FilterRegular, ChevronDoubleLeftRegular, ChevronDoubleRightRegular, ChevronLeftRegular, ChevronRightRegular, ChevronDownRegular } from "@fluentui/react-icons"
 import { useState, useEffect, useCallback } from "react"
 import { User } from "firebase/auth"
 
@@ -90,8 +90,8 @@ export default function DeletedInvoicesPage() {
             <CardHeader className="p-2 border-b bg-muted/30 flex flex-row justify-between items-center">
                 <span className="text-sm">No se encontraron documentos eliminados Periodo: {new Date().toLocaleString('es-MX', { month: 'long' }).toUpperCase()} {new Date().getFullYear()}</span>
                  <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" className="text-xs h-7"><Filter className="mr-1 h-3.5 w-3.5" />Filtrar</Button>
-                    <Button size="sm" variant="outline" className="text-xs h-7"><ListFilter className="mr-1 h-3.5 w-3.5" />Mostrar todos</Button>
+                    <Button size="sm" variant="outline" className="text-xs h-7"><FilterRegular className="mr-1 h-3.5 w-3.5" />Filtrar</Button>
+                    <Button size="sm" variant="outline" className="text-xs h-7"><FilterRegular className="mr-1 h-3.5 w-3.5" />Mostrar todos</Button>
                 </div>
             </CardHeader>
             
@@ -131,11 +131,11 @@ export default function DeletedInvoicesPage() {
 
             <div className="p-2 border-t bg-muted/30 flex justify-between items-center text-xs">
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronFirst className="h-4 w-4" /></Button>
-                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronLeft className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronDoubleLeftRegular className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronLeftRegular className="h-4 w-4" /></Button>
                     <span>Página 1 de 1</span>
-                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronRight className="h-4 w-4" /></Button>
-                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronLast className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronRightRegular className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronDoubleRightRegular className="h-4 w-4" /></Button>
                 </div>
                 <div className="flex items-center gap-2">
                     <Label>Comprobante Versión:</Label>

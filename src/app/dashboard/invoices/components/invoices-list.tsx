@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreHorizontal, Download, Mail, Filter, Plus, Archive, ListFilter, XCircle, ChevronLeft, ChevronRight, Eye, Sheet, File as FileIcon, ChevronFirst, ChevronLast, ChevronDown, Stamp, BadgeCheck, AlertCircle } from "lucide-react"
+import { MoreHorizontalRegular, ArrowDownloadRegular, MailRegular, FilterRegular, AddRegular, ArchiveRegular, DismissCircleRegular, ChevronLeftRegular, ChevronRightRegular, EyeRegular, DocumentRegular, ChevronDoubleLeftRegular, ChevronDoubleRightRegular, ChevronDownRegular, StampRegular, CheckmarkCircleRegular, ErrorCircleRegular } from "@fluentui/react-icons"
 import { useState, useEffect, useCallback } from "react"
 import { User } from "firebase/auth"
 
@@ -179,21 +179,21 @@ export function InvoicesList() {
                     <Checkbox id="filter-pay" />
                     <Label htmlFor="filter-pay" className="text-xs font-normal">Filtrar CFDI a Pagar</Label>
                 </div>
-                <Button size="sm" variant="outline" className="text-xs h-7"><Plus className="mr-1 h-3.5 w-3.5" />Crear REP</Button>
+                <Button size="sm" variant="outline" className="text-xs h-7"><AddRegular className="mr-1 h-3.5 w-3.5" />Crear REP</Button>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button size="sm" variant="outline" className="text-xs h-7">Exportar listado <ChevronDown className="ml-1 h-3.5 w-3.5" /></Button>
+                        <Button size="sm" variant="outline" className="text-xs h-7">Exportar listado <ChevronDownRegular className="ml-1 h-3.5 w-3.5" /></Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuItem><FileIcon className="mr-2 h-4 w-4" /> Exportar PDF</DropdownMenuItem>
-                        <DropdownMenuItem><Sheet className="mr-2 h-4 w-4" /> Exportar Excel</DropdownMenuItem>
+                        <DropdownMenuItem><DocumentRegular className="mr-2 h-4 w-4" /> Exportar PDF</DropdownMenuItem>
+                        <DropdownMenuItem><DocumentRegular className="mr-2 h-4 w-4" /> Exportar Excel</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <Button size="sm" variant="outline" className="text-xs h-7"><Archive className="mr-1 h-3.5 w-3.5" />Descargar ZIP</Button>
+                <Button size="sm" variant="outline" className="text-xs h-7"><ArchiveRegular className="mr-1 h-3.5 w-3.5" />Descargar ZIP</Button>
                 <div className="flex-grow"></div>
-                <Button size="sm" variant="outline" className="text-xs h-7"><Filter className="mr-1 h-3.5 w-3.5" />Filtrar</Button>
-                <Button size="sm" variant="outline" className="text-xs h-7"><ListFilter className="mr-1 h-3.5 w-3.5" />Mostrar todos</Button>
-                <Button size="sm" variant="destructive" className="text-xs h-7"><XCircle className="mr-1 h-3.5 w-3.5" />Cancelar seleccionados</Button>
+                <Button size="sm" variant="outline" className="text-xs h-7"><FilterRegular className="mr-1 h-3.5 w-3.5" />Filtrar</Button>
+                <Button size="sm" variant="outline" className="text-xs h-7"><FilterRegular className="mr-1 h-3.5 w-3.5" />Mostrar todos</Button>
+                <Button size="sm" variant="destructive" className="text-xs h-7"><DismissCircleRegular className="mr-1 h-3.5 w-3.5" />Cancelar seleccionados</Button>
             </CardContent>
             
             <div className="flex-grow overflow-auto">
@@ -234,7 +234,7 @@ export function InvoicesList() {
                         invoices.map((invoice) => (
                         <TableRow key={invoice.id}>
                             <TableCell><Checkbox /></TableCell>
-                            <TableCell><Button variant="ghost" size="icon" className="h-6 w-6"><Eye className="h-4 w-4" /></Button></TableCell>
+                            <TableCell><Button variant="ghost" size="icon" className="h-6 w-6"><EyeRegular className="h-4 w-4" /></Button></TableCell>
                             <TableCell>4.0</TableCell>
                             <TableCell>{invoice.folio}</TableCell>
                             <TableCell className="font-mono text-xs">{invoice.uuid ? `...${invoice.uuid.substring(invoice.uuid.length - 8)}` : 'N/A'}</TableCell> 
@@ -249,8 +249,8 @@ export function InvoicesList() {
                             <TableCell className="text-right">{invoice.metodoPago === 'PPD' ? formatCurrency(invoice.total) : formatCurrency("0")}</TableCell>
                             <TableCell>
                                 <Badge variant={getBadgeVariant(invoice.status)}>
-                                    {invoice.status === 'stamped' && <BadgeCheck className="mr-1 h-3 w-3" />}
-                                    {invoice.status === 'canceled' && <AlertCircle className="mr-1 h-3 w-3" />}
+                                    {invoice.status === 'stamped' && <CheckmarkCircleRegular className="mr-1 h-3 w-3" />}
+                                    {invoice.status === 'canceled' && <ErrorCircleRegular className="mr-1 h-3 w-3" />}
                                     {getStatusLabel(invoice.status)}
                                 </Badge>
                             </TableCell>
@@ -264,7 +264,7 @@ export function InvoicesList() {
                                 <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button aria-haspopup="true" size="icon" variant="ghost" disabled={isStamping === invoice.id}>
-                                    <MoreHorizontal className="h-4 w-4" />
+                                    <MoreHorizontalRegular className="h-4 w-4" />
                                     <span className="sr-only">Toggle menu</span>
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -272,22 +272,22 @@ export function InvoicesList() {
                                     <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                                     {invoice.status === 'draft' ? (
                                         <DropdownMenuItem onSelect={() => handleStamp(invoice.id)} disabled={isStamping === invoice.id}>
-                                            <Stamp className="mr-2 h-4 w-4" />
+                                            <StampRegular className="mr-2 h-4 w-4" />
                                             Timbrar Factura
                                         </DropdownMenuItem>
                                     ) : (
                                       <>
                                         <DropdownMenuItem onClick={() => handleDownloadPdf(invoice)} disabled={!invoice.pdfUrl}>
-                                            <Download className="mr-2 h-4 w-4" />
+                                            <ArrowDownloadRegular className="mr-2 h-4 w-4" />
                                             Descargar PDF
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onClick={() => handleDownloadXml(invoice)} disabled={!invoice.xmlUrl}>
-                                            <Download className="mr-2 h-4 w-4" />
+                                            <ArrowDownloadRegular className="mr-2 h-4 w-4" />
                                             Descargar XML
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem><Mail className="mr-2 h-4 w-4" />Enviar por correo</DropdownMenuItem>
-                                        <DropdownMenuItem className="text-destructive"><XCircle className="mr-2 h-4 w-4" />Cancelar CFDI</DropdownMenuItem>
+                                        <DropdownMenuItem><MailRegular className="mr-2 h-4 w-4" />Enviar por correo</DropdownMenuItem>
+                                        <DropdownMenuItem className="text-destructive"><DismissCircleRegular className="mr-2 h-4 w-4" />Cancelar CFDI</DropdownMenuItem>
                                       </>
                                     )}
                                 </DropdownMenuContent>
@@ -309,11 +309,11 @@ export function InvoicesList() {
 
             <div className="p-2 border-t bg-muted/30 flex justify-between items-center text-xs">
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronFirst className="h-4 w-4" /></Button>
-                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronLeft className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronDoubleLeftRegular className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronLeftRegular className="h-4 w-4" /></Button>
                     <span>Página 1 de {Math.ceil(invoices.length / 10)}</span>
-                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronRight className="h-4 w-4" /></Button>
-                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronLast className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronRightRegular className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronDoubleRightRegular className="h-4 w-4" /></Button>
                 </div>
                 <div className="flex items-center gap-4">
                     <span>Comprobante Versión: Factura 4.0</span>

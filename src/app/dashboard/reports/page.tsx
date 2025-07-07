@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Download } from "lucide-react"
+import { ArrowDownload24Regular } from "@fluentui/react-icons";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -21,7 +21,7 @@ export default function ReportsPage() {
         <div className="flex items-center gap-2">
             <Button variant="outline">Seleccionar Rango de Fechas</Button>
             <Button>
-                <Download className="mr-2 h-4 w-4" />
+                <ArrowDownload24Regular className="mr-2 h-4 w-4" />
                 Exportar
             </Button>
         </div>

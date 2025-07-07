@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import { ChevronLeft, PlusCircle, Trash2, Download, HelpCircle } from "lucide-react"
+import { ChevronLeftRegular, AddCircleRegular, DeleteRegular, DocumentRegular, QuestionCircleRegular } from "@fluentui/react-icons"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -232,13 +232,13 @@ export default function NewInvoicePage() {
               Tus archivos han sido generados y guardados. Ahora puedes descargarlos o crear una nueva factura.
             </p>
             <div className="flex justify-center gap-4">
-              <Button asChild disabled={!savedInvoice.pdfUrl}><a href={savedInvoice.pdfUrl ?? '#'} target="_blank" rel="noopener noreferrer"><Download className="mr-2 h-4 w-4" />Descargar PDF</a></Button>
-              <Button asChild disabled={!savedInvoice.xmlUrl}><a href={savedInvoice.xmlUrl ?? '#'} target="_blank" rel="noopener noreferrer"><Download className="mr-2 h-4 w-4" />Descargar XML</a></Button>
+              <Button asChild disabled={!savedInvoice.pdfUrl}><a href={savedInvoice.pdfUrl ?? '#'} target="_blank" rel="noopener noreferrer"><DocumentRegular className="mr-2 h-4 w-4" />Descargar PDF</a></Button>
+              <Button asChild disabled={!savedInvoice.xmlUrl}><a href={savedInvoice.xmlUrl ?? '#'} target="_blank" rel="noopener noreferrer"><DocumentRegular className="mr-2 h-4 w-4" />Descargar XML</a></Button>
             </div>
             {!savedInvoice.pdfUrl && <p className="text-xs text-center text-muted-foreground">La subida de archivos está en proceso o no está configurada.</p>}
           </CardContent>
           <CardFooter className="flex-col gap-4 pt-6">
-            <Button variant="outline" className="w-full" onClick={() => { form.reset(); setSavedInvoice(null); }}><PlusCircle className="mr-2 h-4 w-4" />Crear Nueva Factura</Button>
+            <Button variant="outline" className="w-full" onClick={() => { form.reset(); setSavedInvoice(null); }}><AddCircleRegular className="mr-2 h-4 w-4" />Crear Nueva Factura</Button>
             <Button variant="ghost" asChild><Link href="/dashboard/invoices">Volver al listado de facturas</Link></Button>
           </CardFooter>
         </Card>
@@ -253,7 +253,7 @@ export default function NewInvoicePage() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto grid w-full max-w-[966px] flex-1 auto-rows-max gap-4">
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" className="h-7 w-7" asChild><Link href="/dashboard/invoices"><ChevronLeft className="h-4 w-4" /><span className="sr-only">Back</span></Link></Button>
+          <Button variant="outline" size="icon" className="h-7 w-7" asChild><Link href="/dashboard/invoices"><ChevronLeftRegular className="h-4 w-4" /><span className="sr-only">Back</span></Link></Button>
           <h1 className="flex-1 shrink-0 whitespace-nowrap text-base font-bold tracking-tight sm:grow-0 font-headline">Nueva Factura 4.0</h1>
           <div className="hidden items-center gap-4 md:ml-auto md:flex">
             <div className="flex items-center gap-2">
@@ -285,7 +285,7 @@ export default function NewInvoicePage() {
                 )} />
                 <FormField control={form.control} name="exportacion" render={({ field }) => (
                     <FormItem>
-                        <FormLabel className="flex items-center gap-1">Exportación <Tooltip><TooltipTrigger asChild><button type="button"><HelpCircle className="h-3 w-3"/></button></TooltipTrigger><TooltipContent><p>Clave para identificar si la operación es de exportación.</p></TooltipContent></Tooltip></FormLabel>
+                        <FormLabel className="flex items-center gap-1">Exportación <Tooltip><TooltipTrigger asChild><button type="button"><QuestionCircleRegular className="h-3 w-3"/></button></TooltipTrigger><TooltipContent><p>Clave para identificar si la operación es de exportación.</p></TooltipContent></Tooltip></FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                             <SelectContent><SelectItem value="01">01 - No aplica</SelectItem></SelectContent>
@@ -352,7 +352,7 @@ export default function NewInvoicePage() {
                       }}
                       disabled={!tempUuid || !form.watch("relationType")}
                     >
-                      <PlusCircle className="mr-2 h-4 w-4"/>
+                      <AddCircleRegular className="mr-2 h-4 w-4"/>
                       Agregar
                     </Button>
                   </div>
@@ -373,7 +373,7 @@ export default function NewInvoicePage() {
                               <TableCell className="font-mono text-xs">{field.uuid}</TableCell>
                               <TableCell className="text-right">
                                 <Button variant="ghost" size="icon" type="button" className="h-8 w-8" onClick={() => cfdiRemove(index)}>
-                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                  <DeleteRegular className="h-4 w-4 text-destructive" />
                                   <span className="sr-only">Eliminar UUID</span>
                                 </Button>
                               </TableCell>
@@ -448,7 +448,7 @@ export default function NewInvoicePage() {
                         )} />
                         <FormField control={form.control} name="metodoPago" render={({ field }) => (
                             <FormItem>
-                                <FormLabel className="flex items-center gap-1">* Método de Pago<Tooltip><TooltipTrigger asChild><button type="button"><HelpCircle className="h-3 w-3" /></button></TooltipTrigger><TooltipContent><p>PUE: Pago en una sola exhibición<br/>PPD: Pago en parcialidades o diferido</p></TooltipContent></Tooltip></FormLabel>
+                                <FormLabel className="flex items-center gap-1">* Método de Pago<Tooltip><TooltipTrigger asChild><button type="button"><QuestionCircleRegular className="h-3 w-3" /></button></TooltipTrigger><TooltipContent><p>PUE: Pago en una sola exhibición<br/>PPD: Pago en parcialidades o diferido</p></TooltipContent></Tooltip></FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                                     <SelectContent>
@@ -495,7 +495,7 @@ export default function NewInvoicePage() {
             <CardHeader>
               <div className="flex items-center gap-4">
                 <Button type="button" variant="outline" size="sm" onClick={() => conceptAppend({ productId: 0, description: "", satKey: "", unitKey: "", quantity: 1, unitPrice: 0, discount: 0, objetoImpuesto: '02', amount: 0 })}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
+                  <AddCircleRegular className="mr-2 h-4 w-4" />
                    Agregar partida (productos y servicios) al documento
                 </Button>
                  <Select onValueChange={addProductToConcepts} disabled={loading}>
@@ -530,7 +530,7 @@ export default function NewInvoicePage() {
 
                       return (
                       <TableRow key={field.id}>
-                        <TableCell><Button variant="ghost" size="icon" type="button" onClick={() => conceptRemove(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                        <TableCell><Button variant="ghost" size="icon" type="button" onClick={() => conceptRemove(index)}><DeleteRegular className="h-4 w-4 text-destructive" /></Button></TableCell>
                         <TableCell><Input value={field.satKey} onChange={e => updateConcept(index, { satKey: e.target.value })}/></TableCell>
                         <TableCell><Input value={field.description} onChange={e => updateConcept(index, { description: e.target.value })} /></TableCell>
                         <TableCell><Input value={field.unitKey} onChange={e => updateConcept(index, { unitKey: e.target.value })}/></TableCell>

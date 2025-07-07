@@ -7,7 +7,7 @@ import * as z from "zod";
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { onAuthStateChanged, User, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
-import { Check, XCircle, AlertTriangle } from "lucide-react";
+import { CheckRegular,DismissCircleRegular,WarningRegular } from "@fluentui/react-icons";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -162,9 +162,9 @@ export default function SettingsPage() {
     if (!status) return <Badge variant="secondary">Desconocido</Badge>;
 
     const config = {
-        active: { label: 'Activo', variant: 'default' as const, icon: <Check className="mr-1 h-3.5 w-3.5" /> },
-        revoked: { label: 'Revocado', variant: 'destructive' as const, icon: <XCircle className="mr-1 h-3.5 w-3.5" /> },
-        expired: { label: 'Expirado', variant: 'secondary' as const, icon: <AlertTriangle className="mr-1 h-3.5 w-3.5" /> },
+        active: { label: 'Activo', variant: 'default' as const, icon: <CheckRegular className="mr-1 h-3.5 w-3.5" /> },
+        revoked: { label: 'Revocado', variant: 'destructive' as const, icon: <DismissCircleRegular className="mr-1 h-3.5 w-3.5" /> },
+        expired: { label: 'Expirado', variant: 'secondary' as const, icon: <WarningRegular className="mr-1 h-3.5 w-3.5" /> },
     };
 
     const currentConfig = config[status];

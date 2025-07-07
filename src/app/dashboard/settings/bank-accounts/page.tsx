@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { PlusCircle, MoreHorizontal, RefreshCw } from "lucide-react";
+import { AddCircleRegular, MoreHorizontalRegular, ArrowClockwiseRegular } from "@fluentui/react-icons";
 import { User } from "firebase/auth";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
@@ -97,12 +97,12 @@ export default function BankAccountsPage() {
             <div className="flex items-center gap-2 flex-wrap">
                 <Button asChild size="sm">
                     <Link href="/dashboard/settings/bank-accounts/new">
-                        <PlusCircle className="mr-2 h-4 w-4" />
+                        <AddCircleRegular className="mr-2 h-4 w-4" />
                         Agregar cuentas bancarias
                     </Link>
                 </Button>
                 <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
-                    <RefreshCw className="mr-2 h-4 w-4" />
+                    <ArrowClockwiseRegular className="mr-2 h-4 w-4" />
                     Recargar
                 </Button>
             </div>
@@ -146,7 +146,7 @@ export default function BankAccountsPage() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button aria-haspopup="true" size="icon" variant="ghost">
-                                <MoreHorizontal className="h-4 w-4" />
+                                <MoreHorizontalRegular className="h-4 w-4" />
                                 <span className="sr-only">Toggle menu</span>
                               </Button>
                             </DropdownMenuTrigger>

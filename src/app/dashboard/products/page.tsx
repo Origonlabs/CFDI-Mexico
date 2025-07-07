@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { PlusCircle, MoreHorizontal, Filter, ListFilter } from "lucide-react";
+import { AddCircleRegular, MoreHorizontalRegular, FilterRegular } from "@fluentui/react-icons";
 import { User } from "firebase/auth";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
@@ -108,18 +108,18 @@ export default function ProductsPage() {
             <div className="flex items-center gap-2 flex-wrap">
                 <Button asChild size="sm">
                     <Link href="/dashboard/products/new">
-                        <PlusCircle className="mr-2 h-4 w-4" />
+                        <AddCircleRegular className="mr-2 h-4 w-4" />
                         Agregar más productos
                     </Link>
                 </Button>
                 <Input placeholder="Código" className="w-40" />
                 <Input placeholder="Descripción" className="w-64" />
                 <Button variant="outline" size="sm">
-                    <Filter className="mr-2 h-4 w-4" />
+                    <FilterRegular className="mr-2 h-4 w-4" />
                     Filtrar
                 </Button>
                 <Button variant="outline" size="sm">
-                    <ListFilter className="mr-2 h-4 w-4" />
+                    <FilterRegular className="mr-2 h-4 w-4" />
                     Mostrar todos
                 </Button>
             </div>
@@ -163,7 +163,7 @@ export default function ProductsPage() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button aria-haspopup="true" size="icon" variant="ghost">
-                                <MoreHorizontal className="h-4 w-4" />
+                                <MoreHorizontalRegular className="h-4 w-4" />
                                 <span className="sr-only">Toggle menu</span>
                               </Button>
                             </DropdownMenuTrigger>

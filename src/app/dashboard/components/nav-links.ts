@@ -1,22 +1,22 @@
 import {
-  FileText,
-  Settings,
-  CreditCard,
-  Building,
-  Database,
-  HelpCircle,
-  Home,
-} from "lucide-react";
+  DocumentRegular,
+  SettingsRegular,
+  CreditCardRegular,
+  BuildingRegular,
+  DatabaseRegular,
+  QuestionCircleRegular,
+  HomeRegular,
+} from "@fluentui/react-icons";
 
 export const navigationLinks = [
   {
     title: "Inicio",
-    icon: Home,
+    icon: HomeRegular,
     href: "/dashboard",
   },
   {
     title: "CFDI",
-    icon: FileText,
+    icon: DocumentRegular,
     sublinks: [
       { href: "/dashboard/invoices/new", label: "Crear Facturas 4.0" },
       { href: "/dashboard/invoices", label: "Listar Facturas" },
@@ -26,7 +26,7 @@ export const navigationLinks = [
   },
   {
     title: "Pagos",
-    icon: CreditCard,
+    icon: CreditCardRegular,
     sublinks: [
       { href: "/dashboard/payments/new", label: "Crear Pagos 4.0" },
       { href: "/dashboard/payments", label: "Listar Pagos" },
@@ -35,7 +35,7 @@ export const navigationLinks = [
   },
   {
     title: "Empresa",
-    icon: Building,
+    icon: BuildingRegular,
     sublinks: [
       { href: "/dashboard/clients/new", label: "Crear Clientes" },
       { href: "/dashboard/clients", label: "Listar Clientes" },
@@ -49,7 +49,7 @@ export const navigationLinks = [
   },
   {
     title: "Configuración CFDI 4.0",
-    icon: Settings,
+    icon: SettingsRegular,
     sublinks: [
       { href: "/dashboard/settings", label: "Instalar Certificados" },
       { href: "/dashboard/settings/document-types", label: "Tipos de documentos" },
@@ -57,7 +57,7 @@ export const navigationLinks = [
   },
   {
     title: "Almacenamiento",
-    icon: Database,
+    icon: DatabaseRegular,
     sublinks: [
       { href: "/dashboard/storage/deleted-invoices", label: "Listar CFDI Eliminados" },
       { href: "/dashboard/storage/deleted-payments", label: "Listar Pagos Eliminados" },
@@ -65,7 +65,7 @@ export const navigationLinks = [
   },
   {
     title: "Ayuda",
-    icon: HelpCircle,
+    icon: QuestionCircleRegular,
     sublinks: [
       { href: "#", label: "BD de Conocimiento" },
       { href: "#", label: "Manual del usuario" },
@@ -76,7 +76,7 @@ export const navigationLinks = [
   },
   {
     title: "Configuracion",
-    icon: Settings,
+    icon: SettingsRegular,
     sublinks: [
       { href: "/dashboard/settings", label: "Perfil de Empresa" },
       { href: "/dashboard/settings", label: "Mi Cuenta" },

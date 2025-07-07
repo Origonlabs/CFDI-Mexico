@@ -8,6 +8,7 @@ import * as z from "zod"
 import { User } from "firebase/auth"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { AddCircleRegular, DeleteRegular, ArrowDownloadRegular, CalendarRegular } from "@fluentui/react-icons";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client"
 import { useToast } from "@/hooks/use-toast"
@@ -28,7 +29,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
-import { CalendarIcon, PlusCircle, Trash2, Download } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 
 // Data structures
@@ -222,12 +222,12 @@ export default function NewPaymentPage() {
               Aún no puedes descargar los archivos hasta que el pago sea timbrado.
             </p>
              <div className="flex justify-center gap-4">
-              <Button asChild disabled={!savedPayment.pdfUrl}><a href={savedPayment.pdfUrl ?? '#'} target="_blank" rel="noopener noreferrer"><Download className="mr-2 h-4 w-4" />Descargar PDF</a></Button>
-              <Button asChild disabled={!savedPayment.xmlUrl}><a href={savedPayment.xmlUrl ?? '#'} target="_blank" rel="noopener noreferrer"><Download className="mr-2 h-4 w-4" />Descargar XML</a></Button>
+              <Button asChild disabled={!savedPayment.pdfUrl}><a href={savedPayment.pdfUrl ?? '#'} target="_blank" rel="noopener noreferrer"><ArrowDownloadRegular className="mr-2 h-4 w-4" />Descargar PDF</a></Button>
+              <Button asChild disabled={!savedPayment.xmlUrl}><a href={savedPayment.xmlUrl ?? '#'} target="_blank" rel="noopener noreferrer"><ArrowDownloadRegular className="mr-2 h-4 w-4" />Descargar XML</a></Button>
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-4 pt-6">
-            <Button variant="outline" className="w-full" onClick={() => { form.reset(); setSavedPayment(null); }}><PlusCircle className="mr-2 h-4 w-4" />Crear Nuevo Pago</Button>
+            <Button variant="outline" className="w-full" onClick={() => { form.reset(); setSavedPayment(null); }}><AddCircleRegular className="mr-2 h-4 w-4" />Crear Nuevo Pago</Button>
             <Button variant="ghost" asChild><Link href="/dashboard/payments">Volver al listado de pagos</Link></Button>
           </CardFooter>
         </Card>
@@ -290,7 +290,7 @@ export default function NewPaymentPage() {
                                     !field.value && "text-muted-foreground"
                                 )}
                                 >
-                                <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
+                                <CalendarRegular className="mr-2 h-4 w-4 opacity-50" />
                                 {field.value ? format(field.value, "yyyy-MM-dd") : <span>Elige una fecha</span>}
                                 </Button>
                             </FormControl>
@@ -365,7 +365,7 @@ export default function NewPaymentPage() {
                       }}
                       disabled={!tempUuid || !form.watch("relationType")}
                     >
-                      <PlusCircle className="mr-2 h-4 w-4"/>
+                      <AddCircleRegular className="mr-2 h-4 w-4"/>
                       Agregar
                     </Button>
                   </div>
@@ -386,7 +386,7 @@ export default function NewPaymentPage() {
                               <TableCell className="font-mono text-xs">{field.uuid}</TableCell>
                               <TableCell className="text-right">
                                 <Button variant="ghost" size="icon" type="button" className="h-8 w-8" onClick={() => cfdiRemove(index)}>
-                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                  <DeleteRegular className="h-4 w-4 text-destructive" />
                                   <span className="sr-only">Eliminar UUID</span>
                                 </Button>
                               </TableCell>
@@ -466,7 +466,7 @@ export default function NewPaymentPage() {
                     <Dialog open={isDocsDialogOpen} onOpenChange={setIsDocsDialogOpen}>
                         <DialogTrigger asChild>
                             <Button type="button" variant="outline" size="sm" disabled={!selectedClient || clientPendingInvoices.length === 0}>
-                                <PlusCircle className="mr-2 h-4 w-4" />
+                                <AddCircleRegular className="mr-2 h-4 w-4" />
                                 Agregar documentos relacionados
                             </Button>
                         </DialogTrigger>
@@ -533,7 +533,7 @@ export default function NewPaymentPage() {
                                 {fields.length === 0 && <TableRow><TableCell colSpan={14} className="text-center h-24">Aún no has agregado documentos.</TableCell></TableRow>}
                                 {fields.map((field, index) => (
                                     <TableRow key={field.id}>
-                                        <TableCell><Button variant="ghost" size="icon" type="button" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                                        <TableCell><Button variant="ghost" size="icon" type="button" onClick={() => remove(index)}><DeleteRegular className="h-4 w-4 text-destructive" /></Button></TableCell>
                                         <TableCell className="font-mono text-xs truncate max-w-24">{field.uuid}</TableCell>
                                         <TableCell>{field.fecha}</TableCell>
                                         <TableCell>{field.serie}-{field.folio}</TableCell>

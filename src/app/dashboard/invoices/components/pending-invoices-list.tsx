@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreHorizontal, Download, Mail, Filter, Plus, ListFilter, XCircle, ChevronLeft, ChevronRight, Eye, File as FileIcon, ChevronFirst, ChevronLast, BadgeCheck } from "lucide-react"
+import { MoreHorizontalRegular, ArrowDownloadRegular, MailRegular, FilterRegular, AddRegular, DismissCircleRegular, ChevronLeftRegular, ChevronRightRegular, EyeRegular, DocumentRegular, ChevronDoubleLeftRegular, ChevronDoubleRightRegular, CheckmarkRegular } from "@fluentui/react-icons"
 import { useState, useEffect, useCallback } from "react"
 import { User } from "firebase/auth"
 
@@ -147,7 +147,7 @@ export function PendingInvoicesList() {
   return (
         <Card className="flex flex-col flex-1">
             <CardHeader className="p-2 border-b">
-                 <Button size="sm" variant="outline" className="text-xs h-7 w-fit"><FileIcon className="mr-1 h-3.5 w-3.5" />Consultar al SAT</Button>
+                 <Button size="sm" variant="outline" className="text-xs h-7 w-fit"><DocumentRegular className="mr-1 h-3.5 w-3.5" />Consultar al SAT</Button>
             </CardHeader>
             
             <div className="flex-grow overflow-auto">
@@ -196,7 +196,7 @@ export function PendingInvoicesList() {
                             <TableCell><Badge variant="secondary">Pendiente</Badge></TableCell> {/* Estado REP */}
                             <TableCell>
                                 <Badge variant={getBadgeVariant(invoice.status)}>
-                                    <BadgeCheck className="mr-1 h-3 w-3" />
+                                    <CheckmarkRegular className="mr-1 h-3 w-3" />
                                     {getStatusLabel(invoice.status)}
                                 </Badge>
                             </TableCell> {/* Estado CFDI */}
@@ -205,24 +205,24 @@ export function PendingInvoicesList() {
                                 <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button aria-haspopup="true" size="icon" variant="ghost">
-                                    <MoreHorizontal className="h-4 w-4" />
+                                    <MoreHorizontalRegular className="h-4 w-4" />
                                     <span className="sr-only">Toggle menu</span>
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                                     <DropdownMenuItem onClick={() => handleDownloadPdf(invoice)} disabled={!invoice.pdfUrl}>
-                                        <Download className="mr-2 h-4 w-4" />
+                                        <ArrowDownloadRegular className="mr-2 h-4 w-4" />
                                         Descargar PDF
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleDownloadXml(invoice)} disabled={!invoice.xmlUrl}>
-                                        <Download className="mr-2 h-4 w-4" />
+                                        <ArrowDownloadRegular className="mr-2 h-4 w-4" />
                                         Descargar XML
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                     <DropdownMenuItem><Plus className="mr-2 h-4 w-4" />Crear REP</DropdownMenuItem>
-                                    <DropdownMenuItem><Mail className="mr-2 h-4 w-4" />Enviar por correo</DropdownMenuItem>
-                                    <DropdownMenuItem className="text-destructive"><XCircle className="mr-2 h-4 w-4" />Cancelar CFDI</DropdownMenuItem>
+                                     <DropdownMenuItem><AddRegular className="mr-2 h-4 w-4" />Crear REP</DropdownMenuItem>
+                                    <DropdownMenuItem><MailRegular className="mr-2 h-4 w-4" />Enviar por correo</DropdownMenuItem>
+                                    <DropdownMenuItem className="text-destructive"><DismissCircleRegular className="mr-2 h-4 w-4" />Cancelar CFDI</DropdownMenuItem>
                                 </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
@@ -242,11 +242,11 @@ export function PendingInvoicesList() {
 
             <div className="p-2 border-t bg-muted/30 flex justify-between items-center text-xs">
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronFirst className="h-4 w-4" /></Button>
-                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronLeft className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronDoubleLeftRegular className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronLeftRegular className="h-4 w-4" /></Button>
                     <span>Página 1 de {Math.ceil(invoices.length / 10)}</span>
-                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronRight className="h-4 w-4" /></Button>
-                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronLast className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronRightRegular className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-6 w-6"><ChevronDoubleRightRegular className="h-4 w-4" /></Button>
                 </div>
                 <div className="flex items-center gap-4">
                     <span>Comprobante Versión: Factura 4.0</span>

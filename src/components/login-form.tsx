@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, getMultiFactorResolver, TotpMultiFactorGenerator, type MultiFactorResolver } from 'firebase/auth';
-import { Eye, EyeOff } from 'lucide-react';
+import { EyeRegular, EyeOffRegular } from '@fluentui/react-icons';
 
 import { cn } from "@/lib/utils"
 import { auth, firebaseEnabled } from '@/lib/firebase/client';
@@ -151,7 +151,7 @@ export function LoginForm({
                         <div className="relative">
                             <Input id="password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
                             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
-                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                {showPassword ? <EyeOffRegular className="h-4 w-4" /> : <EyeRegular className="h-4 w-4" />}
                             </button>
                         </div>
                     </div>

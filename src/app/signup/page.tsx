@@ -10,7 +10,7 @@ import { auth, firebaseEnabled } from '@/lib/firebase/client';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { Eye, EyeOff } from 'lucide-react';
+import { EyeRegular, EyeOffRegular } from '@fluentui/react-icons';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { OrigonLogo } from '@/components/logo';
 
@@ -210,7 +210,7 @@ export default function SignupPage() {
                                     onClick={() => setShowPassword(!showPassword)}
                                     className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
                                 >
-                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    {showPassword ? <EyeOffRegular className="h-4 w-4" /> : <EyeRegular className="h-4 w-4" />}
                                 </button>
                             </div>
                           </div>
@@ -223,7 +223,7 @@ export default function SignupPage() {
                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                     className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
                                 >
-                                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    {showConfirmPassword ? <EyeOffRegular className="h-4 w-4" /> : <EyeRegular className="h-4 w-4" />}
                                 </button>
                             </div>
                           </div>

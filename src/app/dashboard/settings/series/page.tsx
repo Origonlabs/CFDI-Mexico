@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { PlusCircle, RefreshCw, Trash2, Pencil } from "lucide-react";
+import { AddCircle24Regular, ArrowClockwise24Regular, Delete24Regular, Edit24Regular } from "@fluentui/react-icons";
 import { User } from "firebase/auth";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
@@ -105,12 +105,12 @@ export default function SeriesListPage() {
           <div className="flex items-center gap-4 flex-wrap">
               <Button asChild size="sm">
                   <Link href="/dashboard/settings/series/new">
-                      <PlusCircle className="mr-2 h-4 w-4" />
+                      <AddCircle24Regular className="mr-2 h-4 w-4" />
                       Agregar más folios
                   </Link>
               </Button>
               <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
-                  <RefreshCw className="mr-2 h-4 w-4" />
+                  <ArrowClockwise24Regular className="mr-2 h-4 w-4" />
                   Recargar
               </Button>
           </div>
@@ -151,11 +151,11 @@ export default function SeriesListPage() {
                       <TableCell>{formatDate(serie.createdAt)}</TableCell>
                       <TableCell className="text-right">
                           <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
-                              <Trash2 className="h-4 w-4" />
+                              <Delete24Regular className="h-4 w-4" />
                               <span className="sr-only">Eliminar</span>
                           </Button>
                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <Pencil className="h-4 w-4" />
+                              <Edit24Regular className="h-4 w-4" />
                               <span className="sr-only">Editar</span>
                           </Button>
                       </TableCell>

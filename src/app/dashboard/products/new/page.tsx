@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import { User } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { PlusCircle, HelpCircle } from "lucide-react";
+import { AddCircleRegular, QuestionCircleRegular } from "@fluentui/react-icons";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -149,11 +149,11 @@ export default function NewProductPage() {
                         </div>
                          <div className="flex gap-2">
                             <Button variant="outline" size="sm" type="button" disabled>
-                                <PlusCircle className="mr-2 h-4 w-4" />
+                                <AddCircleRegular className="mr-2 h-4 w-4" />
                                 Agregar Impuestos
                             </Button>
                             <Tooltip>
-                                <TooltipTrigger asChild><Button variant="ghost" size="icon" type="button" disabled><HelpCircle className="h-4 w-4" /></Button></TooltipTrigger>
+                                <TooltipTrigger asChild><Button variant="ghost" size="icon" type="button" disabled><QuestionCircleRegular className="h-4 w-4" /></Button></TooltipTrigger>
                                 <TooltipContent><p>Ayuda Impuestos</p></TooltipContent>
                             </Tooltip>
                          </div>
