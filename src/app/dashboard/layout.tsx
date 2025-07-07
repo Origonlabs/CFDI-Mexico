@@ -179,12 +179,17 @@ export default function DashboardLayout({
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
-                    <AvatarFallback>{getInitials(user?.displayName, user?.email)}</AvatarFallback>
-                  </Avatar>
-                </Button>
+              <Button variant="ghost" className="flex items-center gap-2 rounded-full p-1 pr-3 text-neutral-300 hover:bg-neutral-800 hover:text-white">
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
+                  <AvatarFallback className="text-xs">
+                    {getInitials(user?.displayName, user?.email)}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="hidden sm:inline-block text-sm font-medium">
+                  {user?.displayName ?? 'Mi tienda'}
+                </span>
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end">
               <DropdownMenuLabel className="font-normal">
@@ -213,7 +218,7 @@ export default function DashboardLayout({
         </div>
       </header>
       <div className="flex flex-1 overflow-hidden">
-        <aside className="hidden w-[240px] flex-col bg-[#EBEBEB] md:flex rounded-tl-[15px]">
+        <aside className="hidden w-[240px] flex-col bg-background md:flex rounded-tl-[15px]">
           <div className="flex-1 overflow-y-auto p-4">
             <nav className="grid items-start gap-1 text-sm font-medium">
               {mainLinks.map((item: any) =>
