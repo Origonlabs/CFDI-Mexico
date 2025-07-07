@@ -10,8 +10,6 @@ import { signOut as firebaseSignOut } from 'firebase/auth';
 import {
   SettingsRegular,
   ChevronDownFilled,
-  HomeFilled,
-  HomeRegular,
   GlobeSearchRegular,
 } from '@fluentui/react-icons';
 
@@ -82,50 +80,55 @@ export default function DashboardLayout({
   const mainLinks = navigationLinks.slice(0, -1);
   // We will handle settings link separately as a dropdown.
 
-  const renderLinkGroup = (item: any) => (
-    <Collapsible
-      key={item.title}
-      open={openCategory === item.title}
-      onOpenChange={(isOpen) => {
-        setOpenCategory(isOpen ? item.title : undefined);
-      }}
-      className="w-full"
-    >
-      <div className="w-full">
-        <CollapsibleTrigger asChild>
-          <Button
-            variant="ghost"
-            className="group w-full justify-start gap-2 px-2"
-          >
-            {item.icon && <item.icon className="h-4 w-4" />}
-            <span className="flex-1 text-left">{item.title}</span>
-            <ChevronDownFilled className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <div className="mt-1 ml-4 flex flex-col gap-1 border-l pl-4">
-            {item.sublinks?.map((subItem: any) => (
-              <Button
-                key={subItem.label}
-                asChild
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  'w-full justify-start gap-2 px-2',
-                  pathname === subItem.href &&
-                    'bg-accent text-accent-foreground'
-                )}
-              >
-                <Link href={subItem.href}>
-                  <span>{subItem.label}</span>
-                </Link>
-              </Button>
-            ))}
-          </div>
-        </CollapsibleContent>
-      </div>
-    </Collapsible>
-  );
+  const renderLinkGroup = (item: any) => {
+    const isActive = openCategory === item.title;
+    const Icon = isActive && item.activeIcon ? item.activeIcon : item.icon;
+
+    return (
+      <Collapsible
+        key={item.title}
+        open={openCategory === item.title}
+        onOpenChange={(isOpen) => {
+          setOpenCategory(isOpen ? item.title : undefined);
+        }}
+        className="w-full"
+      >
+        <div className="w-full">
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              className="group w-full justify-start gap-2 px-2"
+            >
+              {Icon && <Icon className="h-4 w-4" />}
+              <span className="flex-1 text-left">{item.title}</span>
+              <ChevronDownFilled className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="mt-1 ml-4 flex flex-col gap-1 border-l pl-4">
+              {item.sublinks?.map((subItem: any) => (
+                <Button
+                  key={subItem.label}
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    'w-full justify-start gap-2 px-2',
+                    pathname === subItem.href &&
+                      'bg-accent text-accent-foreground'
+                  )}
+                >
+                  <Link href={subItem.href}>
+                    <span>{subItem.label}</span>
+                  </Link>
+                </Button>
+              ))}
+            </div>
+          </CollapsibleContent>
+        </div>
+      </Collapsible>
+    );
+  };
 
   return (
     <div className="flex h-screen w-full flex-col bg-[#1A1A1A]">

@@ -5,9 +5,11 @@ import {
   DocumentText24Regular,
   Payment24Regular,
   BuildingBank24Regular,
-  Settings24Regular,
+  DocumentSettingsFilled,
+  DocumentSettingsRegular,
   Archive24Regular,
   QuestionCircle24Regular,
+  Settings24Regular,
 } from "@fluentui/react-icons";
 
 export const navigationLinks = [
@@ -52,7 +54,8 @@ export const navigationLinks = [
   },
   {
     title: "Configuración CFDI 4.0",
-    icon: Settings24Regular,
+    icon: DocumentSettingsFilled,
+    activeIcon: DocumentSettingsRegular,
     sublinks: [
       { href: "/dashboard/settings", label: "Instalar Certificados" },
       { href: "/dashboard/settings/document-types", label: "Tipos de documentos" },
