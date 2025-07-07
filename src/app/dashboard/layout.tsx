@@ -18,6 +18,7 @@ import {
   SettingsFilled,
   ArrowExitRegular,
   InfoRegular,
+  PremiumRegular,
 } from '@fluentui/react-icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -177,10 +178,7 @@ export default function DashboardLayout({
 
         {/* Right side */}
         <div className="flex items-center gap-1">
-           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-neutral-800 hover:text-white -mr-1">
-            <SettingsRegular className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-neutral-800 hover:text-white">
+           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-neutral-800 hover:text-white">
             <AlertRegular className="h-5 w-5" />
           </Button>
           <DropdownMenu>
@@ -274,7 +272,7 @@ export default function DashboardLayout({
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <SettingsRegular className="mr-2 h-4 w-4" />
+                    <PremiumRegular className="mr-2 h-4 w-4" />
                     <span>Incrementa la vigencia</span>
                   </Link>
                 </DropdownMenuItem>
