@@ -112,21 +112,22 @@ export default function NewInvoicePage() {
   const totalRetenidos = 0; // Placeholder for future implementation
   const total = baseForIva + totalTraslados - totalRetenidos;
 
-  const watchedValues = form.watch();
-
   useEffect(() => {
-    const { clientId, usoCfdi, formaPago, concepts } = watchedValues;
-    let completedSteps = 0;
-    const totalSteps = 4;
+    const subscription = form.watch((value) => {
+      const { clientId, usoCfdi, formaPago, concepts } = value;
+      let completedSteps = 0;
+      const totalSteps = 4;
 
-    if (clientId > 0) completedSteps++;
-    if (usoCfdi) completedSteps++;
-    if (formaPago) completedSteps++;
-    if (concepts && concepts.length > 0) completedSteps++;
-    
-    const newProgress = Math.round((completedSteps / totalSteps) * 100)
-    setProgress(newProgress);
-  }, [watchedValues]);
+      if (clientId && clientId > 0) completedSteps++;
+      if (usoCfdi) completedSteps++;
+      if (formaPago) completedSteps++;
+      if (concepts && concepts.length > 0) completedSteps++;
+      
+      const newProgress = Math.round((completedSteps / totalSteps) * 100);
+      setProgress(newProgress);
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
 
 
   useEffect(() => {

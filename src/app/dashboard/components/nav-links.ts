@@ -22,8 +22,8 @@ import {
 export const navigationLinks = [
   {
     title: "Inicio",
-    icon: HomeRegular,
-    activeIcon: HomeFilled,
+    icon: HomeFilled,
+    activeIcon: HomeRegular,
     href: "/dashboard",
   },
   {
