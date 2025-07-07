@@ -1,6 +1,7 @@
 
 import {
   HomeFilled,
+  HomeRegular,
   DocumentText24Regular,
   Payment24Regular,
   BuildingBank24Regular,
@@ -13,6 +14,7 @@ export const navigationLinks = [
   {
     title: "Inicio",
     icon: HomeFilled,
+    activeIcon: HomeRegular,
     href: "/dashboard",
   },
   {

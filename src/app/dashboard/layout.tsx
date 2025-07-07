@@ -210,27 +210,31 @@ export default function DashboardLayout({
         <aside className="hidden w-[240px] flex-col bg-sidebar md:flex">
           <div className="flex-1 overflow-y-auto p-4">
             <nav className="grid items-start gap-1 text-sm font-medium">
-              {mainLinks.map((item: any) =>
-                item.sublinks ? (
-                  renderLinkGroup(item)
-                ) : (
+              {mainLinks.map((item: any) => {
+                if (item.sublinks) {
+                  return renderLinkGroup(item);
+                }
+                
+                const isActive = pathname === item.href;
+                const Icon = isActive ? item.activeIcon || item.icon : item.icon;
+
+                return (
                   <Button
                     key={item.title}
                     asChild
                     variant="ghost"
                     className={cn(
                       'w-full justify-start gap-2 px-2',
-                      pathname === item.href &&
-                        'bg-accent text-accent-foreground'
+                      isActive && 'bg-accent text-accent-foreground'
                     )}
                   >
                     <Link href={item.href}>
-                      {item.icon && <item.icon className="h-4 w-4" />}
+                      {Icon && <Icon className="h-4 w-4" />}
                       <span>{item.title}</span>
                     </Link>
                   </Button>
-                )
-              )}
+                );
+              })}
             </nav>
           </div>
           <div className="shrink-0 border-t p-4">
