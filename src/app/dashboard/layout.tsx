@@ -16,6 +16,7 @@ import {
   BotSparkleRegular,
   PersonRegular,
   SettingsFilled,
+  ArrowExitRegular,
 } from '@fluentui/react-icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -207,15 +208,15 @@ export default function DashboardLayout({
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/settings">
-                    <PersonRegular />
+                    <PersonRegular className="mr-2 h-4 w-4" />
                     <span>Mi cuenta</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut}>
-                <SettingsRegular className="mr-2 h-4 w-4" />
-                Cerrar sesión
+                <ArrowExitRegular className="mr-2 h-4 w-4" />
+                <span>Cerrar sesión</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -266,7 +267,7 @@ export default function DashboardLayout({
               <DropdownMenuContent className="w-64 mb-1" side="top" align="start">
                  <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <BotSparkleRegular />
+                    <BotSparkleRegular className="mr-2 h-4 w-4" />
                     <span>Asistente de Configuración</span>
                   </Link>
                 </DropdownMenuItem>
@@ -278,14 +279,14 @@ export default function DashboardLayout({
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <ShoppingBagRegular />
+                    <ShoppingBagRegular className="mr-2 h-4 w-4" />
                     <span>Comprar Origon CFDI Facturación en línea</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/settings" className="cursor-pointer">
-                    <PersonRegular />
+                    <PersonRegular className="mr-2 h-4 w-4" />
                     <span>Mi cuenta</span>
                   </Link>
                 </DropdownMenuItem>
@@ -297,8 +298,8 @@ export default function DashboardLayout({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={handleSignOut} className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
-                  <SettingsRegular className="mr-2 h-4 w-4" />
-                  <span>Salir</span>
+                  <ArrowExitRegular className="mr-2 h-4 w-4" />
+                  <span>Cerrar sesión</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
