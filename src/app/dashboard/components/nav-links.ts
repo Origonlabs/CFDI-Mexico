@@ -1,9 +1,10 @@
+
 import {
   DocumentRegular,
   SettingsRegular,
   CreditCardRegular,
   BuildingRegular,
-  Database24Regular as DatabaseRegular,
+  DatabaseRegular,
   QuestionCircleRegular,
   HomeRegular,
 } from "@fluentui/react-icons";
