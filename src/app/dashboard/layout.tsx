@@ -14,6 +14,7 @@ import {
   AlertRegular,
   ShoppingBagRegular,
   BotSparkleRegular,
+  PersonRegular,
 } from '@fluentui/react-icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -203,7 +204,10 @@ export default function DashboardLayout({
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                  <Link href="/dashboard/settings">Mi cuenta</Link>
+                  <Link href="/dashboard/settings">
+                    <PersonRegular />
+                    <span>Mi cuenta</span>
+                  </Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
@@ -260,7 +264,7 @@ export default function DashboardLayout({
               <DropdownMenuContent className="w-64 mb-1" side="top" align="start">
                  <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <BotSparkleRegular className="mr-2 h-4 w-4" />
+                    <BotSparkleRegular />
                     <span>Asistente de Configuración</span>
                   </Link>
                 </DropdownMenuItem>
@@ -272,14 +276,14 @@ export default function DashboardLayout({
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <ShoppingBagRegular className="mr-2 h-4 w-4" />
+                    <ShoppingBagRegular />
                     <span>Comprar Origon CFDI Facturación en línea</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/settings" className="cursor-pointer">
-                    <SettingsRegular className="mr-2 h-4 w-4" />
+                    <PersonRegular />
                     <span>Mi cuenta</span>
                   </Link>
                 </DropdownMenuItem>
