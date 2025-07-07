@@ -157,10 +157,10 @@ export default function DashboardLayout({
                 placeholder="Buscar"
               />
               <div className="absolute right-3 flex items-center gap-1">
-                <kbd className="inline-flex h-6 items-center rounded border border-neutral-600 bg-neutral-800 px-2 text-xs font-sans text-neutral-400">
+                <kbd className="inline-flex h-[20px] w-[34px] items-center justify-center rounded border border-neutral-600 bg-neutral-800 text-xs font-sans text-neutral-400">
                   CTRL
                 </kbd>
-                <kbd className="inline-flex h-6 items-center rounded border border-neutral-600 bg-neutral-800 px-2 text-xs font-sans text-neutral-400">
+                <kbd className="inline-flex h-[20px] w-[20px] items-center justify-center rounded border border-neutral-600 bg-neutral-800 text-xs font-sans text-neutral-400">
                   K
                 </kbd>
               </div>
@@ -212,8 +212,8 @@ export default function DashboardLayout({
         </div>
       </header>
       <div className="flex flex-1 overflow-hidden">
-        <aside className="hidden w-[240px] flex-col rounded-tl-[15px] bg-[#EBEBEB] text-neutral-800 md:flex">
-          <div className="flex-1 overflow-y-auto p-4">
+        <aside className="hidden w-[240px] flex-col bg-[#1A1A1A] text-neutral-800 md:flex">
+          <div className="flex-1 overflow-y-auto p-4 bg-[#EBEBEB] rounded-tl-[15px]">
             <nav className="grid items-start gap-1 text-sm font-medium">
               {mainLinks.map((item: any) =>
                 item.sublinks ? (
@@ -238,7 +238,7 @@ export default function DashboardLayout({
               )}
             </nav>
           </div>
-          <div className="shrink-0 border-t p-4">
+          <div className="shrink-0 border-t p-4 bg-[#EBEBEB]">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
