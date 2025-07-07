@@ -36,10 +36,9 @@ export default function NewClientPage() {
             rfc: "",
             email: "",
             phone: "",
-            address: "",
             city: "",
             state: "",
-            zipCode: "",
+            zip: "",
             country: "México",
             taxRegime: "601",
         },
@@ -167,20 +166,7 @@ export default function NewClientPage() {
                                 />
                             </div>
 
-                            <FormField
-                                control={form.control}
-                                name="address"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Dirección</FormLabel>
-                                        <FormControl>
-                                            <Textarea placeholder="Dirección completa" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
+                            {/* Dirección eliminada porque no está en el esquema */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <FormField
                                     control={form.control}
@@ -212,7 +198,7 @@ export default function NewClientPage() {
 
                                 <FormField
                                     control={form.control}
-                                    name="zipCode"
+                                    name="zip"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Código Postal</FormLabel>

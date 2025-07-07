@@ -36,7 +36,7 @@ export default function NewClientPage() {
             rfc: "",
             email: "",
             phone: "",
-            address: "",
+            street: "",
             city: "",
             state: "",
             zipCode: "",
@@ -169,12 +169,12 @@ export default function NewClientPage() {
 
                             <FormField
                                 control={form.control}
-                                name="address"
+                                name="street"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Dirección</FormLabel>
                                         <FormControl>
-                                            <Textarea placeholder="Dirección completa" {...field} />
+                                            <Textarea placeholder="Calle y número" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -212,7 +212,7 @@ export default function NewClientPage() {
 
                                 <FormField
                                     control={form.control}
-                                    name="zipCode"
+                                    name="zip"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Código Postal</FormLabel>

@@ -1,0 +1,44 @@
+[debug] [2025-07-07T03:08:23.393Z] [Firebase Plugin] Activating Firebase extension.
+[debug] [2025-07-07T03:08:25.743Z] [Firebase Plugin] requireAuthWrapper
+[debug] [2025-07-07T03:08:25.747Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-07-07T03:08:25.748Z] > authorizing via signed-in user (agrufino@cloud.opendex.dev)
+[debug] [2025-07-07T03:08:25.761Z] Checked if tokens are valid: true, expires at: 1751858702707
+[debug] [2025-07-07T03:08:25.762Z] Checked if tokens are valid: true, expires at: 1751858702707
+[debug] [2025-07-07T03:08:25.763Z] [Firebase Plugin] User found:  agrufino@cloud.opendex.dev
+[info] [Firebase Plugin] (Core:Project) New user detected, fetching projects
+[debug] [2025-07-07T03:08:25.766Z] Checked if tokens are valid: true, expires at: 1751858702707
+[debug] [2025-07-07T03:08:25.769Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[debug] [2025-07-07T03:08:25.798Z] [Firebase Plugin] VSCode notification server listening on port 40001
+[info] [Firebase Plugin] Starting Data Connect toolkit (version 2.8.0) on port 50001
+[debug] [2025-07-07T03:08:28.053Z] I0706 21:08:28.009970   89214 control.go:84] [/emulator/origoncfdi a281] UpdateResources(): done
+Schema: sources: schema/schema.gql [2088B] 
+Connector "default": sources: connector/mutations.gql [1233B] connector/queries.gql [1802B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0706 21:08:28.009970   89214 control.go:84] [/emulator/origoncfdi a281] UpdateResources(): done\nSchema: sources: schema/schema.gql [2088B] \nConnector \"default\": sources: connector/mutations.gql [1233B] connector/queries.gql [1802B] \n"}}
+[debug] [2025-07-07T03:08:28.058Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2025-07-07T03:08:28.062Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2025-07-07T03:08:28.066Z] Starting Data Connect Emulator with command {"binary":"/home/agrufinog/.cache/firebase/emulators/dataconnect-emulator-2.8.0","args":["--logtostderr","-v=2","dev","--listen=localhost:50001","--config_dir=/home/agrufinog/Documentos/OrigonCFDI/dataconnect","--enable_output_schema_extensions=true","--enable_output_generated_sdk=true"],"optionalArgs":["listen","config_dir","enable_output_schema_extensions","enable_output_generated_sdk"],"joinArgs":true,"shell":false,"port":9399} {"metadata":{"emulator":{"name":"dataconnect"},"message":"Starting Data Connect Emulator with command {\"binary\":\"/home/agrufinog/.cache/firebase/emulators/dataconnect-emulator-2.8.0\",\"args\":[\"--logtostderr\",\"-v=2\",\"dev\",\"--listen=localhost:50001\",\"--config_dir=/home/agrufinog/Documentos/OrigonCFDI/dataconnect\",\"--enable_output_schema_extensions=true\",\"--enable_output_generated_sdk=true\"],\"optionalArgs\":[\"listen\",\"config_dir\",\"enable_output_schema_extensions\",\"enable_output_generated_sdk\"],\"joinArgs\":true,\"shell\":false,\"port\":9399}"}}
+[info] i  dataconnect: Data Connect Emulator logging to dataconnect-debug.log {"metadata":{"emulator":{"name":"dataconnect"},"message":"Data Connect Emulator logging to dataconnect-debug.log"}}
+[debug] [2025-07-07T03:08:28.341Z] I0706 21:08:28.217972   89219 load.go:37] Reloading schema and connectors...
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0706 21:08:28.217972   89219 load.go:37] Reloading schema and connectors...\n"}}
+[debug] [2025-07-07T03:08:28.665Z] I0706 21:08:28.491723   89219 control.go:84] [/emulator/origoncfdi 851b] UpdateResources(): done
+Schema: sources: schema/schema.gql [2088B] 
+Connector "default": sources: connector/mutations.gql [1233B] connector/queries.gql [1802B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0706 21:08:28.491723   89219 control.go:84] [/emulator/origoncfdi 851b] UpdateResources(): done\nSchema: sources: schema/schema.gql [2088B] \nConnector \"default\": sources: connector/mutations.gql [1233B] connector/queries.gql [1802B] \n"}}
+[debug] [2025-07-07T03:08:28.687Z] I0706 21:08:28.683778   89219 codegen.go:82] [connector "default" javascriptSdk] Generating sources into "/home/agrufinog/Documentos/OrigonCFDI/dataconnect-generated/js/default-connector"
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0706 21:08:28.683778   89219 codegen.go:82] [connector \"default\" javascriptSdk] Generating sources into \"/home/agrufinog/Documentos/OrigonCFDI/dataconnect-generated/js/default-connector\"\n"}}
+[debug] [2025-07-07T03:08:28.711Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-07-07T03:08:28.730Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-07-07T03:08:28.738Z] I0706 21:08:28.713393   89219 collector.go:107] schema extensions wrote into "/home/agrufinog/Documentos/OrigonCFDI/dataconnect/.dataconnect/schema"
+Generated sources: prelude.gql [71203B] 
+I0706 21:08:28.716761   89219 collector.go:107] connector "default" javascriptSdk wrote into "/home/agrufinog/Documentos/OrigonCFDI/dataconnect-generated/js/default-connector"
+Generated sources: esm/package.json [17B] index.cjs.js [148B] react/index.d.ts [228B] react/package.json [468B] react/esm/index.esm.js [0B] index.d.ts [246B] esm/index.esm.js [113B] package.json [860B] README.md [2896B] react/esm/package.json [17B] react/index.cjs.js [0B] react/README.md [5474B] 
+I0706 21:08:28.736430   89219 installsdk.go:55] Package @firebasegen/default-connector is already installed. Skipping installation
+I0706 21:08:28.736636   89219 load.go:115] Finished reloading
+I0706 21:08:28.738587   89219 dev.go:95] Listening on address (HTTP + gRPC): 127.0.0.1:50001
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0706 21:08:28.713393   89219 collector.go:107] schema extensions wrote into \"/home/agrufinog/Documentos/OrigonCFDI/dataconnect/.dataconnect/schema\"\nGenerated sources: prelude.gql [71203B] \nI0706 21:08:28.716761   89219 collector.go:107] connector \"default\" javascriptSdk wrote into \"/home/agrufinog/Documentos/OrigonCFDI/dataconnect-generated/js/default-connector\"\nGenerated sources: esm/package.json [17B] index.cjs.js [148B] react/index.d.ts [228B] react/package.json [468B] react/esm/index.esm.js [0B] index.d.ts [246B] esm/index.esm.js [113B] package.json [860B] README.md [2896B] react/esm/package.json [17B] react/index.cjs.js [0B] react/README.md [5474B] \nI0706 21:08:28.736430   89219 installsdk.go:55] Package @firebasegen/default-connector is already installed. Skipping installation\nI0706 21:08:28.736636   89219 load.go:115] Finished reloading\nI0706 21:08:28.738587   89219 dev.go:95] Listening on address (HTTP + gRPC): 127.0.0.1:50001\n"}}
+[debug] [2025-07-07T03:08:29.499Z] I0706 21:08:29.498883   89219 engine.go:170] [/emulator/origoncfdi 851b] ExecuteGraphqlRead IntrospectionQuery: succeeded. 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0706 21:08:29.498883   89219 engine.go:170] [/emulator/origoncfdi 851b] ExecuteGraphqlRead IntrospectionQuery: succeeded. \n"}}
+[info] [Firebase Plugin] Stopping Data Connect toolkit
+[warn] ⚠  Data Connect Emulator has exited upon receiving signal: SIGINT 
+[debug] [2025-07-07T03:24:38.843Z] [Firebase Plugin] Activating Firebase extension.
+[debug] [2025-07-07T03:26:17.996Z] [Firebase Plugin] Activating Firebase extension.
