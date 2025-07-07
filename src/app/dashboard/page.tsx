@@ -188,7 +188,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="w-[1638px] h-[389px]">
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Resumen de Facturación</CardTitle>
