@@ -95,20 +95,20 @@ export default function ClientsPage() {
       <Card className="flex flex-col flex-1">
         <CardHeader className="p-2 border-b bg-muted/30">
             <div className="flex items-center gap-2 flex-wrap">
-                <Button asChild size="sm" className="h-8">
+                <Button asChild size="sm">
                     <Link href="/dashboard/clients/new">
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Agregar más clientes
                     </Link>
                 </Button>
-                <Input placeholder="RFC" className="h-8 w-40" />
-                <Input placeholder="Razón Social" className="h-8 w-64" />
-                <Input placeholder="Referencia" className="h-8 w-40" />
-                <Button variant="outline" size="sm" className="h-8">
+                <Input placeholder="RFC" className="w-40" />
+                <Input placeholder="Razón Social" className="w-64" />
+                <Input placeholder="Referencia" className="w-40" />
+                <Button variant="outline" size="sm">
                     <Filter className="mr-2 h-4 w-4" />
                     Filtrar
                 </Button>
-                <Button variant="outline" size="sm" className="h-8">
+                <Button variant="outline" size="sm">
                     <ListFilter className="mr-2 h-4 w-4" />
                     Mostrar todos
                 </Button>

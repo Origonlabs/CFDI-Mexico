@@ -106,19 +106,19 @@ export default function ProductsPage() {
       <Card className="flex flex-col flex-1">
         <CardHeader className="p-2 border-b bg-muted/30">
             <div className="flex items-center gap-2 flex-wrap">
-                <Button asChild size="sm" className="h-8">
+                <Button asChild size="sm">
                     <Link href="/dashboard/products/new">
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Agregar más productos
                     </Link>
                 </Button>
-                <Input placeholder="Código" className="h-8 w-40" />
-                <Input placeholder="Descripción" className="h-8 w-64" />
-                <Button variant="outline" size="sm" className="h-8">
+                <Input placeholder="Código" className="w-40" />
+                <Input placeholder="Descripción" className="w-64" />
+                <Button variant="outline" size="sm">
                     <Filter className="mr-2 h-4 w-4" />
                     Filtrar
                 </Button>
-                <Button variant="outline" size="sm" className="h-8">
+                <Button variant="outline" size="sm">
                     <ListFilter className="mr-2 h-4 w-4" />
                     Mostrar todos
                 </Button>

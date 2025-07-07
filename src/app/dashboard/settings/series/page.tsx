@@ -103,13 +103,13 @@ export default function SeriesListPage() {
     <Card className="flex flex-col flex-1">
       <CardHeader className="p-2 border-b bg-muted/30">
           <div className="flex items-center gap-4 flex-wrap">
-              <Button asChild size="sm" className="h-8">
+              <Button asChild size="sm">
                   <Link href="/dashboard/settings/series/new">
                       <PlusCircle className="mr-2 h-4 w-4" />
                       Agregar más folios
                   </Link>
               </Button>
-              <Button variant="outline" size="sm" className="h-8" onClick={fetchData} disabled={loading}>
+              <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Recargar
               </Button>
