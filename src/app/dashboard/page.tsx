@@ -150,40 +150,40 @@ export default function DashboardPage() {
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="w-[398px] h-[80px]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Facturado (Mes)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? <Skeleton className="h-7 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.totalFacturadoMes ?? 0)}</div>}
-          </CardContent>
+        <Card className="w-[398px] h-[80px] flex flex-col justify-center p-6">
+          <CardTitle className="text-sm font-medium">Total Facturado (Mes)</CardTitle>
+          {loading ? (
+            <Skeleton className="h-7 w-3/4 mt-2" />
+          ) : (
+            <div className="text-2xl font-bold">{formatCurrency(stats?.totalFacturadoMes ?? 0)}</div>
+          )}
         </Card>
 
-        <Card className="w-[398px] h-[80px]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Facturas Timbradas (Mes)</CardTitle>
-          </CardHeader>
-          <CardContent>
-             {loading ? <Skeleton className="h-7 w-1/2" /> : <div className="text-2xl font-bold">+{stats?.facturasTimbradasMes ?? 0}</div>}
-          </CardContent>
+        <Card className="w-[398px] h-[80px] flex flex-col justify-center p-6">
+          <CardTitle className="text-sm font-medium">Facturas Timbradas (Mes)</CardTitle>
+          {loading ? (
+            <Skeleton className="h-7 w-1/2 mt-2" />
+          ) : (
+            <div className="text-2xl font-bold">+{stats?.facturasTimbradasMes ?? 0}</div>
+          )}
         </Card>
 
-        <Card className="w-[398px] h-[80px]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Clientes Activos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? <Skeleton className="h-7 w-1/4" /> : <div className="text-2xl font-bold">{stats?.clientesActivos ?? 0}</div>}
-          </CardContent>
+        <Card className="w-[398px] h-[80px] flex flex-col justify-center p-6">
+          <CardTitle className="text-sm font-medium">Clientes Activos</CardTitle>
+          {loading ? (
+            <Skeleton className="h-7 w-1/4 mt-2" />
+          ) : (
+            <div className="text-2xl font-bold">{stats?.clientesActivos ?? 0}</div>
+          )}
         </Card>
 
-        <Card className="w-[398px] h-[80px]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Saldo Pendiente (PPD)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? <Skeleton className="h-7 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.saldoPendiente ?? 0)}</div>}
-          </CardContent>
+        <Card className="w-[398px] h-[80px] flex flex-col justify-center p-6">
+          <CardTitle className="text-sm font-medium">Saldo Pendiente (PPD)</CardTitle>
+          {loading ? (
+            <Skeleton className="h-7 w-3/4 mt-2" />
+          ) : (
+            <div className="text-2xl font-bold">{formatCurrency(stats?.saldoPendiente ?? 0)}</div>
+          )}
         </Card>
       </div>
 
