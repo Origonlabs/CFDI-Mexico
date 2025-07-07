@@ -1,23 +1,45 @@
-PROPRIETARY SOFTWARE LICENSE
+ORIGONCFDI PROPRIETARY LICENSE AGREEMENT
 
-Copyright (c) 2025 Origon CFDI. All rights reserved.
+© 2025 OPendex Corporation. All Rights Reserved.
 
-IMPORTANT: This software is proprietary and confidential. This license agreement 
-("Agreement") is a legal agreement between you ("Licensee") and Origon CFDI ("Licensor") 
-for the use of the Origon CFDI software ("Software").
+1. DEFINITIONS  
+   a. “Software” means the OrigonCFDI application, including source code, binaries, libraries, modules, documentation and related materials.  
+   b. “Licensor” means OPendex Corporation.  
+   c. “Licensee” means the individual or entity that has been granted this license.
 
-BY USING THIS SOFTWARE, YOU AGREE TO BE BOUND BY THE TERMS OF THIS AGREEMENT.
+2. LICENSE GRANT  
+   Licensor hereby grants Licensee a limited, non-exclusive, non-transferable, revocable license to internally use the Software solely for Licensee’s business operations, subject to the terms and conditions of this Agreement.
 
-RESTRICTIONS:
-1. You may NOT copy, modify, distribute, or reverse engineer this software.
-2. You may NOT share this software with third parties.
-3. You may NOT use this software for commercial purposes without explicit written 
-   permission from Origon CFDI.
-4. All rights not expressly granted are reserved.
+3. RESTRICTIONS  
+   Licensee shall not, directly or indirectly:  
+   a. Distribute, sublicense, rent, lease or lend the Software to any third party.  
+   b. Reverse engineer, decompile, disassemble or attempt to derive the source code of any component of the Software.  
+   c. Modify, adapt, translate or create derivative works based on the Software except as expressly permitted in writing by Licensor.  
+   d. Use the Software to develop a competing product or service.
 
-DISCLAIMER:
-This software is provided "as is" without warranty of any kind, either express 
-or implied, including but not limited to the implied warranties of merchantability 
-and fitness for a particular purpose.
+4. INTELLECTUAL PROPERTY  
+   The Software and all intellectual property rights therein are and shall remain the sole property of Licensor. This Agreement does not grant Licensee any ownership interest in the Software.
 
-For licensing inquiries, contact: info@origoncfdi.com
+5. CONFIDENTIALITY  
+   The Software and all information related to it are confidential. Licensee agrees to protect and not disclose any confidential information to any third party without Licensor’s prior written consent.
+
+6. TERM AND TERMINATION  
+   a. This Agreement is effective until terminated.  
+   b. Licensor may terminate the license immediately upon Licensee’s material breach of any term herein.  
+   c. Upon termination, Licensee shall cease all use of the Software and destroy all copies.
+
+7. DISCLAIMER OF WARRANTY  
+   THE SOFTWARE IS PROVIDED “AS IS,” WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
+
+8. LIMITATION OF LIABILITY  
+   IN NO EVENT SHALL LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF OR IN CONNECTION WITH THIS AGREEMENT OR THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+9. GOVERNING LAW  
+   This Agreement shall be governed by and construed in accordance with the laws of the State of [Your Jurisdiction], without regard to conflict of law principles.
+
+10. CONTACT INFORMATION  
+   For license inquiries or permissions, please contact:  
+   legal@opendex.com
+
+---  
+This license constitutes the entire agreement between the parties with respect to the Software and supersedes all prior or contemporaneous oral or written agreements.
