@@ -100,7 +100,7 @@ export default function DashboardLayout({
         <CollapsibleTrigger asChild>
           <Button
             variant="ghost"
-            className="w-full justify-start gap-2 px-2"
+            className="group w-full justify-start gap-2 px-2"
           >
             {item.icon && <item.icon className="h-4 w-4" />}
             <span className="flex-1 text-left">{item.title}</span>
