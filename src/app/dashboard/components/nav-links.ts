@@ -1,9 +1,9 @@
 
 import {
-  Home24Regular,
-  Document24Regular,
+  ChevronDownRegular,
+  DocumentText24Regular,
   Payment24Regular,
-  Briefcase24Regular,
+  BuildingBank24Regular,
   Settings24Regular,
   Archive24Regular,
   QuestionCircle24Regular,
@@ -12,12 +12,12 @@ import {
 export const navigationLinks = [
   {
     title: "Inicio",
-    icon: Home24Regular,
+    icon: ChevronDownRegular,
     href: "/dashboard",
   },
   {
     title: "CFDI",
-    icon: Document24Regular,
+    icon: DocumentText24Regular,
     sublinks: [
       { href: "/dashboard/invoices/new", label: "Crear Facturas 4.0" },
       { href: "/dashboard/invoices", label: "Listar Facturas" },
@@ -36,7 +36,7 @@ export const navigationLinks = [
   },
   {
     title: "Empresa",
-    icon: Briefcase24Regular,
+    icon: BuildingBank24Regular,
     sublinks: [
       { href: "/dashboard/clients/new", label: "Crear Clientes" },
       { href: "/dashboard/clients", label: "Listar Clientes" },
