@@ -10,6 +10,9 @@ import { signOut as firebaseSignOut } from 'firebase/auth';
 import {
   SettingsRegular,
   ChevronDownFilled,
+  HomeFilled,
+  HomeRegular,
+  GlobeSearchRegular,
 } from '@fluentui/react-icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -144,7 +147,7 @@ export default function DashboardLayout({
         <div className="flex-1 max-w-xl mx-auto hidden md:block">
           <StarBorder thickness={3} borderRadius={15} color="hsl(var(--primary))">
             <div className="relative flex h-9 items-center">
-              <SettingsRegular className="absolute left-3.5 h-4 w-4 text-neutral-400" />
+              <GlobeSearchRegular className="absolute left-3.5 h-4 w-4 text-neutral-400" />
               <Input
                 className="h-full w-full border-none bg-transparent pl-10 pr-24 placeholder:text-neutral-400 focus-visible:ring-0 focus-visible:ring-offset-0"
                 placeholder="Buscar"
