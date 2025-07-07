@@ -91,20 +91,24 @@ export default {
           from: {
             height: '0',
             opacity: '0',
+            transform: 'translateY(-10px)',
           },
           to: {
             height: 'var(--radix-accordion-content-height)',
             opacity: '1',
+            transform: 'translateY(0)',
           },
         },
         'accordion-up': {
           from: {
             height: 'var(--radix-accordion-content-height)',
             opacity: '1',
+            transform: 'translateY(0)',
           },
           to: {
             height: '0',
             opacity: '0',
+            transform: 'translateY(-10px)',
           },
         },
         'border-spin': {
@@ -114,8 +118,8 @@ export default {
         },
       },
       animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
+        'accordion-down': 'accordion-down 0.3s ease-in-out',
+        'accordion-up': 'accordion-up 0.3s ease-in-out',
         'border-spin': 'border-spin 4s linear infinite',
       },
     },
