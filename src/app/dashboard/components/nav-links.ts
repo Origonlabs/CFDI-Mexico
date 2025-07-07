@@ -1,17 +1,23 @@
 
 import {
-  SettingsRegular,
+  Home24Regular,
+  Document24Regular,
+  Payment24Regular,
+  Briefcase24Regular,
+  Settings24Regular,
+  Archive24Regular,
+  QuestionCircle24Regular,
 } from "@fluentui/react-icons";
 
 export const navigationLinks = [
   {
     title: "Inicio",
-    icon: SettingsRegular,
+    icon: Home24Regular,
     href: "/dashboard",
   },
   {
     title: "CFDI",
-    icon: SettingsRegular,
+    icon: Document24Regular,
     sublinks: [
       { href: "/dashboard/invoices/new", label: "Crear Facturas 4.0" },
       { href: "/dashboard/invoices", label: "Listar Facturas" },
@@ -21,7 +27,7 @@ export const navigationLinks = [
   },
   {
     title: "Pagos",
-    icon: SettingsRegular,
+    icon: Payment24Regular,
     sublinks: [
       { href: "/dashboard/payments/new", label: "Crear Pagos 4.0" },
       { href: "/dashboard/payments", label: "Listar Pagos" },
@@ -30,7 +36,7 @@ export const navigationLinks = [
   },
   {
     title: "Empresa",
-    icon: SettingsRegular,
+    icon: Briefcase24Regular,
     sublinks: [
       { href: "/dashboard/clients/new", label: "Crear Clientes" },
       { href: "/dashboard/clients", label: "Listar Clientes" },
@@ -44,7 +50,7 @@ export const navigationLinks = [
   },
   {
     title: "Configuración CFDI 4.0",
-    icon: SettingsRegular,
+    icon: Settings24Regular,
     sublinks: [
       { href: "/dashboard/settings", label: "Instalar Certificados" },
       { href: "/dashboard/settings/document-types", label: "Tipos de documentos" },
@@ -52,7 +58,7 @@ export const navigationLinks = [
   },
   {
     title: "Almacenamiento",
-    icon: SettingsRegular,
+    icon: Archive24Regular,
     sublinks: [
       { href: "/dashboard/storage/deleted-invoices", label: "Listar CFDI Eliminados" },
       { href: "/dashboard/storage/deleted-payments", label: "Listar Pagos Eliminados" },
@@ -60,7 +66,7 @@ export const navigationLinks = [
   },
   {
     title: "Ayuda",
-    icon: SettingsRegular,
+    icon: QuestionCircle24Regular,
     sublinks: [
       { href: "#", label: "BD de Conocimiento" },
       { href: "#", label: "Manual del usuario" },
@@ -71,7 +77,7 @@ export const navigationLinks = [
   },
   {
     title: "Configuracion",
-    icon: SettingsRegular,
+    icon: Settings24Regular,
     sublinks: [
       { href: "/dashboard/settings", label: "Perfil de Empresa" },
       { href: "/dashboard/settings", label: "Mi Cuenta" },
