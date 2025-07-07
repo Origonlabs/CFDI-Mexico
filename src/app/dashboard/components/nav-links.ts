@@ -3,13 +3,15 @@ import {
   HomeFilled,
   HomeRegular,
   DocumentText24Regular,
-  Payment24Regular,
+  PaymentFilled,
+  PaymentRegular,
   BuildingBank24Regular,
   DocumentSettingsFilled,
   DocumentSettingsRegular,
   Archive24Regular,
   QuestionCircle24Regular,
   Settings24Regular,
+  ChevronDownFilled
 } from "@fluentui/react-icons";
 
 export const navigationLinks = [
@@ -31,7 +33,8 @@ export const navigationLinks = [
   },
   {
     title: "Pagos",
-    icon: Payment24Regular,
+    icon: PaymentFilled,
+    activeIcon: PaymentRegular,
     sublinks: [
       { href: "/dashboard/payments/new", label: "Crear Pagos 4.0" },
       { href: "/dashboard/payments", label: "Listar Pagos" },
