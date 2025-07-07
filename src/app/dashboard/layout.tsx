@@ -179,16 +179,13 @@ export default function DashboardLayout({
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 rounded-full p-1 pr-3 text-neutral-300 hover:bg-neutral-800 hover:text-white">
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
                 <Avatar className="h-6 w-6">
                   <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
                   <AvatarFallback className="text-xs">
                     {getInitials(user?.displayName, user?.email)}
                   </AvatarFallback>
                 </Avatar>
-                <span className="hidden sm:inline-block text-sm font-medium">
-                  {user?.displayName ?? 'Mi tienda'}
-                </span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end">
