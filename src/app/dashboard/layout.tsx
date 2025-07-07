@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -159,7 +158,7 @@ export default function DashboardLayout({
               />
               <div className="absolute right-3 flex items-center gap-1">
                 <kbd className="inline-flex h-6 items-center rounded border border-neutral-600 bg-neutral-800 px-2 text-xs font-sans text-neutral-400">
-                  Ctrl
+                  CTRL
                 </kbd>
                 <kbd className="inline-flex h-6 items-center rounded border border-neutral-600 bg-neutral-800 px-2 text-xs font-sans text-neutral-400">
                   K
