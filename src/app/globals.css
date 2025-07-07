@@ -10,9 +10,9 @@ body {
   :root {
     --background: 0 0% 94.5%; /* #F1F1F1 */
     --foreground: 214 84% 15%;
-    --card: 200 100% 97%;
+    --card: 0 0% 100%; /* #FFFFFF */
     --card-foreground: 214 84% 15%;
-    --popover: 200 100% 97%;
+    --popover: 0 0% 100%; /* #FFFFFF */
     --popover-foreground: 214 84% 15%;
     
     /* New Button Colors */
