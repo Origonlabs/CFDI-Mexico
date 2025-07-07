@@ -12,7 +12,8 @@ import {
   DocumentSettingsRegular,
   DatabaseFilled,
   DatabaseRegular,
-  QuestionCircle24Regular,
+  ChatFilled,
+  ChatRegular,
   SettingsFilled,
   SettingsRegular,
   ChevronDownFilled
@@ -81,8 +82,8 @@ export const navigationLinks = [
   },
   {
     title: "Ayuda",
-    icon: QuestionCircle24Regular,
-    activeIcon: QuestionCircle24Regular,
+    icon: ChatFilled,
+    activeIcon: ChatRegular,
     sublinks: [
       { href: "#", label: "BD de Conocimiento" },
       { href: "#", label: "Manual del usuario" },
