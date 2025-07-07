@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -15,7 +14,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Overview } from "./components/overview";
 import { firebaseEnabled, auth } from "@/lib/firebase/client";
-import { AlertCircle, DollarSign, Users, Hourglass, Info, CheckCircle } from "lucide-react";
+import { AlertCircle, Info, CheckCircle } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { RecentInvoices } from "./components/recent-invoices";
 import { useToast } from "@/hooks/use-toast";
@@ -23,24 +22,6 @@ import { getDashboardStats } from "../actions/dashboard";
 import { getSetupStatus } from "../actions/setup";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-
-const WavyTrendingUpIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M5 15C8 15 8 9 11 9C14 9 14 3 17 3" />
-    <path d="M14 3H17V6" />
-  </svg>
-);
 
 interface DashboardStats {
   totalFacturadoMes: number;
@@ -172,14 +153,9 @@ export default function DashboardPage() {
         <Card className="w-[398px] h-[80px]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Facturado (Mes)</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {loading ? <Skeleton className="h-7 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.totalFacturadoMes ?? 0)}</div>}
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <WavyTrendingUpIcon className="h-4 w-4" />
-              <span>&nbsp;</span>
-            </p>
           </CardContent>
         </Card>
 
@@ -189,35 +165,24 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
              {loading ? <Skeleton className="h-7 w-1/2" /> : <div className="text-2xl font-bold">+{stats?.facturasTimbradasMes ?? 0}</div>}
-             <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <WavyTrendingUpIcon className="h-4 w-4" />
-              <span>&nbsp;</span>
-            </p>
           </CardContent>
         </Card>
 
         <Card className="w-[398px] h-[80px]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Clientes Activos</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {loading ? <Skeleton className="h-7 w-1/4" /> : <div className="text-2xl font-bold">{stats?.clientesActivos ?? 0}</div>}
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <WavyTrendingUpIcon className="h-4 w-4" />
-              <span>&nbsp;</span>
-            </p>
           </CardContent>
         </Card>
 
         <Card className="w-[398px] h-[80px]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Saldo Pendiente (PPD)</CardTitle>
-            <Hourglass className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {loading ? <Skeleton className="h-7 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.saldoPendiente ?? 0)}</div>}
-            <p className="text-xs text-muted-foreground">Correspondiente a facturas PPD</p>
           </CardContent>
         </Card>
       </div>
