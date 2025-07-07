@@ -1,5 +1,3 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
 
 import { neon } from '@neondatabase/serverless';
 import { drizzle, type NeonHttpDatabase } from 'drizzle-orm/neon-http';

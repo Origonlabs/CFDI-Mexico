@@ -1,9 +1,5 @@
 import admin from 'firebase-admin';
 
-// Load environment variables
-import * as dotenv from 'dotenv';
-dotenv.config();
-
 const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
 
 let adminApp: admin.app.App | null = null;
