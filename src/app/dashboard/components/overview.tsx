@@ -3,8 +3,6 @@
 
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton"
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 
 interface OverviewProps {
   data: { date: string, total: number }[] | undefined | null;
@@ -18,6 +16,23 @@ const formatCurrency = (value: number) => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value);
+};
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0];
+    return (
+      <div className="rounded-lg border bg-card p-3 shadow-sm">
+        <p className="text-sm font-bold mb-2 text-card-foreground">Ventas totales</p>
+        <div className="flex items-center gap-2 text-sm">
+          <span className="h-px w-4" style={{ backgroundColor: data.stroke }} />
+          <span className="font-medium text-muted-foreground">{label}</span>
+          <span className="ml-auto font-semibold text-card-foreground">{formatCurrency(data.value)}</span>
+        </div>
+      </div>
+    );
+  }
+  return null;
 };
 
 
@@ -63,13 +78,7 @@ export function Overview({ data, loading }: OverviewProps) {
         />
         <Tooltip
             cursor={{ stroke: 'hsl(var(--border))', strokeWidth: 1 }}
-            contentStyle={{
-                background: "hsl(var(--background))",
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "var(--radius)"
-            }}
-             labelStyle={{ textTransform: 'capitalize' }}
-             formatter={(value: number, name: string) => [formatCurrency(value), 'Total Facturado']}
+            content={<CustomTooltip />}
         />
         <defs>
           <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
