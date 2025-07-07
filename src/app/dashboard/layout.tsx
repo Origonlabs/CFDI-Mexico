@@ -15,6 +15,7 @@ import {
   ShoppingBagRegular,
   BotSparkleRegular,
   PersonRegular,
+  SettingsFilled,
 } from '@fluentui/react-icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -49,6 +50,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [openCategory, setOpenCategory] = React.useState<string | undefined>();
+  const isSettingsActive = pathname.startsWith('/dashboard/settings');
 
   React.useEffect(() => {
     const activeItem = navigationLinks.find((item: any) =>
@@ -257,7 +259,7 @@ export default function DashboardLayout({
                   variant="ghost"
                   className="w-full justify-start gap-2 px-2"
                 >
-                  <SettingsRegular className="h-4 w-4" />
+                  {isSettingsActive ? <SettingsRegular className="h-4 w-4" /> : <SettingsFilled className="h-4 w-4" />}
                   <span className="flex-1 text-left">Configuracion</span>
                 </Button>
               </DropdownMenuTrigger>

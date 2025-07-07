@@ -13,7 +13,8 @@ import {
   DatabaseFilled,
   DatabaseRegular,
   QuestionCircle24Regular,
-  Settings24Regular,
+  SettingsFilled,
+  SettingsRegular,
   ChevronDownFilled
 } from "@fluentui/react-icons";
 
@@ -92,7 +93,8 @@ export const navigationLinks = [
   },
   {
     title: "Configuracion",
-    icon: Settings24Regular,
+    icon: SettingsFilled,
+    activeIcon: SettingsRegular,
     sublinks: [
       { href: "/dashboard/settings", label: "Perfil de Empresa" },
       { href: "/dashboard/settings", label: "Mi Cuenta" },
