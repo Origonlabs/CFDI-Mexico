@@ -3,7 +3,7 @@ import {
   SettingsRegular,
   CreditCardRegular,
   BuildingRegular,
-  Database24Regular,
+  DatabaseRegular,
   QuestionCircleRegular,
   HomeRegular,
 } from "@fluentui/react-icons";
@@ -57,7 +57,7 @@ export const navigationLinks = [
   },
   {
     title: "Almacenamiento",
-    icon: Database24Regular,
+    icon: DatabaseRegular,
     sublinks: [
       { href: "/dashboard/storage/deleted-invoices", label: "Listar CFDI Eliminados" },
       { href: "/dashboard/storage/deleted-payments", label: "Listar Pagos Eliminados" },

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { ArrowDownload24Regular } from "@fluentui/react-icons";
+import { ArrowDownloadRegular } from "@fluentui/react-icons";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -21,7 +21,7 @@ export default function ReportsPage() {
         <div className="flex items-center gap-2">
             <Button variant="outline">Seleccionar Rango de Fechas</Button>
             <Button>
-                <ArrowDownload24Regular className="mr-2 h-4 w-4" />
+                <ArrowDownloadRegular className="mr-2 h-4 w-4" />
                 Exportar
             </Button>
         </div>

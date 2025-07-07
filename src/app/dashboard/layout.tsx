@@ -14,7 +14,7 @@ import {
   BellRegular,
   QuestionCircleRegular,
   SettingsRegular,
-  Flash24Regular,
+  FlashRegular,
   CartRegular,
   PersonRegular as UserIcon,
   InfoRegular,
@@ -261,7 +261,7 @@ export default function DashboardLayout({
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <Flash24Regular className="mr-2 h-4 w-4" />
+                    <FlashRegular className="mr-2 h-4 w-4" />
                     <span>Incrementa la vigencia</span>
                   </Link>
                 </DropdownMenuItem>
