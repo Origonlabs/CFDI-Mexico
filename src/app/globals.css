@@ -69,15 +69,3 @@ body {
     @apply bg-background text-foreground;
   }
 }
-
-@layer utilities {
-  .sidebar-scroll::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .sidebar-scroll {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
-}
