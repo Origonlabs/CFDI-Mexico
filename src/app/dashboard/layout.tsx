@@ -214,8 +214,8 @@ export default function DashboardLayout({
           </DropdownMenu>
         </div>
       </header>
-      <div className="flex flex-1 overflow-hidden rounded-t-[15px]">
-        <aside className="hidden w-[240px] flex-col bg-background md:flex">
+      <div className="flex flex-1 overflow-hidden rounded-tl-[15px]">
+        <aside className="hidden w-[240px] flex-col bg-sidebar md:flex">
           <div className="flex-1 overflow-y-auto p-4">
             <nav className="grid items-start gap-1 text-sm font-medium">
               {mainLinks.map((item: any) =>
@@ -293,7 +293,7 @@ export default function DashboardLayout({
             </DropdownMenu>
           </div>
         </aside>
-        <main className="flex-1 overflow-y-auto bg-background">
+        <main className="flex-1 overflow-y-auto bg-background rounded-tr-[15px]">
           <div className="p-4 lg:p-6">
             {children}
           </div>
