@@ -9,6 +9,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { signOut as firebaseSignOut } from 'firebase/auth';
 import {
   SettingsRegular,
+  ChevronDownFilled,
 } from '@fluentui/react-icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -95,7 +96,7 @@ export default function DashboardLayout({
           >
             {item.icon && <item.icon className="h-4 w-4" />}
             <span className="flex-1 text-left">{item.title}</span>
-            <SettingsRegular className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+            <ChevronDownFilled className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
           </Button>
         </CollapsibleTrigger>
         <CollapsibleContent>
