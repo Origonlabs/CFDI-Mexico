@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -11,6 +10,7 @@ import {
   SettingsRegular,
   ChevronDownFilled,
   GlobeSearchRegular,
+  AlertRegular,
 } from '@fluentui/react-icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -173,7 +173,7 @@ export default function DashboardLayout({
             <SettingsRegular className="h-5 w-5" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-neutral-800 hover:text-white">
-            <SettingsRegular className="h-5 w-5" />
+            <AlertRegular className="h-5 w-5" />
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
