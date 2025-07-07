@@ -5,7 +5,8 @@ import {
   DocumentText24Regular,
   PaymentFilled,
   PaymentRegular,
-  BuildingBank24Regular,
+  BuildingPeopleFilled,
+  BuildingPeopleRegular,
   DocumentSettingsFilled,
   DocumentSettingsRegular,
   Archive24Regular,
@@ -43,7 +44,8 @@ export const navigationLinks = [
   },
   {
     title: "Empresa",
-    icon: BuildingBank24Regular,
+    icon: BuildingPeopleFilled,
+    activeIcon: BuildingPeopleRegular,
     sublinks: [
       { href: "/dashboard/clients/new", label: "Crear Clientes" },
       { href: "/dashboard/clients", label: "Listar Clientes" },
