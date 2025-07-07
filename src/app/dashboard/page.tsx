@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -150,7 +151,7 @@ export default function DashboardPage() {
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="w-[398px] h-[80px] flex flex-col justify-center p-6">
+        <Card className="h-[80px] flex flex-col justify-center p-6">
           <CardTitle className="text-sm font-medium">Total Facturado (Mes)</CardTitle>
           {loading ? (
             <Skeleton className="h-7 w-3/4 mt-2" />
@@ -159,7 +160,7 @@ export default function DashboardPage() {
           )}
         </Card>
 
-        <Card className="w-[398px] h-[80px] flex flex-col justify-center p-6">
+        <Card className="h-[80px] flex flex-col justify-center p-6">
           <CardTitle className="text-sm font-medium">Facturas Timbradas (Mes)</CardTitle>
           {loading ? (
             <Skeleton className="h-7 w-1/2 mt-2" />
@@ -168,7 +169,7 @@ export default function DashboardPage() {
           )}
         </Card>
 
-        <Card className="w-[398px] h-[80px] flex flex-col justify-center p-6">
+        <Card className="h-[80px] flex flex-col justify-center p-6">
           <CardTitle className="text-sm font-medium">Clientes Activos</CardTitle>
           {loading ? (
             <Skeleton className="h-7 w-1/4 mt-2" />
@@ -177,7 +178,7 @@ export default function DashboardPage() {
           )}
         </Card>
 
-        <Card className="w-[398px] h-[80px] flex flex-col justify-center p-6">
+        <Card className="h-[80px] flex flex-col justify-center p-6">
           <CardTitle className="text-sm font-medium">Saldo Pendiente (PPD)</CardTitle>
           {loading ? (
             <Skeleton className="h-7 w-3/4 mt-2" />
