@@ -1,23 +1,17 @@
 
 import {
-  DocumentRegular,
   SettingsRegular,
-  CreditCardRegular,
-  BuildingRegular,
-  DatabaseRegular,
-  QuestionCircleRegular,
-  HomeRegular,
 } from "@fluentui/react-icons";
 
 export const navigationLinks = [
   {
     title: "Inicio",
-    icon: HomeRegular,
+    icon: SettingsRegular,
     href: "/dashboard",
   },
   {
     title: "CFDI",
-    icon: DocumentRegular,
+    icon: SettingsRegular,
     sublinks: [
       { href: "/dashboard/invoices/new", label: "Crear Facturas 4.0" },
       { href: "/dashboard/invoices", label: "Listar Facturas" },
@@ -27,7 +21,7 @@ export const navigationLinks = [
   },
   {
     title: "Pagos",
-    icon: CreditCardRegular,
+    icon: SettingsRegular,
     sublinks: [
       { href: "/dashboard/payments/new", label: "Crear Pagos 4.0" },
       { href: "/dashboard/payments", label: "Listar Pagos" },
@@ -36,7 +30,7 @@ export const navigationLinks = [
   },
   {
     title: "Empresa",
-    icon: BuildingRegular,
+    icon: SettingsRegular,
     sublinks: [
       { href: "/dashboard/clients/new", label: "Crear Clientes" },
       { href: "/dashboard/clients", label: "Listar Clientes" },
@@ -58,7 +52,7 @@ export const navigationLinks = [
   },
   {
     title: "Almacenamiento",
-    icon: DatabaseRegular,
+    icon: SettingsRegular,
     sublinks: [
       { href: "/dashboard/storage/deleted-invoices", label: "Listar CFDI Eliminados" },
       { href: "/dashboard/storage/deleted-payments", label: "Listar Pagos Eliminados" },
@@ -66,7 +60,7 @@ export const navigationLinks = [
   },
   {
     title: "Ayuda",
-    icon: QuestionCircleRegular,
+    icon: SettingsRegular,
     sublinks: [
       { href: "#", label: "BD de Conocimiento" },
       { href: "#", label: "Manual del usuario" },

@@ -8,16 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { signOut as firebaseSignOut } from 'firebase/auth';
 import {
-  ChevronRightRegular,
-  SignOutRegular,
-  SearchRegular,
-  BellRegular,
-  QuestionCircleRegular,
   SettingsRegular,
-  FlashRegular,
-  CartRegular,
-  PersonRegular as UserIcon,
-  InfoRegular,
 } from '@fluentui/react-icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -104,7 +95,7 @@ export default function DashboardLayout({
           >
             {item.icon && <item.icon className="h-4 w-4" />}
             <span className="flex-1 text-left">{item.title}</span>
-            <ChevronRightRegular className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+            <SettingsRegular className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
           </Button>
         </CollapsibleTrigger>
         <CollapsibleContent>
@@ -152,7 +143,7 @@ export default function DashboardLayout({
         <div className="flex-1 max-w-xl mx-auto hidden md:block">
           <StarBorder thickness={3} borderRadius={15} color="hsl(var(--primary))">
             <div className="relative flex h-9 items-center">
-              <SearchRegular className="absolute left-3.5 h-4 w-4 text-neutral-400" />
+              <SettingsRegular className="absolute left-3.5 h-4 w-4 text-neutral-400" />
               <Input
                 className="h-full w-full border-none bg-transparent pl-10 pr-24 placeholder:text-neutral-400 focus-visible:ring-0 focus-visible:ring-offset-0"
                 placeholder="Buscar"
@@ -172,10 +163,10 @@ export default function DashboardLayout({
         {/* Right side */}
         <div className="flex items-center gap-1">
            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-neutral-800 hover:text-white -mr-1">
-            <QuestionCircleRegular className="h-5 w-5" />
+            <SettingsRegular className="h-5 w-5" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-neutral-800 hover:text-white">
-            <BellRegular className="h-5 w-5" />
+            <SettingsRegular className="h-5 w-5" />
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -207,7 +198,7 @@ export default function DashboardLayout({
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut}>
-                <SignOutRegular className="mr-2 h-4 w-4" />
+                <SettingsRegular className="mr-2 h-4 w-4" />
                 Cerrar sesión
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -261,32 +252,32 @@ export default function DashboardLayout({
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <FlashRegular className="mr-2 h-4 w-4" />
+                    <SettingsRegular className="mr-2 h-4 w-4" />
                     <span>Incrementa la vigencia</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <CartRegular className="mr-2 h-4 w-4" />
+                    <SettingsRegular className="mr-2 h-4 w-4" />
                     <span>Comprar Origon CFDI Facturación en línea</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/settings" className="cursor-pointer">
-                    <UserIcon className="mr-2 h-4 w-4" />
+                    <SettingsRegular className="mr-2 h-4 w-4" />
                     <span>Mi cuenta</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <InfoRegular className="mr-2 h-4 w-4" />
+                    <SettingsRegular className="mr-2 h-4 w-4" />
                     <span>Acerca de...</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={handleSignOut} className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
-                  <SignOutRegular className="mr-2 h-4 w-4" />
+                  <SettingsRegular className="mr-2 h-4 w-4" />
                   <span>Salir</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
