@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -11,6 +12,7 @@ import {
   ChevronDownFilled,
   GlobeSearchRegular,
   AlertRegular,
+  ShoppingBagRegular,
 } from '@fluentui/react-icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -269,7 +271,7 @@ export default function DashboardLayout({
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <SettingsRegular className="mr-2 h-4 w-4" />
+                    <ShoppingBagRegular className="mr-2 h-4 w-4" />
                     <span>Comprar Origon CFDI Facturación en línea</span>
                   </Link>
                 </DropdownMenuItem>
