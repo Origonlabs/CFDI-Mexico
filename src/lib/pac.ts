@@ -60,8 +60,12 @@ export async function stampWithFacturaLoPlus(xmlString: string): Promise<{ succe
       return { success: false, message: 'El XML timbrado no contiene el Timbre Fiscal Digital.' };
     }
 
-    const uuid = timbreNode.att('UUID');
-    const stampDate = timbreNode.att('FechaTimbrado');
+    // Usar una expresión regular para extraer los atributos del XML
+    const uuidMatch = stampedXml.match(/UUID="([^"]+)"/);
+    const stampDateMatch = stampedXml.match(/FechaTimbrado="([^"]+)"/);
+    
+    const uuid = uuidMatch ? uuidMatch[1] : '';
+    const stampDate = stampDateMatch ? stampDateMatch[1] : '';
     
     if (!uuid || !stampDate) {
         return { success: false, message: 'No se pudo extraer el UUID o la Fecha de Timbrado del XML.' };

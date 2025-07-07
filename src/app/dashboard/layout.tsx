@@ -48,7 +48,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [user] = useAuthState(auth);
+  const [user] = useAuthState(auth!);
   const router = useRouter();
   const pathname = usePathname();
   const [openCategory, setOpenCategory] = React.useState<string | undefined>();

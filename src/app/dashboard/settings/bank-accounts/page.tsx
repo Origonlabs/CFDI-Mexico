@@ -56,7 +56,11 @@ export default function BankAccountsPage() {
     ]);
 
     if (accountsResponse.success && accountsResponse.data) {
-      setAccounts(accountsResponse.data as BankAccount[]);
+      const processedAccounts = accountsResponse.data.map(account => ({
+        ...account,
+        createdAt: account.createdAt instanceof Date ? account.createdAt.toISOString() : account.createdAt
+      }));
+      setAccounts(processedAccounts as BankAccount[]);
     } else {
       toast({
         title: "Error",

@@ -97,7 +97,16 @@ export default function SettingsPage() {
       }
 
       if (certificateResponse.success && certificateResponse.data) {
-          setCertificate(certificateResponse.data as Certificate);
+          const processedCertificate = {
+            ...certificateResponse.data,
+            validFrom: certificateResponse.data.validFrom instanceof Date 
+              ? certificateResponse.data.validFrom.toISOString() 
+              : certificateResponse.data.validFrom,
+            validTo: certificateResponse.data.validTo instanceof Date 
+              ? certificateResponse.data.validTo.toISOString() 
+              : certificateResponse.data.validTo
+          };
+          setCertificate(processedCertificate as Certificate);
       }
       setLoading(false);
   }, [profileForm]);

@@ -11,7 +11,8 @@ import { create } from 'xmlbuilder2';
 import QRCode from 'qrcode';
 import { adminStorage } from "@/lib/firebase/admin";
 import { Buffer } from 'buffer';
-import { numeroALetras } from 'numero-a-letras';
+// import { numeroALetras } from 'numero-a-letras';
+const numeroALetras = require('numero-a-letras').numeroALetras;
 import { stampWithFacturaLoPlus } from "@/lib/pac";
 import { invoiceSchema, type InvoiceFormValues } from "@/lib/schemas";
 import { getRateLimiter } from "@/lib/rate-limiter";
@@ -612,7 +613,6 @@ async function _generatePdfBuffer(data: NonNullable<Awaited<ReturnType<typeof ge
         font: boldFont,
         size: 8,
         color: darkGray,
-        xAlign: 'center',
     });
 
     return await pdfDoc.save();

@@ -85,7 +85,18 @@ export default function DashboardPage() {
     ]);
 
     if (statsResponse.success && statsResponse.data) {
-      setStats(statsResponse.data);
+      const processedStats = {
+        totalFacturadoMes: typeof statsResponse.data.totalFacturadoMes === 'string' 
+          ? parseFloat(statsResponse.data.totalFacturadoMes) 
+          : statsResponse.data.totalFacturadoMes,
+        facturasTimbradasMes: statsResponse.data.facturasTimbradasMes,
+        clientesActivos: statsResponse.data.clientesActivos,
+        saldoPendiente: typeof statsResponse.data.saldoPendiente === 'string' 
+          ? parseFloat(statsResponse.data.saldoPendiente) 
+          : statsResponse.data.saldoPendiente,
+        facturacionUltimos90Dias: statsResponse.data.facturacionUltimos90Dias
+      };
+      setStats(processedStats);
     } else {
       toast({
         title: "Error",
