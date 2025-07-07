@@ -17,6 +17,7 @@ import {
   PersonRegular,
   SettingsFilled,
   ArrowExitRegular,
+  InfoRegular,
 } from '@fluentui/react-icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -292,7 +293,7 @@ export default function DashboardLayout({
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <SettingsRegular className="mr-2 h-4 w-4" />
+                    <InfoRegular className="mr-2 h-4 w-4" />
                     <span>Acerca de...</span>
                   </Link>
                 </DropdownMenuItem>
