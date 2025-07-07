@@ -22,7 +22,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     const data = payload[0];
     return (
       <div className="rounded-md bg-[#2A2A2A] p-2 text-white shadow-md">
-        <p className="mb-1 text-sm font-bold">Ventas totales</p>
+        <p className="mb-1 text-sm font-bold">Total Facturado</p>
         <div className="my-1 border-t border-white/20" />
         <div className="flex items-center justify-between text-xs">
           <span>{label}</span>
