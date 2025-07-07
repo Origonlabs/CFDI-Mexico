@@ -169,7 +169,7 @@ export default function DashboardPage() {
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="w-[398px] h-[80px]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Facturado (Mes)</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -183,7 +183,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="w-[398px] h-[80px]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Facturas Timbradas (Mes)</CardTitle>
           </CardHeader>
@@ -196,7 +196,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="w-[398px] h-[80px]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Clientes Activos</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -210,7 +210,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="w-[398px] h-[80px]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Saldo Pendiente (PPD)</CardTitle>
             <Hourglass className="h-4 w-4 text-muted-foreground" />
