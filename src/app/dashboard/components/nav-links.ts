@@ -9,7 +9,8 @@ import {
   BuildingPeopleRegular,
   DocumentSettingsFilled,
   DocumentSettingsRegular,
-  Archive24Regular,
+  DatabaseFilled,
+  DatabaseRegular,
   QuestionCircle24Regular,
   Settings24Regular,
   ChevronDownFilled
@@ -68,7 +69,8 @@ export const navigationLinks = [
   },
   {
     title: "Almacenamiento",
-    icon: Archive24Regular,
+    icon: DatabaseFilled,
+    activeIcon: DatabaseRegular,
     sublinks: [
       { href: "/dashboard/storage/deleted-invoices", label: "Listar CFDI Eliminados" },
       { href: "/dashboard/storage/deleted-payments", label: "Listar Pagos Eliminados" },
