@@ -8,8 +8,7 @@ body {
 
 @layer base {
   :root {
-    /* Original Background & Text colors */
-    --background: 0 0% 95%;
+    --background: 0 0% 94.5%; /* #F1F1F1 */
     --foreground: 214 84% 15%;
     --card: 200 100% 97%;
     --card-foreground: 214 84% 15%;
@@ -50,7 +49,7 @@ body {
     --chart-5: 202 100% 85%;
     
     /* Original Sidebar colors */
-    --sidebar-background: 200 100% 97%;
+    --sidebar-background: 0 0% 92.2%; /* #EBEBEB */
     --sidebar-foreground: 214 84% 15%;
     --sidebar-primary: 217 89% 61%;
     --sidebar-primary-foreground: 210 40% 98%;
