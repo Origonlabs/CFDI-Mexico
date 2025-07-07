@@ -214,7 +214,7 @@ export default function DashboardLayout({
       </header>
       <div className="flex flex-1 overflow-hidden">
         <aside className="hidden w-[240px] flex-col rounded-tl-[15px] bg-[#EBEBEB] text-neutral-800 md:flex">
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto p-4 sidebar-scroll">
             <nav className="grid items-start gap-1 text-sm font-medium">
               {mainLinks.map((item: any) =>
                 item.sublinks ? (
