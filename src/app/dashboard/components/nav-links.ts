@@ -81,6 +81,7 @@ export const navigationLinks = [
   {
     title: "Ayuda",
     icon: QuestionCircle24Regular,
+    activeIcon: QuestionCircle24Regular,
     sublinks: [
       { href: "#", label: "BD de Conocimiento" },
       { href: "#", label: "Manual del usuario" },
