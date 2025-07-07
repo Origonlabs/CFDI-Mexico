@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -212,8 +213,8 @@ export default function DashboardLayout({
         </div>
       </header>
       <div className="flex flex-1 overflow-hidden">
-        <aside className="hidden w-[240px] flex-col bg-[#1A1A1A] text-neutral-800 md:flex">
-          <div className="flex-1 overflow-y-auto p-4 bg-[#EBEBEB] rounded-tl-[15px]">
+        <aside className="hidden w-[240px] flex-col bg-[#EBEBEB] md:flex rounded-tl-[15px]">
+          <div className="flex-1 overflow-y-auto p-4">
             <nav className="grid items-start gap-1 text-sm font-medium">
               {mainLinks.map((item: any) =>
                 item.sublinks ? (
@@ -238,7 +239,7 @@ export default function DashboardLayout({
               )}
             </nav>
           </div>
-          <div className="shrink-0 border-t p-4 bg-[#EBEBEB]">
+          <div className="shrink-0 border-t p-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -290,7 +291,7 @@ export default function DashboardLayout({
             </DropdownMenu>
           </div>
         </aside>
-        <main className="flex-1 overflow-y-auto bg-background">
+        <main className="flex-1 overflow-y-auto bg-background rounded-tr-[15px]">
           <div className="p-4 lg:p-6">
             {children}
           </div>
