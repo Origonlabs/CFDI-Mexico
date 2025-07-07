@@ -1,4 +1,3 @@
-
 "use client"
 
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
@@ -22,12 +21,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0];
     return (
-      <div className="rounded-lg border bg-card p-3 shadow-sm">
-        <p className="text-sm font-bold mb-2 text-card-foreground">Ventas totales</p>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="h-px w-4" style={{ backgroundColor: data.stroke }} />
-          <span className="font-medium text-muted-foreground">{label}</span>
-          <span className="ml-auto font-semibold text-card-foreground">{formatCurrency(data.value)}</span>
+      <div className="rounded-md bg-[#2A2A2A] p-2 text-white shadow-md">
+        <p className="mb-1 text-sm font-bold">Ventas totales</p>
+        <div className="my-1 border-t border-white/20" />
+        <div className="flex items-center justify-between text-xs">
+          <span>{label}</span>
+          <span className="font-bold">{formatCurrency(data.value)}</span>
         </div>
       </div>
     );
