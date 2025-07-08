@@ -8,6 +8,19 @@ import { cn } from "@/lib/utils";
 
 const plans = [
   {
+    name: "Estandar",
+    price: "Gratis",
+    pricePeriod: "",
+    description: "Para empezar a facturar sin costo y conocer la plataforma.",
+    features: [
+      "Hasta 5 CFDIs al mes",
+      "Soporte comunitario",
+      "Funciones básicas de facturación",
+      "Almacenamiento por 6 meses",
+    ],
+    isPopular: false,
+  },
+  {
     name: "Básico",
     price: "$99",
     pricePeriod: "/mes",
@@ -52,7 +65,7 @@ const plans = [
 
 export default function BillingPage() {
   return (
-    <div className="flex flex-col flex-1 gap-6 max-w-5xl mx-auto py-8">
+    <div className="flex flex-col flex-1 gap-6 max-w-7xl mx-auto py-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold font-headline">Planes de Suscripción</h1>
         <p className="text-muted-foreground mt-2 max-w-xl mx-auto">
@@ -60,7 +73,7 @@ export default function BillingPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-start">
         {plans.map((plan) => (
           <Card key={plan.name} className={cn("flex flex-col h-full", plan.isPopular && "border-primary ring-2 ring-primary")}>
             {plan.isPopular && (
