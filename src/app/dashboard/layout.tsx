@@ -292,9 +292,9 @@ export default function DashboardLayout({
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="#" className="cursor-pointer">
+                  <Link href="/dashboard/billing" className="cursor-pointer">
                     <ShoppingBagRegular className="mr-2 h-4 w-4" />
-                    <span>Comprar Origon CFDI Facturación en línea</span>
+                    <span>Planes y Suscripción</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
