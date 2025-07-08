@@ -97,29 +97,31 @@ export default function SignupPage() {
           setColonias([]);
 
           try {
-              const response = await fetch(`https://api.caduceus.com.mx/cliente/api/codigos-postales?cp=${watchedZip}`);
-
+              const response = await fetch(`https://api.copomex.com/query/info_cp/${watchedZip}?token=pruebas`);
+              
               if (!response.ok) {
                   throw new Error('El servicio de códigos postales no está respondiendo.');
               }
+
               const data = await response.json();
 
               if (data.error) {
                   throw new Error(data.error_message || 'Código postal no encontrado.');
               }
               
-              if (data.estado && data.municipio && data.asentamiento) {
-                  setValue('state', data.estado, { shouldValidate: true });
-                  setValue('municipality', data.municipio, { shouldValidate: true });
+              if (Array.isArray(data) && data.length > 0) {
+                  const firstResult = data[0].response;
+                  setValue('state', firstResult.estado, { shouldValidate: true });
+                  setValue('municipality', firstResult.municipio, { shouldValidate: true });
                   
-                  const neighborhoodList = Array.isArray(data.asentamiento) ? data.asentamiento : [data.asentamiento].filter(Boolean);
+                  const neighborhoodList = data.map(item => item.response.asentamiento);
                   setColonias(neighborhoodList);
 
                   if (neighborhoodList.length === 1) {
                       setValue('neighborhood', neighborhoodList[0], { shouldValidate: true });
                   }
               } else {
-                   throw new Error('Formato de respuesta inesperado del servicio.');
+                   throw new Error('No se encontró información para el código postal ingresado.');
               }
 
           } catch (error: any) {
