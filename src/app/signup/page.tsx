@@ -84,20 +84,19 @@ export default function SignupPage() {
     }
   });
   
-  const { formState: { isSubmitting } } = form;
-
-  const watchedZip = form.watch('zip');
+  const { formState: { isSubmitting }, watch, setValue } = form;
+  const watchedZip = watch('zip');
 
   useEffect(() => {
     if (watchedZip && watchedZip.length === 5) {
         const fetchAddress = async () => {
             setAddressLoading(true);
+            setValue('state', '');
+            setValue('municipality', '');
+            setValue('neighborhood', '');
             setColonias([]);
-            form.setValue('state', '');
-            form.setValue('municipality', '');
-            form.setValue('neighborhood', '');
+
             try {
-                // Using a publicly available API for postal codes in Mexico
                 const response = await fetch(`https://api-sepomex.hckdrk.mx/query/info_cp/${watchedZip}`);
                 
                 if (!response.ok) {
@@ -109,23 +108,18 @@ export default function SignupPage() {
                     throw new Error(data.error_message || 'Código postal no encontrado.');
                 }
 
-                if (Array.isArray(data) && data.length > 0) {
+                if (Array.isArray(data) && data.length > 0 && data[0].response) {
                     const responseData = data[0].response;
                     const { estado, municipio, asentamiento } = responseData;
 
-                    form.setValue('state', estado);
-                    form.setValue('municipality', municipio);
+                    setValue('state', estado, { shouldValidate: true });
+                    setValue('municipality', municipio, { shouldValidate: true });
                     
-                    if (Array.isArray(asentamiento)) {
-                      setColonias(asentamiento);
-                      if (asentamiento.length === 1) {
-                          form.setValue('neighborhood', asentamiento[0]);
-                      }
-                    } else if (typeof asentamiento === 'string') {
-                        setColonias([asentamiento]);
-                        form.setValue('neighborhood', asentamiento);
-                    } else {
-                      setColonias([]);
+                    const neighborhoodList = Array.isArray(asentamiento) ? asentamiento : [asentamiento].filter(Boolean);
+                    setColonias(neighborhoodList);
+
+                    if (neighborhoodList.length === 1) {
+                        setValue('neighborhood', neighborhoodList[0], { shouldValidate: true });
                     }
                 } else {
                      throw new Error('Respuesta inválida de la API de códigos postales.');
@@ -138,7 +132,7 @@ export default function SignupPage() {
         };
         fetchAddress();
     }
-}, [watchedZip, form, toast]);
+  }, [watchedZip, setValue, toast]);
 
   async function onSubmit(data: SignupFormValues) {
     if (!firebaseEnabled || !auth) {
@@ -366,7 +360,7 @@ export default function SignupPage() {
                                 <FormLabel>Régimen Fiscal*</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl><SelectTrigger><SelectValue placeholder="Selecciona un régimen fiscal" /></SelectTrigger></FormControl>
-                                    <SelectContent>
+                                     <SelectContent>
                                         <SelectItem value="601">601 – General de Ley Personas Morales</SelectItem>
                                         <SelectItem value="612">612 – Personas físicas con actividades empresariales y profesionales</SelectItem>
                                         <SelectItem value="626">626 – Régimen Simplificado de Confianza (RESICO)</SelectItem>
