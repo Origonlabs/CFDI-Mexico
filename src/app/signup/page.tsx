@@ -97,7 +97,7 @@ export default function SignupPage() {
           setColonias([]);
 
           try {
-              const response = await fetch(`https://api.copomex.com/query/info_cp/${watchedZip}?type=simplified&token=pruebas`);
+              const response = await fetch(`https://api-sepomex.hckdrk.mx/query/info_cp/${watchedZip}`);
               
               if (!response.ok) {
                   throw new Error('El servicio de códigos postales no está respondiendo.');
@@ -105,8 +105,8 @@ export default function SignupPage() {
 
               const data = await response.json();
               
-              if (data.error) {
-                  throw new Error(data.error_message || 'Código postal no encontrado.');
+              if (data.error || (Array.isArray(data) && data.length === 0)) {
+                  throw new Error(data.error_message || 'No se encontró información para el código postal ingresado.');
               }
               
               if (Array.isArray(data) && data.length > 0) {
