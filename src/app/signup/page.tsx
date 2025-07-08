@@ -11,8 +11,23 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { EyeRegular, EyeOffRegular } from '@fluentui/react-icons';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { OrigonLogo } from '@/components/logo';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { saveCompanyProfile } from '@/app/actions/companies';
+import { type ProfileFormValues } from '@/lib/schemas';
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const GoogleIcon = () => (
   <svg role="img" viewBox="0 0 24 24" className="mr-2 h-4 w-4">
@@ -36,27 +51,70 @@ const GoogleIcon = () => (
   </svg>
 );
 
+const signupSchema = z.object({
+  email: z.string().email({ message: "El Correo es requerido." }),
+  password: z.string().min(1, "Contraseña es requerida."),
+  confirmPassword: z.string(),
+  
+  tipoPersona: z.string().min(1, "Tipo de Persona es requerido"),
+  companyName: z.string().min(1, "Nombre o Razón Social es requerido"),
+  rfc: z.string().min(12, "RFC inválido").max(13, "RFC inválido"),
+  taxRegime: z.string().min(1, "Régimen fiscal es requerido."),
+
+  officePhone: z.string().min(10, "El teléfono es requerido."),
+  secondaryEmail: z.string().email("Correo electrónico inválido.").optional().or(z.literal('')),
+  
+  distributorCode: z.string().min(1, "Código Distribuidor es requerido"),
+  contactName: z.string().min(1, "El nombre del contacto es requerido"),
+  contactPhone: z.string().min(1, "El Telefono del Contacto es requerido"),
+  timeZone: z.string().min(1, "La Zona Horaria es requerida."),
+  
+  zip: z.string().min(5, "Código Postal es requerido."),
+  street: z.string().optional(),
+  exteriorNumber: z.string().optional(),
+  interiorNumber: z.string().optional(),
+  neighborhood: z.string().optional(),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Por favor, verifique que las contraseñas coincidan.",
+  path: ["confirmPassword"],
+});
+
+type SignupFormValues = z.infer<typeof signupSchema>;
+
 
 export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const numericValue = e.target.value.replace(/[^0-9]/g, '');
-    setPhone(numericValue.slice(0, 10));
-  };
+  const form = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+        email: "",
+        password: "",
+        confirmPassword: "",
+        tipoPersona: "",
+        companyName: "",
+        rfc: "",
+        taxRegime: "",
+        officePhone: "",
+        secondaryEmail: "",
+        distributorCode: "Conectia",
+        contactName: "",
+        contactPhone: "",
+        timeZone: "",
+        zip: "",
+        street: "",
+        exteriorNumber: "",
+        interiorNumber: "",
+        neighborhood: "",
+    }
+  });
+  
+  const { formState: { isSubmitting } } = form;
 
-  const handleEmailSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  async function onSubmit(data: SignupFormValues) {
     if (!firebaseEnabled || !auth) {
       toast({
         title: "Error de Configuración",
@@ -65,34 +123,31 @@ export default function SignupPage() {
       });
       return;
     }
-
-    if (password !== confirmPassword) {
-      toast({
-        title: "Las contraseñas no coinciden",
-        description: "Por favor, verifica que ambas contraseñas sean iguales.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const phoneRegex = /^\d{10}$/;
-    if (!phoneRegex.test(phone)) {
-        toast({
-            title: "Número de Teléfono Inválido",
-            description: "Por favor, ingresa un número de teléfono mexicano de 10 dígitos.",
-            variant: "destructive",
-        });
-        return;
-    }
-
-    setIsSubmitting(true);
+    
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      if (auth.currentUser) {
-        await updateProfile(auth.currentUser, {
-          displayName: `${firstName} ${lastName}`.trim(),
-        });
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const user = userCredential.user;
+
+      if (user) {
+        await updateProfile(user, { displayName: data.companyName });
+        
+        const profileData: ProfileFormValues = {
+            companyName: data.companyName,
+            rfc: data.rfc,
+            taxRegime: data.taxRegime,
+            street: data.street,
+            exteriorNumber: data.exteriorNumber,
+            interiorNumber: data.interiorNumber,
+            neighborhood: data.neighborhood,
+            zip: data.zip,
+            phone: data.officePhone,
+            phone2: data.contactPhone,
+            contadorEmail: data.secondaryEmail,
+        };
+        
+        await saveCompanyProfile(profileData, user.uid);
       }
+      
       router.push('/dashboard');
     } catch (error: any) {
       console.error("Error al registrar con email y contraseña", error);
@@ -107,8 +162,6 @@ export default function SignupPage() {
         description,
         variant: "destructive",
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -121,7 +174,6 @@ export default function SignupPage() {
       });
       return;
     }
-    setIsSubmitting(true);
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
@@ -137,119 +189,142 @@ export default function SignupPage() {
           variant: "destructive",
         });
       }
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-      <div className="flex w-full max-w-sm flex-col gap-6">
-          <Link href="/" className="flex items-center gap-2 self-center font-medium">
-              <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-md p-1">
-                  <OrigonLogo />
-              </div>
-              <span className="font-headline text-lg">Origon CFDI</span>
-          </Link>
-          <Card>
-              <CardHeader className="text-center">
-                  <CardTitle className="text-xl">Crear una cuenta</CardTitle>
-                  <CardDescription>
-                      Ingresa tus datos para empezar a facturar
-                  </CardDescription>
-              </CardHeader>
-              <CardContent>
-                  <form onSubmit={handleEmailSignUp}>
-                      <div className="grid gap-4">
-                          <div className="grid grid-cols-2 gap-4">
-                          <div className="grid gap-2">
-                              <Label htmlFor="first-name">Nombre(s)</Label>
-                              <Input id="first-name" placeholder="Max" required value={firstName} onChange={(e) => setFirstName(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
-                          </div>
-                          <div className="grid gap-2">
-                              <Label htmlFor="last-name">Apellidos</Label>
-                              <Input id="last-name" placeholder="Robinson" required value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
-                          </div>
-                          </div>
-                          <div className="grid gap-2">
-                            <Label htmlFor="email">Correo electrónico</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                placeholder="GlobalID@Company.com"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                disabled={!firebaseEnabled || isSubmitting}
-                            />
-                          </div>
-                          <div className="grid gap-2">
-                            <Label htmlFor="phone">Número de teléfono</Label>
-                            <div className="relative">
-                              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <span className="text-muted-foreground sm:text-sm">+52</span>
-                              </div>
-                              <Input
-                                  id="phone"
-                                  type="tel"
-                                  placeholder="5512345678"
-                                  required
-                                  value={phone}
-                                  onChange={handlePhoneChange}
-                                  disabled={!firebaseEnabled || isSubmitting}
-                                  className="pl-12"
-                              />
-                            </div>
-                          </div>
-                          <div className="grid gap-2">
-                            <Label htmlFor="password">Contraseña</Label>
-                            <div className="relative">
-                                <Input id="password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
-                                >
-                                    {showPassword ? <EyeOffRegular className="h-4 w-4" /> : <EyeRegular className="h-4 w-4" />}
-                                </button>
-                            </div>
-                          </div>
-                          <div className="grid gap-2">
-                            <Label htmlFor="confirm-password">Confirmar Contraseña</Label>
-                            <div className="relative">
-                                <Input id="confirm-password" type={showConfirmPassword ? "text" : "password"} required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={!firebaseEnabled || isSubmitting} />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
-                                >
-                                    {showConfirmPassword ? <EyeOffRegular className="h-4 w-4" /> : <EyeRegular className="h-4 w-4" />}
-                                </button>
-                            </div>
-                          </div>
-                          <Button type="submit" className="w-full" disabled={!firebaseEnabled || isSubmitting}>
-                              {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta'}
-                          </Button>
-                          <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignUp} disabled={!firebaseEnabled || isSubmitting}>
-                              <GoogleIcon />
-                              Registrarse con Google
-                          </Button>
-                          {!firebaseEnabled && (
+    <div className="bg-muted flex min-h-svh w-full flex-col items-center justify-center gap-6 p-6 md:p-10">
+        <Link href="/" className="flex items-center gap-2 self-center font-medium">
+            <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-md p-1">
+                <OrigonLogo />
+            </div>
+            <span className="font-headline text-lg">Origon CFDI</span>
+        </Link>
+        <Card className="w-full max-w-4xl">
+            <CardHeader className="text-center">
+                <CardTitle className="text-xl">Crear una cuenta</CardTitle>
+                <CardDescription>
+                Asegúrese y rectifique que su información proporcionada sea correcta.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <FormField control={form.control} name="tipoPersona" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Tipo de Persona*</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccione"/></SelectTrigger></FormControl>
+                                        <SelectContent><SelectItem value="fisica">Persona Física</SelectItem><SelectItem value="moral">Persona Moral</SelectItem></SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            <FormField control={form.control} name="companyName" render={({ field }) => ( <FormItem><FormLabel>Nombre / Razón Social*</FormLabel><FormControl><Input placeholder="Razón Social" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="rfc" render={({ field }) => ( <FormItem><FormLabel>RFC*</FormLabel><FormControl><Input placeholder="XAXX010101000" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="officePhone" render={({ field }) => ( <FormItem><FormLabel>Teléfono de oficina*</FormLabel><FormControl><Input placeholder="Teléfono a 10 Digitos" {...field} /></FormControl><FormMessage /></FormMessage> )} />
+                            
+                            <FormField control={form.control} name="password" render={({ field }) => (
+                                <FormItem><FormLabel>Contraseña*</FormLabel>
+                                    <div className="relative"><FormControl><Input type={showPassword ? "text" : "password"} {...field} /></FormControl>
+                                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
+                                            {showPassword ? <EyeOffRegular className="h-4 w-4" /> : <EyeRegular className="h-4 w-4" />}
+                                        </button>
+                                    </div>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                             <FormField control={form.control} name="confirmPassword" render={({ field }) => (
+                                <FormItem><FormLabel>Confirmar Contraseña*</FormLabel>
+                                    <div className="relative"><FormControl><Input type={showConfirmPassword ? "text" : "password"} {...field} /></FormControl>
+                                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
+                                            {showConfirmPassword ? <EyeOffRegular className="h-4 w-4" /> : <EyeRegular className="h-4 w-4" />}
+                                        </button>
+                                    </div>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            <FormField control={form.control} name="email" render={({ field }) => ( <FormItem><FormLabel>Correo*</FormLabel><FormControl><Input type="email" placeholder="Correo Electrónico" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="secondaryEmail" render={({ field }) => ( <FormItem><FormLabel>Correo Secundario</FormLabel><FormControl><Input type="email" placeholder="Correo Electrónico Secundario" {...field} /></FormControl><FormMessage /></FormItem> )} />
+
+                            <FormField control={form.control} name="distributorCode" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Código Distribuidor*</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccione"/></SelectTrigger></FormControl>
+                                        <SelectContent><SelectItem value="Conectia">Conectia</SelectItem></SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            <FormField control={form.control} name="contactName" render={({ field }) => ( <FormItem><FormLabel>Nombre de contacto*</FormLabel><FormControl><Input placeholder="Nombre de contacto" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="contactPhone" render={({ field }) => ( <FormItem><FormLabel>Teléfono del Contacto*</FormLabel><FormControl><Input placeholder="Teléfono a contactar" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                             <FormField control={form.control} name="timeZone" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Zona Horaria*</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccione su zona horaria"/></SelectTrigger></FormControl>
+                                        <SelectContent><SelectItem value="Central">Centro</SelectItem><SelectItem value="Pacific">Pacífico</SelectItem></SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                        </div>
+                        <h3 className="font-semibold pt-4">Dirección del cliente</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                           <FormField control={form.control} name="zip" render={({ field }) => ( <FormItem><FormLabel>Código Postal*</FormLabel><FormControl><Input placeholder="66064" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                           <FormField control={form.control} name="street" render={({ field }) => ( <FormItem><FormLabel>Calle</FormLabel><FormControl><Input placeholder="Calle" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                           <FormField control={form.control} name="exteriorNumber" render={({ field }) => ( <FormItem><FormLabel>N° Exterior</FormLabel><FormControl><Input placeholder="Ej: 23" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                           <FormField control={form.control} name="interiorNumber" render={({ field }) => ( <FormItem><FormLabel>N° Interior</FormLabel><FormControl><Input placeholder="Ej: A" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                           <FormField control={form.control} name="neighborhood" render={({ field }) => ( <FormItem><FormLabel>Colonia</FormLabel><FormControl><Input placeholder="Colonia" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                        </div>
+                         <FormField control={form.control} name="taxRegime" render={({ field }) => (
+                            <FormItem className="pt-4">
+                                <FormLabel>Régimen Fiscal*</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl><SelectTrigger><SelectValue placeholder="Selecciona un régimen fiscal" /></SelectTrigger></FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="601">601 - General de Ley Personas Morales</SelectItem>
+                                        <SelectItem value="603">603 - Personas Morales con Fines no Lucrativos</SelectItem>
+                                        <SelectItem value="606">606 - Arrendamiento</SelectItem>
+                                        <SelectItem value="612">612 - Personas Físicas con Actividades Empresariales y Profesionales</SelectItem>
+                                        <SelectItem value="626">626 - Régimen Simplificado de Confianza</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+
+                        <CardFooter className="px-0 pt-6 flex-col items-center gap-4">
+                           <p className="text-xs text-muted-foreground">- Los campos marcados con un * son requeridos.</p>
+                           <div className="flex gap-4">
+                             <Button type="submit" disabled={!firebaseEnabled || isSubmitting}>
+                                {isSubmitting ? 'Registrando...' : 'Registrarme'}
+                             </Button>
+                             <Button variant="destructive" type="button" onClick={() => router.push('/')}>
+                                Cancelar
+                             </Button>
+                           </div>
+                           {!firebaseEnabled && (
                             <p className="text-center text-xs text-destructive pt-2">
-                              La configuración de Firebase está incompleta. La autenticación está deshabilitada.
+                            La configuración de Firebase está incompleta. La autenticación está deshabilitada.
                             </p>
-                          )}
-                      </div>
+                           )}
+                        </CardFooter>
                     </form>
-              </CardContent>
-          </Card>
-          <div className="mt-4 text-center text-sm">
-              ¿Ya tienes una cuenta?{' '}
-              <Link href="/" className="underline">
-              Iniciar sesión
-              </Link>
-          </div>
-      </div>
+                </Form>
+            </CardContent>
+        </Card>
+        <div className="mt-4 text-center text-sm">
+            <Button variant="outline" className="w-full max-w-sm mb-4" onClick={handleGoogleSignUp} disabled={!firebaseEnabled || isSubmitting}>
+                <GoogleIcon />
+                Registrarse con Google
+            </Button>
+            <p>
+                ¿Ya tienes una cuenta?{' '}
+                <Link href="/" className="underline">
+                Iniciar sesión
+                </Link>
+            </p>
+        </div>
     </div>
   )
 }
