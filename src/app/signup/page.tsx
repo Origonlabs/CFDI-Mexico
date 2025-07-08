@@ -98,19 +98,21 @@ export default function SignupPage() {
             form.setValue('neighborhood', '');
             try {
                 // Using a publicly available API for postal codes in Mexico
-                const response = await fetch(`https://api.copomex.com/query/info_cp/${watchedZip}?token=pruebas`);
+                const response = await fetch(`https://api-sepomex.hckdrk.mx/query/info_cp/${watchedZip}`);
                 
                 if (!response.ok) {
                     throw new Error('No se encontró información para este código postal.');
                 }
                 const data = await response.json();
                 
-                if (data.error) {
-                    throw new Error(data.error_message || 'Error al buscar código postal.');
+                if (data.error || (Array.isArray(data) && data.length === 0)) {
+                    throw new Error(data.error_message || 'Código postal no encontrado.');
                 }
 
                 if (Array.isArray(data) && data.length > 0) {
-                    const { estado, municipio, asentamiento } = data[0].response;
+                    const responseData = data[0].response;
+                    const { estado, municipio, asentamiento } = responseData;
+
                     form.setValue('state', estado);
                     form.setValue('municipality', municipio);
                     
@@ -119,6 +121,9 @@ export default function SignupPage() {
                       if (asentamiento.length === 1) {
                           form.setValue('neighborhood', asentamiento[0]);
                       }
+                    } else if (typeof asentamiento === 'string') {
+                        setColonias([asentamiento]);
+                        form.setValue('neighborhood', asentamiento);
                     } else {
                       setColonias([]);
                     }
@@ -363,10 +368,10 @@ export default function SignupPage() {
                                     <FormControl><SelectTrigger><SelectValue placeholder="Selecciona un régimen fiscal" /></SelectTrigger></FormControl>
                                     <SelectContent>
                                         <SelectItem value="601">601 – General de Ley Personas Morales</SelectItem>
-                                        <SelectItem value="603">603 – Personas Morales con Fines no Lucrativos</SelectItem>
-                                        <SelectItem value="606">606 – Arrendamiento</SelectItem>
                                         <SelectItem value="612">612 – Personas físicas con actividades empresariales y profesionales</SelectItem>
                                         <SelectItem value="626">626 – Régimen Simplificado de Confianza (RESICO)</SelectItem>
+                                        <SelectItem value="606">606 – Arrendamiento</SelectItem>
+                                        <SelectItem value="603">603 – Fines no lucrativos</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
