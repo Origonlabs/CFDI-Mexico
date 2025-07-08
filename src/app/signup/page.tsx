@@ -89,48 +89,65 @@ export default function SignupPage() {
 
   useEffect(() => {
     if (watchedZip && watchedZip.length === 5) {
-        const fetchAddress = async () => {
-            setAddressLoading(true);
-            setValue('state', '');
-            setValue('municipality', '');
-            setValue('neighborhood', '');
-            setColonias([]);
+      const fetchAddress = async () => {
+          setAddressLoading(true);
+          setValue('state', '');
+          setValue('municipality', '');
+          setValue('neighborhood', '');
+          setColonias([]);
 
-            try {
-                const response = await fetch(`https://api-sepomex.hckdrk.mx/query/info_cp/${watchedZip}`);
-                
-                if (!response.ok) {
-                    throw new Error('No se encontró información para este código postal.');
-                }
-                const data = await response.json();
-                
-                if (data.error || (Array.isArray(data) && data.length === 0)) {
-                    throw new Error(data.error_message || 'Código postal no encontrado.');
-                }
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 8000); // 8-second timeout
 
-                if (Array.isArray(data) && data.length > 0 && data[0].response) {
-                    const responseData = data[0].response;
-                    const { estado, municipio, asentamiento } = responseData;
+          try {
+              const response = await fetch(`https://api-sepomex.hckdrk.mx/query/info_cp/${watchedZip}`, {
+                  signal: controller.signal
+              });
+              clearTimeout(timeoutId);
 
-                    setValue('state', estado, { shouldValidate: true });
-                    setValue('municipality', municipio, { shouldValidate: true });
-                    
-                    const neighborhoodList = Array.isArray(asentamiento) ? asentamiento : [asentamiento].filter(Boolean);
-                    setColonias(neighborhoodList);
+              if (!response.ok) {
+                  throw new Error('El servicio de códigos postales no está respondiendo.');
+              }
+              const data = await response.json();
 
-                    if (neighborhoodList.length === 1) {
-                        setValue('neighborhood', neighborhoodList[0], { shouldValidate: true });
-                    }
-                } else {
-                     throw new Error('Respuesta inválida de la API de códigos postales.');
-                }
-            } catch (error: any) {
-                toast({ title: "Error de Código Postal", description: error.message, variant: "destructive" });
-            } finally {
-                setAddressLoading(false);
-            }
-        };
-        fetchAddress();
+              if (!Array.isArray(data) || data.length === 0) {
+                  throw new Error('Respuesta inválida del servicio de códigos postales.');
+              }
+              
+              const result = data[0];
+              if (result.error) {
+                  throw new Error(result.error_message || 'Código postal no encontrado.');
+              }
+
+              if (result.response) {
+                  const { estado, municipio, asentamiento } = result.response;
+                  setValue('state', estado || '', { shouldValidate: true });
+                  setValue('municipality', municipio || '', { shouldValidate: true });
+                  
+                  const neighborhoodList = Array.isArray(asentamiento) ? asentamiento : [asentamiento].filter(Boolean);
+                  setColonias(neighborhoodList);
+
+                  if (neighborhoodList.length === 1) {
+                      setValue('neighborhood', neighborhoodList[0], { shouldValidate: true });
+                  }
+              } else {
+                   throw new Error('Formato de respuesta inesperado del servicio.');
+              }
+
+          } catch (error: any) {
+              let errorMessage = "Ocurrió un error al consultar el código postal.";
+              if (error.name === 'AbortError') {
+                  errorMessage = "La consulta del código postal tardó demasiado. Inténtalo de nuevo.";
+              } else if (error.message) {
+                  errorMessage = error.message;
+              }
+              toast({ title: "Error de Código Postal", description: errorMessage, variant: "destructive" });
+          } finally {
+              clearTimeout(timeoutId);
+              setAddressLoading(false);
+          }
+      };
+      fetchAddress();
     }
   }, [watchedZip, setValue, toast]);
 
