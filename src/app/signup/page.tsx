@@ -64,7 +64,6 @@ const signupSchema = z.object({
   officePhone: z.string().min(10, "El teléfono es requerido."),
   secondaryEmail: z.string().email("Correo electrónico inválido.").optional().or(z.literal('')),
   
-  distributorCode: z.string().min(1, "Código Distribuidor es requerido"),
   contactName: z.string().min(1, "El nombre del contacto es requerido"),
   contactPhone: z.string().min(1, "El Telefono del Contacto es requerido"),
   timeZone: z.string().min(1, "La Zona Horaria es requerida."),
@@ -100,7 +99,6 @@ export default function SignupPage() {
         taxRegime: "",
         officePhone: "",
         secondaryEmail: "",
-        distributorCode: "Conectia",
         contactName: "",
         contactPhone: "",
         timeZone: "",
@@ -247,19 +245,10 @@ export default function SignupPage() {
                             <FormField control={form.control} name="email" render={({ field }) => ( <FormItem><FormLabel>Correo*</FormLabel><FormControl><Input type="email" placeholder="Correo Electrónico" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="secondaryEmail" render={({ field }) => ( <FormItem><FormLabel>Correo Secundario</FormLabel><FormControl><Input type="email" placeholder="Correo Electrónico Secundario" {...field} /></FormControl><FormMessage /></FormItem> )} />
 
-                            <FormField control={form.control} name="distributorCode" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Código Distribuidor*</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccione"/></SelectTrigger></FormControl>
-                                        <SelectContent><SelectItem value="Conectia">Conectia</SelectItem></SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
                             <FormField control={form.control} name="contactName" render={({ field }) => ( <FormItem><FormLabel>Nombre de contacto*</FormLabel><FormControl><Input placeholder="Nombre de contacto" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="contactPhone" render={({ field }) => ( <FormItem><FormLabel>Teléfono del Contacto*</FormLabel><FormControl><Input placeholder="Teléfono a contactar" {...field} /></FormControl><FormMessage /></FormItem> )} />
                              <FormField control={form.control} name="timeZone" render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="lg:col-span-2">
                                     <FormLabel>Zona Horaria*</FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccione su zona horaria"/></SelectTrigger></FormControl>
                                         <SelectContent><SelectItem value="Central">Centro</SelectItem><SelectItem value="Pacific">Pacífico</SelectItem></SelectContent>
@@ -327,3 +316,4 @@ export default function SignupPage() {
         </div>
     </div>
   )
+}
