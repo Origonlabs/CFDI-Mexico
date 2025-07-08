@@ -249,11 +249,9 @@ export default function SettingsPage() {
                                         <SelectContent>
                                             <SelectItem value="601">601 - General de Ley Personas Morales</SelectItem>
                                             <SelectItem value="603">603 - Personas Morales con Fines no Lucrativos</SelectItem>
-                                            <SelectItem value="605">605 - Sueldos y Salarios e Ingresos Asimilados a Salarios</SelectItem>
                                             <SelectItem value="606">606 - Arrendamiento</SelectItem>
+                                            <SelectItem value="610">610 - Residentes en el Extranjero sin Establecimiento Permanente en México</SelectItem>
                                             <SelectItem value="612">612 - Personas Físicas con Actividades Empresariales y Profesionales</SelectItem>
-                                            <SelectItem value="616">616 - Sin obligaciones fiscales</SelectItem>
-                                            <SelectItem value="621">621 - Incorporación Fiscal</SelectItem>
                                             <SelectItem value="626">626 - Régimen Simplificado de Confianza</SelectItem>
                                         </SelectContent>
                                     </Select>

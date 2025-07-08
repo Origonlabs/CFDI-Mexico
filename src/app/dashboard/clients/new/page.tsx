@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -21,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Skeleton } from "@/components/ui/skeleton";
+import { AppleLoader } from "@/components/ui/apple-loader";
 
 export default function NewClientPage() {
     const { toast } = useToast();
@@ -39,7 +40,7 @@ export default function NewClientPage() {
             street: "",
             city: "",
             state: "",
-            zipCode: "",
+            zip: "",
             country: "México",
             taxRegime: "601",
         },
@@ -59,22 +60,8 @@ export default function NewClientPage() {
 
     if (loading) {
         return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="mb-8 space-y-4">
-                    <Skeleton className="h-10 w-48" />
-                    <Skeleton className="h-4 w-96" />
-                </div>
-                <Card>
-                    <CardHeader>
-                        <Skeleton className="h-6 w-48" />
-                        <Skeleton className="h-4 w-72" />
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <Skeleton className="h-10 w-full" />
-                        <Skeleton className="h-10 w-full" />
-                        <Skeleton className="h-10 w-full" />
-                    </CardContent>
-                </Card>
+            <div className="flex items-center justify-center min-h-[calc(100vh-10rem)]">
+                <AppleLoader />
             </div>
         );
     }
@@ -253,25 +240,12 @@ export default function NewClientPage() {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    <SelectItem value="601">General de Ley Personas Morales</SelectItem>
-                                                    <SelectItem value="603">Personas Morales con Fines no Lucrativos</SelectItem>
-                                                    <SelectItem value="605">Sueldos y Salarios e Ingresos Asimilados a Salarios</SelectItem>
-                                                    <SelectItem value="606">Arrendamiento</SelectItem>
-                                                    <SelectItem value="607">Régimen de Enajenación o Adquisición de Bienes</SelectItem>
-                                                    <SelectItem value="608">Demás ingresos</SelectItem>
-                                                    <SelectItem value="610">Residentes en el Extranjero sin Establecimiento Permanente en México</SelectItem>
-                                                    <SelectItem value="611">Ingresos por Dividendos (socios y accionistas)</SelectItem>
-                                                    <SelectItem value="612">Personas Físicas con Actividades Empresariales y Profesionales</SelectItem>
-                                                    <SelectItem value="614">Ingresos por intereses</SelectItem>
-                                                    <SelectItem value="615">Régimen de los ingresos por obtención de premios</SelectItem>
-                                                    <SelectItem value="616">Sin obligaciones fiscales</SelectItem>
-                                                    <SelectItem value="620">Sociedades Cooperativas de Producción que optan por diferir sus ingresos</SelectItem>
-                                                    <SelectItem value="621">Incorporación Fiscal</SelectItem>
-                                                    <SelectItem value="622">Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras</SelectItem>
-                                                    <SelectItem value="623">Opcional para Grupos de Sociedades</SelectItem>
-                                                    <SelectItem value="624">Coordinados</SelectItem>
-                                                    <SelectItem value="625">Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas</SelectItem>
-                                                    <SelectItem value="626">Régimen Simplificado de Confianza</SelectItem>
+                                                    <SelectItem value="601">601 - General de Ley Personas Morales</SelectItem>
+                                                    <SelectItem value="603">603 - Personas Morales con Fines no Lucrativos</SelectItem>
+                                                    <SelectItem value="606">606 - Arrendamiento</SelectItem>
+                                                    <SelectItem value="610">610 - Residentes en el Extranjero sin Establecimiento Permanente en México</SelectItem>
+                                                    <SelectItem value="612">612 - Personas Físicas con Actividades Empresariales y Profesionales</SelectItem>
+                                                    <SelectItem value="626">626 - Régimen Simplificado de Confianza</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
