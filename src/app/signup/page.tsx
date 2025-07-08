@@ -91,32 +91,32 @@ export default function SignupPage() {
     if (watchedZip && watchedZip.length === 5) {
       const fetchAddress = async () => {
           setAddressLoading(true);
+          // Clear previous values
           setValue('state', '');
           setValue('municipality', '');
           setValue('neighborhood', '');
           setColonias([]);
 
           try {
-              // Using a new, more reliable API from a public Google Sheet
-              const response = await fetch(`https://v2.api.sheety.co/b30c1496-8502-4a17-a53b-813d33958955/sepomex/search?d_codigo=${watchedZip}`);
+              // Using a new, more reliable API from Copomex
+              const response = await fetch(`https://api.copomex.com/query/info_cp/${watchedZip}?type=simplified&token=pruebas`);
               
               if (!response.ok) {
-                  throw new Error('El servicio de códigos postales no está disponible en este momento.');
+                   throw new Error('El servicio de códigos postales no está disponible. Intenta de nuevo más tarde.');
               }
 
-              const data = await response.json();
-              const results = data.sepomex; // The results are nested under a key with the sheet's name
+              const results = await response.json();
               
-              if (!results || !Array.isArray(results) || results.length === 0) {
-                  throw new Error('No se encontró información para el código postal ingresado.');
+              if (!Array.isArray(results) || results.length === 0 || results[0].error) {
+                  throw new Error(results[0]?.error_message || 'No se encontró información para el código postal ingresado.');
               }
               
-              const firstResult = results[0];
+              const firstResult = results[0].response;
               
-              setValue('state', firstResult.d_estado, { shouldValidate: true });
-              setValue('municipality', firstResult.d_mnpio, { shouldValidate: true });
+              setValue('state', firstResult.estado, { shouldValidate: true });
+              setValue('municipality', firstResult.municipio, { shouldValidate: true });
               
-              const neighborhoodList = [...new Set(results.map(item => item.d_asenta).filter(Boolean) as string[])];
+              const neighborhoodList = [...new Set(results.map(item => item.response.asentamiento).filter(Boolean) as string[])];
               setColonias(neighborhoodList);
 
               if (neighborhoodList.length === 1) {
@@ -404,3 +404,5 @@ export default function SignupPage() {
     </div>
   );
 }
+
+    
