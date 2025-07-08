@@ -96,35 +96,23 @@ export default function SignupPage() {
           setValue('neighborhood', '');
           setColonias([]);
 
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 8000); // 8-second timeout
-
           try {
-              const response = await fetch(`https://api-sepomex.hckdrk.mx/query/info_cp/${watchedZip}`, {
-                  signal: controller.signal
-              });
-              clearTimeout(timeoutId);
+              const response = await fetch(`https://api.caduceus.com.mx/cliente/api/codigos-postales?cp=${watchedZip}`);
 
               if (!response.ok) {
                   throw new Error('El servicio de códigos postales no está respondiendo.');
               }
               const data = await response.json();
 
-              if (!Array.isArray(data) || data.length === 0) {
-                  throw new Error('Respuesta inválida del servicio de códigos postales.');
+              if (data.error) {
+                  throw new Error(data.error_message || 'Código postal no encontrado.');
               }
               
-              const result = data[0];
-              if (result.error) {
-                  throw new Error(result.error_message || 'Código postal no encontrado.');
-              }
-
-              if (result.response) {
-                  const { estado, municipio, asentamiento } = result.response;
-                  setValue('state', estado || '', { shouldValidate: true });
-                  setValue('municipality', municipio || '', { shouldValidate: true });
+              if (data.estado && data.municipio && data.asentamiento) {
+                  setValue('state', data.estado, { shouldValidate: true });
+                  setValue('municipality', data.municipio, { shouldValidate: true });
                   
-                  const neighborhoodList = Array.isArray(asentamiento) ? asentamiento : [asentamiento].filter(Boolean);
+                  const neighborhoodList = Array.isArray(data.asentamiento) ? data.asentamiento : [data.asentamiento].filter(Boolean);
                   setColonias(neighborhoodList);
 
                   if (neighborhoodList.length === 1) {
@@ -135,15 +123,9 @@ export default function SignupPage() {
               }
 
           } catch (error: any) {
-              let errorMessage = "Ocurrió un error al consultar el código postal.";
-              if (error.name === 'AbortError') {
-                  errorMessage = "La consulta del código postal tardó demasiado. Inténtalo de nuevo.";
-              } else if (error.message) {
-                  errorMessage = error.message;
-              }
+              const errorMessage = error.message || "Ocurrió un error al consultar el código postal.";
               toast({ title: "Error de Código Postal", description: errorMessage, variant: "destructive" });
           } finally {
-              clearTimeout(timeoutId);
               setAddressLoading(false);
           }
       };
@@ -305,7 +287,7 @@ export default function SignupPage() {
                                     <FormLabel>Código Postal*</FormLabel>
                                     <FormControl>
                                         <div className="relative">
-                                            <Input placeholder="66064" {...field} />
+                                            <Input placeholder="Escribe tu CP" {...field} />
                                             {addressLoading && <div className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent" />}
                                         </div>
                                     </FormControl>
