@@ -113,9 +113,14 @@ export default function SignupPage() {
                     const { estado, municipio, asentamiento } = data[0].response;
                     form.setValue('state', estado);
                     form.setValue('municipality', municipio);
-                    setColonias(asentamiento);
-                    if (asentamiento.length === 1) {
-                        form.setValue('neighborhood', asentamiento[0]);
+                    
+                    if (Array.isArray(asentamiento)) {
+                      setColonias(asentamiento);
+                      if (asentamiento.length === 1) {
+                          form.setValue('neighborhood', asentamiento[0]);
+                      }
+                    } else {
+                      setColonias([]);
                     }
                 } else {
                      throw new Error('Respuesta inválida de la API de códigos postales.');
@@ -356,12 +361,12 @@ export default function SignupPage() {
                                 <FormLabel>Régimen Fiscal*</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl><SelectTrigger><SelectValue placeholder="Selecciona un régimen fiscal" /></SelectTrigger></FormControl>
-                                     <SelectContent>
+                                    <SelectContent>
                                         <SelectItem value="601">601 – General de Ley Personas Morales</SelectItem>
+                                        <SelectItem value="603">603 – Personas Morales con Fines no Lucrativos</SelectItem>
+                                        <SelectItem value="606">606 – Arrendamiento</SelectItem>
                                         <SelectItem value="612">612 – Personas físicas con actividades empresariales y profesionales</SelectItem>
                                         <SelectItem value="626">626 – Régimen Simplificado de Confianza (RESICO)</SelectItem>
-                                        <SelectItem value="606">606 – Arrendamiento</SelectItem>
-                                        <SelectItem value="603">603 – Fines no lucrativos</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -397,5 +402,5 @@ export default function SignupPage() {
             </p>
         </div>
     </div>
-  )
+  );
 }
