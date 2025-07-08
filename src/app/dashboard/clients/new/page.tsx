@@ -4,7 +4,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { User } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -45,6 +45,27 @@ export default function NewClientPage() {
             taxRegime: "601",
         },
     });
+
+    const watch = form.watch;
+    const [progress, setProgress] = useState(0);
+
+    useEffect(() => {
+        const subscription = watch((value, { name, type }) => {
+            const { name: clientName, rfc, zip, usoCfdi, taxRegime } = value;
+            let completedSteps = 0;
+            const totalSteps = 5;
+
+            if (clientName) completedSteps++;
+            if (rfc && rfc.length >= 12) completedSteps++;
+            if (zip && zip.length === 5) completedSteps++;
+            if (usoCfdi) completedSteps++;
+            if (taxRegime) completedSteps++;
+            
+            const newProgress = Math.round((completedSteps / totalSteps) * 100);
+            setProgress(newProgress);
+        });
+        return () => subscription.unsubscribe();
+    }, [watch]);
 
     useEffect(() => {
         if (!firebaseEnabled || !auth) {
@@ -243,7 +264,6 @@ export default function NewClientPage() {
                                                     <SelectItem value="601">601 - General de Ley Personas Morales</SelectItem>
                                                     <SelectItem value="603">603 - Personas Morales con Fines no Lucrativos</SelectItem>
                                                     <SelectItem value="606">606 - Arrendamiento</SelectItem>
-                                                    <SelectItem value="610">610 - Residentes en el Extranjero sin Establecimiento Permanente en México</SelectItem>
                                                     <SelectItem value="612">612 - Personas Físicas con Actividades Empresariales y Profesionales</SelectItem>
                                                     <SelectItem value="626">626 - Régimen Simplificado de Confianza</SelectItem>
                                                 </SelectContent>
