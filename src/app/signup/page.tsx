@@ -97,35 +97,30 @@ export default function SignupPage() {
           setColonias([]);
 
           try {
-              const response = await fetch(`https://api-sepomex.hckdrk.mx/query/info_cp/${watchedZip}`);
+              // Using a new, more reliable API from a public Google Sheet
+              const response = await fetch(`https://v2.api.sheety.co/b30c1496-8502-4a17-a53b-813d33958955/sepomex/search?d_codigo=${watchedZip}`);
               
               if (!response.ok) {
-                  throw new Error('El servicio de códigos postales no está respondiendo.');
+                  throw new Error('El servicio de códigos postales no está disponible en este momento.');
               }
 
               const data = await response.json();
+              const results = data.sepomex; // The results are nested under a key with the sheet's name
               
-              if (data.error || (Array.isArray(data) && data.length === 0)) {
-                  throw new Error(data.error_message || 'No se encontró información para el código postal ingresado.');
+              if (!results || !Array.isArray(results) || results.length === 0) {
+                  throw new Error('No se encontró información para el código postal ingresado.');
               }
               
-              if (Array.isArray(data) && data.length > 0) {
-                  const firstResult = data[0]?.response;
-                  if (!firstResult) {
-                    throw new Error('La respuesta de la API no tiene el formato esperado.');
-                  }
-                  
-                  setValue('state', firstResult.estado, { shouldValidate: true });
-                  setValue('municipality', firstResult.municipio, { shouldValidate: true });
-                  
-                  const neighborhoodList = [...new Set(data.map(item => item.response?.asentamiento).filter(Boolean) as string[])];
-                  setColonias(neighborhoodList);
+              const firstResult = results[0];
+              
+              setValue('state', firstResult.d_estado, { shouldValidate: true });
+              setValue('municipality', firstResult.d_mnpio, { shouldValidate: true });
+              
+              const neighborhoodList = [...new Set(results.map(item => item.d_asenta).filter(Boolean) as string[])];
+              setColonias(neighborhoodList);
 
-                  if (neighborhoodList.length === 1) {
-                      setValue('neighborhood', neighborhoodList[0], { shouldValidate: true });
-                  }
-              } else {
-                   throw new Error('No se encontró información para el código postal ingresado.');
+              if (neighborhoodList.length === 1) {
+                  setValue('neighborhood', neighborhoodList[0], { shouldValidate: true });
               }
 
           } catch (error: any) {
@@ -138,6 +133,7 @@ export default function SignupPage() {
       fetchAddress();
     }
   }, [watchedZip, setValue, toast]);
+
 
   async function onSubmit(data: SignupFormValues) {
     if (!firebaseEnabled || !auth) {
