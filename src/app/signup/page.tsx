@@ -222,7 +222,7 @@ export default function SignupPage() {
                             )} />
                             <FormField control={form.control} name="companyName" render={({ field }) => ( <FormItem><FormLabel>Nombre / Razón Social*</FormLabel><FormControl><Input placeholder="Razón Social" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="rfc" render={({ field }) => ( <FormItem><FormLabel>RFC*</FormLabel><FormControl><Input placeholder="XAXX010101000" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="officePhone" render={({ field }) => ( <FormItem><FormLabel>Teléfono de oficina*</FormLabel><FormControl><Input placeholder="Teléfono a 10 Digitos" {...field} /></FormControl><FormMessage /></FormMessage> )} />
+                            <FormField control={form.control} name="officePhone" render={({ field }) => ( <FormItem><FormLabel>Teléfono de oficina*</FormLabel><FormControl><Input placeholder="Teléfono a 10 Digitos" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             
                             <FormField control={form.control} name="password" render={({ field }) => (
                                 <FormItem><FormLabel>Contraseña*</FormLabel>
@@ -327,4 +327,3 @@ export default function SignupPage() {
         </div>
     </div>
   )
-}
