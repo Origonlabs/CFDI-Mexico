@@ -187,3 +187,36 @@ export const passwordChangeSchema = z.object({
   path: ["confirmPassword"],
 });
 export type PasswordChangeValues = z.infer<typeof passwordChangeSchema>;
+
+
+// --- Signup ---
+export const signupSchema = z.object({
+  email: z.string().email({ message: "El Correo es requerido." }),
+  password: z.string().min(1, "Contraseña es requerida."),
+  confirmPassword: z.string(),
+  
+  tipoPersona: z.string().min(1, "Tipo de Persona es requerido"),
+  companyName: z.string().min(1, "Nombre o Razón Social es requerido"),
+  rfc: z.string().min(12, "RFC inválido").max(13, "RFC inválido"),
+  
+  officePhone: z.string().min(10, "El teléfono es requerido."),
+  secondaryEmail: z.string().email("Correo electrónico inválido.").optional().or(z.literal('')),
+  
+  contactName: z.string().min(1, "El nombre del contacto es requerido"),
+  contactPhone: z.string().min(1, "El Telefono del Contacto es requerido"),
+  timeZone: z.string().min(1, "La Zona Horaria es requerida."),
+  
+  zip: z.string().length(5, "El Código Postal debe tener 5 dígitos."),
+  state: z.string().min(1, "El estado es requerido (se autocompleta con el CP)."),
+  municipality: z.string().min(1, "El municipio es requerido (se autocompleta con el CP)."),
+  neighborhood: z.string().min(1, "La colonia es requerida."),
+  street: z.string().optional(),
+  exteriorNumber: z.string().optional(),
+  interiorNumber: z.string().optional(),
+
+  taxRegime: z.string().min(1, "Régimen fiscal es requerido."),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Por favor, verifique que las contraseñas coincidan.",
+  path: ["confirmPassword"],
+});
+export type SignupFormValues = z.infer<typeof signupSchema>;

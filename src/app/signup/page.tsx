@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { auth, firebaseEnabled } from '@/lib/firebase/client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { EyeRegular, EyeOffRegular } from '@fluentui/react-icons';
@@ -17,7 +17,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { saveCompanyProfile } from '@/app/actions/companies';
-import { type ProfileFormValues } from '@/lib/schemas';
+import { type ProfileFormValues, signupSchema, type SignupFormValues } from '@/lib/schemas';
 
 import {
   Form,
@@ -51,41 +51,13 @@ const GoogleIcon = () => (
   </svg>
 );
 
-const signupSchema = z.object({
-  email: z.string().email({ message: "El Correo es requerido." }),
-  password: z.string().min(1, "Contraseña es requerida."),
-  confirmPassword: z.string(),
-  
-  tipoPersona: z.string().min(1, "Tipo de Persona es requerido"),
-  companyName: z.string().min(1, "Nombre o Razón Social es requerido"),
-  rfc: z.string().min(12, "RFC inválido").max(13, "RFC inválido"),
-  taxRegime: z.string().min(1, "Régimen fiscal es requerido."),
-
-  officePhone: z.string().min(10, "El teléfono es requerido."),
-  secondaryEmail: z.string().email("Correo electrónico inválido.").optional().or(z.literal('')),
-  
-  contactName: z.string().min(1, "El nombre del contacto es requerido"),
-  contactPhone: z.string().min(1, "El Telefono del Contacto es requerido"),
-  timeZone: z.string().min(1, "La Zona Horaria es requerida."),
-  
-  zip: z.string().min(5, "Código Postal es requerido."),
-  street: z.string().optional(),
-  exteriorNumber: z.string().optional(),
-  interiorNumber: z.string().optional(),
-  neighborhood: z.string().optional(),
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Por favor, verifique que las contraseñas coincidan.",
-  path: ["confirmPassword"],
-});
-
-type SignupFormValues = z.infer<typeof signupSchema>;
-
-
 export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [colonias, setColonias] = useState<string[]>([]);
+  const [addressLoading, setAddressLoading] = useState(false);
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -103,14 +75,60 @@ export default function SignupPage() {
         contactPhone: "",
         timeZone: "",
         zip: "",
+        state: "",
+        municipality: "",
+        neighborhood: "",
         street: "",
         exteriorNumber: "",
         interiorNumber: "",
-        neighborhood: "",
     }
   });
   
   const { formState: { isSubmitting } } = form;
+
+  const watchedZip = form.watch('zip');
+
+  useEffect(() => {
+    if (watchedZip && watchedZip.length === 5) {
+        const fetchAddress = async () => {
+            setAddressLoading(true);
+            setColonias([]);
+            form.setValue('state', '');
+            form.setValue('municipality', '');
+            form.setValue('neighborhood', '');
+            try {
+                // Using a publicly available API for postal codes in Mexico
+                const response = await fetch(`https://api.copomex.com/query/info_cp/${watchedZip}?token=pruebas`);
+                
+                if (!response.ok) {
+                    throw new Error('No se encontró información para este código postal.');
+                }
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error_message || 'Error al buscar código postal.');
+                }
+
+                if (Array.isArray(data) && data.length > 0) {
+                    const { estado, municipio, asentamiento } = data[0].response;
+                    form.setValue('state', estado);
+                    form.setValue('municipality', municipio);
+                    setColonias(asentamiento);
+                    if (asentamiento.length === 1) {
+                        form.setValue('neighborhood', asentamiento[0]);
+                    }
+                } else {
+                     throw new Error('Respuesta inválida de la API de códigos postales.');
+                }
+            } catch (error: any) {
+                toast({ title: "Error de Código Postal", description: error.message, variant: "destructive" });
+            } finally {
+                setAddressLoading(false);
+            }
+        };
+        fetchAddress();
+    }
+}, [watchedZip, form, toast]);
 
   async function onSubmit(data: SignupFormValues) {
     if (!firebaseEnabled || !auth) {
@@ -129,7 +147,7 @@ export default function SignupPage() {
       if (user) {
         await updateProfile(user, { displayName: data.companyName });
         
-        const profileData: ProfileFormValues = {
+        const profileData: Partial<ProfileFormValues> = {
             companyName: data.companyName,
             rfc: data.rfc,
             taxRegime: data.taxRegime,
@@ -137,13 +155,15 @@ export default function SignupPage() {
             exteriorNumber: data.exteriorNumber,
             interiorNumber: data.interiorNumber,
             neighborhood: data.neighborhood,
+            municipality: data.municipality,
+            state: data.state,
             zip: data.zip,
             phone: data.officePhone,
             phone2: data.contactPhone,
             contadorEmail: data.secondaryEmail,
         };
         
-        await saveCompanyProfile(profileData, user.uid);
+        await saveCompanyProfile(profileData as ProfileFormValues, user.uid);
       }
       
       router.push('/dashboard');
@@ -257,25 +277,91 @@ export default function SignupPage() {
                                 </FormItem>
                             )} />
                         </div>
-                        <h3 className="font-semibold pt-4">Dirección del cliente</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                           <FormField control={form.control} name="zip" render={({ field }) => ( <FormItem><FormLabel>Código Postal*</FormLabel><FormControl><Input placeholder="66064" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                           <FormField control={form.control} name="street" render={({ field }) => ( <FormItem><FormLabel>Calle</FormLabel><FormControl><Input placeholder="Calle" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                           <FormField control={form.control} name="exteriorNumber" render={({ field }) => ( <FormItem><FormLabel>N° Exterior</FormLabel><FormControl><Input placeholder="Ej: 23" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                           <FormField control={form.control} name="interiorNumber" render={({ field }) => ( <FormItem><FormLabel>N° Interior</FormLabel><FormControl><Input placeholder="Ej: A" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                           <FormField control={form.control} name="neighborhood" render={({ field }) => ( <FormItem><FormLabel>Colonia</FormLabel><FormControl><Input placeholder="Colonia" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                        <h3 className="font-semibold pt-4 md:col-span-2 lg:col-span-4">Dirección del cliente</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <FormField control={form.control} name="zip" render={({ field }) => ( 
+                                <FormItem>
+                                    <FormLabel>Código Postal*</FormLabel>
+                                    <FormControl>
+                                        <div className="relative">
+                                            <Input placeholder="66064" {...field} />
+                                            {addressLoading && <div className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent" />}
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem> 
+                            )} />
+
+                            <FormField control={form.control} name="state" render={({ field }) => ( 
+                                <FormItem>
+                                    <FormLabel>Estado*</FormLabel>
+                                    <FormControl><Input placeholder="Se llena automáticamente" {...field} disabled /></FormControl>
+                                    <FormMessage />
+                                </FormItem> 
+                            )} />
+
+                            <FormField control={form.control} name="municipality" render={({ field }) => ( 
+                                <FormItem className="md:col-span-2">
+                                    <FormLabel>Municipio*</FormLabel>
+                                    <FormControl><Input placeholder="Se llena automáticamente" {...field} disabled /></FormControl>
+                                    <FormMessage />
+                                </FormItem> 
+                            )} />
+
+                            <FormField control={form.control} name="neighborhood" render={({ field }) => ( 
+                                <FormItem className="lg:col-span-2">
+                                    <FormLabel>Colonia*</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value} disabled={colonias.length === 0 || addressLoading}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder={addressLoading ? "Cargando..." : "Selecciona una colonia"}/>
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {colonias.map(colonia => (
+                                                <SelectItem key={colonia} value={colonia}>{colonia}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem> 
+                            )} />
+
+                            <FormField control={form.control} name="street" render={({ field }) => ( 
+                                <FormItem className="lg:col-span-2">
+                                    <FormLabel>Calle</FormLabel>
+                                    <FormControl><Input placeholder="Calle" {...field} /></FormControl>
+                                    <FormMessage />
+                                </FormItem> 
+                            )} />
+
+                            <FormField control={form.control} name="exteriorNumber" render={({ field }) => ( 
+                                <FormItem>
+                                    <FormLabel>N° Exterior</FormLabel>
+                                    <FormControl><Input placeholder="Ej: 23" {...field} /></FormControl>
+                                    <FormMessage />
+                                </FormItem> 
+                            )} />
+
+                            <FormField control={form.control} name="interiorNumber" render={({ field }) => ( 
+                                <FormItem>
+                                    <FormLabel>N° Interior</FormLabel>
+                                    <FormControl><Input placeholder="Ej: A" {...field} /></FormControl>
+                                    <FormMessage />
+                                </FormItem> 
+                            )} />
                         </div>
                          <FormField control={form.control} name="taxRegime" render={({ field }) => (
                             <FormItem className="pt-4">
                                 <FormLabel>Régimen Fiscal*</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl><SelectTrigger><SelectValue placeholder="Selecciona un régimen fiscal" /></SelectTrigger></FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="601">601 - General de Ley Personas Morales</SelectItem>
-                                        <SelectItem value="603">603 - Personas Morales con Fines no Lucrativos</SelectItem>
-                                        <SelectItem value="606">606 - Arrendamiento</SelectItem>
-                                        <SelectItem value="612">612 - Personas Físicas con Actividades Empresariales y Profesionales</SelectItem>
-                                        <SelectItem value="626">626 - Régimen Simplificado de Confianza</SelectItem>
+                                     <SelectContent>
+                                        <SelectItem value="601">601 – General de Ley Personas Morales</SelectItem>
+                                        <SelectItem value="612">612 – Personas físicas con actividades empresariales y profesionales</SelectItem>
+                                        <SelectItem value="626">626 – Régimen Simplificado de Confianza (RESICO)</SelectItem>
+                                        <SelectItem value="606">606 – Arrendamiento</SelectItem>
+                                        <SelectItem value="603">603 – Fines no lucrativos</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -303,10 +389,6 @@ export default function SignupPage() {
             </CardContent>
         </Card>
         <div className="mt-4 text-center text-sm">
-            <Button variant="outline" className="w-full max-w-sm mb-4" onClick={handleGoogleSignUp} disabled={!firebaseEnabled || isSubmitting}>
-                <GoogleIcon />
-                Registrarse con Google
-            </Button>
             <p>
                 ¿Ya tienes una cuenta?{' '}
                 <Link href="/" className="underline">
