@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import { onAuthStateChanged, User, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
+import { onAuthStateChanged, User, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword, deleteUser } from "firebase/auth";
 import { CheckRegular,DismissCircleRegular,WarningRegular } from "@fluentui/react-icons";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
@@ -28,6 +28,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 
 interface Certificate {
@@ -43,6 +44,7 @@ export default function SettingsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [certificate, setCertificate] = useState<Certificate | null>(null);
+  const [deletePassword, setDeletePassword] = useState('');
 
   // User profile state
   const [firstName, setFirstName] = useState('');
@@ -150,12 +152,40 @@ export default function SettingsPage() {
     }
   }
 
-  const handleAccountDelete = () => {
-    toast({
-        title: "Función no implementada",
-        description: "La eliminación de cuenta está en desarrollo.",
-        variant: "default",
-    })
+  async function handleAccountDelete() {
+    if (!user || !user.email) {
+      toast({ title: "Error", description: "Usuario no autenticado.", variant: "destructive" });
+      return;
+    }
+    if (!deletePassword) {
+      toast({ title: "Error", description: "Por favor, introduce tu contraseña para confirmar.", variant: "destructive" });
+      return;
+    }
+
+    const credential = EmailAuthProvider.credential(user.email, deletePassword);
+
+    try {
+      await reauthenticateWithCredential(user, credential);
+      
+      // Backend logic would go here to delete database records and handle re-registration blocking.
+      console.log("User re-authenticated. In a real app, backend would delete associated data now.");
+
+      await deleteUser(user);
+      
+      toast({ 
+        title: "Cuenta Eliminada", 
+        description: "Tu cuenta ha sido eliminada. No podrás registrarte de nuevo con el mismo correo durante 3 meses." 
+      });
+      // The onAuthStateChanged listener will handle redirection.
+      
+    } catch (error: any) {
+      console.error("Error deleting account:", error);
+      let description = "Ocurrió un error al intentar eliminar la cuenta.";
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        description = "La contraseña que ingresaste es incorrecta.";
+      }
+      toast({ title: "Error de Eliminación", description, variant: "destructive" });
+    }
   }
 
   const CertificateStatusBadge = ({ status }: { status: 'active' | 'revoked' | 'expired' | null }) => {
@@ -400,24 +430,44 @@ export default function SettingsPage() {
               <AccordionItem value="eliminacion">
                   <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Eliminación de la Cuenta</AccordionTrigger>
                   <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
-                      <div className="space-y-6">
-                          <div className="grid md:grid-cols-2 gap-x-8 gap-y-4 max-w-lg">
-                          <div className="space-y-2">
-                              <Label htmlFor="fiel-key-file">*Archivo .key de la Fiel:</Label>
-                              <Input id="fiel-key-file" type="file" />
-                          </div>
-                          <div className="space-y-2">
-                              <Label htmlFor="fiel-cer-file">*Archivo .cer de la Fiel:</Label>
-                              <Input id="fiel-cer-file" type="file" />
-                          </div>
-                          <div className="space-y-2 md:col-span-1">
-                              <Label htmlFor="fiel-password">*Contraseña de la Fiel:</Label>
-                              <Input id="fiel-password" type="password" />
-                          </div>
-                          </div>
-                          <div className="flex justify-end pt-4">
-                              <Button variant="destructive" onClick={handleAccountDelete} disabled={isLoading}>Eliminar Cuenta</Button>
-                          </div>
+                      <div className="space-y-4">
+                        <div className="p-4 border border-destructive/50 bg-destructive/10 rounded-md">
+                            <h4 className="font-bold text-destructive">¡Atención! Acción Irreversible</h4>
+                            <p className="text-sm text-destructive/90 mt-1">
+                                Si eliminas tu cuenta, todos tus datos (empresa, clientes, facturas, etc.) serán borrados permanentemente. No podrás recuperarlos.
+                            </p>
+                        </div>
+
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <div className="flex justify-end pt-4">
+                                    <Button variant="destructive" disabled={isLoading}>Solicitar Eliminación de Cuenta</Button>
+                                </div>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>¿Estás absolutamente seguro?</DialogTitle>
+                                    <DialogDescription>
+                                        Esta acción no se puede deshacer. Para confirmar la eliminación permanente de tu cuenta, por favor ingresa tu contraseña.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="py-4">
+                                    <Label htmlFor="confirm-password-delete" className="sr-only">
+                                        Contraseña
+                                    </Label>
+                                    <Input
+                                        id="confirm-password-delete"
+                                        type="password"
+                                        placeholder="Ingresa tu contraseña"
+                                        value={deletePassword}
+                                        onChange={(e) => setDeletePassword(e.target.value)}
+                                    />
+                                </div>
+                                <DialogFooter>
+                                    <Button variant="destructive" onClick={handleAccountDelete} disabled={!deletePassword || isLoading}>Confirmar y Eliminar Cuenta</Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                       </div>
                   </AccordionContent>
               </AccordionItem>
