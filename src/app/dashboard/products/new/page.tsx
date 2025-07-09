@@ -77,7 +77,7 @@ export default function NewProductPage() {
                 <div className="flex items-center justify-between">
                     <h1 className="text-lg font-bold font-headline">Crear Producto o Servicio</h1>
                     <Button asChild variant="outline" size="sm">
-                        <Link href="/dashboard/products">Listar Productos</Link>
+                        <Link href="/dashboard/products">Productos</Link>
                     </Button>
                 </div>
                 

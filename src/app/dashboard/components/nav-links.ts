@@ -32,9 +32,9 @@ export const navigationLinks = [
     activeIcon: DocumentTextRegular,
     sublinks: [
       { href: "/dashboard/invoices/new", label: "Crear Facturas 4.0" },
-      { href: "/dashboard/invoices", label: "Listar Facturas" },
-      { href: "/dashboard/invoices/pending", label: "Listar Facturas Pendientes" },
-      { href: "/dashboard/invoices/canceled", label: "Listar Facturas Canceladas" },
+      { href: "/dashboard/invoices", label: "Facturas" },
+      { href: "/dashboard/invoices/pending", label: "Facturas Pendientes" },
+      { href: "/dashboard/invoices/canceled", label: "Facturas Canceladas" },
     ],
   },
   {
@@ -43,8 +43,8 @@ export const navigationLinks = [
     activeIcon: PaymentRegular,
     sublinks: [
       { href: "/dashboard/payments/new", label: "Crear Pagos 4.0" },
-      { href: "/dashboard/payments", label: "Listar Pagos" },
-      { href: "/dashboard/payments/canceled", label: "Listar Pagos Cancelados" },
+      { href: "/dashboard/payments", label: "Pagos" },
+      { href: "/dashboard/payments/canceled", label: "Pagos Cancelados" },
     ],
   },
   {
@@ -53,13 +53,13 @@ export const navigationLinks = [
     activeIcon: BuildingPeopleRegular,
     sublinks: [
       { href: "/dashboard/clients/new", label: "Crear Clientes" },
-      { href: "/dashboard/clients", label: "Listar Clientes" },
+      { href: "/dashboard/clients", label: "Clientes" },
       { href: "/dashboard/products/new", label: "Crear Productos" },
-      { href: "/dashboard/products", label: "Listar Productos" },
+      { href: "/dashboard/products", label: "Productos" },
       { href: "/dashboard/settings/series/new", label: "Crear Series y Folios" },
-      { href: "/dashboard/settings/series", label: "Listar Series y Folios" },
+      { href: "/dashboard/settings/series", label: "Series y Folios" },
       { href: "/dashboard/settings/bank-accounts/new", label: "Crear Cuentas Bancarias" },
-      { href: "/dashboard/settings/bank-accounts", label: "Listar Cuentas Bancarias" },
+      { href: "/dashboard/settings/bank-accounts", label: "Cuentas Bancarias" },
     ],
   },
   {
@@ -76,8 +76,8 @@ export const navigationLinks = [
     icon: DatabaseFilled,
     activeIcon: DatabaseRegular,
     sublinks: [
-      { href: "/dashboard/storage/deleted-invoices", label: "Listar CFDI Eliminados" },
-      { href: "/dashboard/storage/deleted-payments", label: "Listar Pagos Eliminados" },
+      { href: "/dashboard/storage/deleted-invoices", label: "CFDI Eliminados" },
+      { href: "/dashboard/storage/deleted-payments", label: "Pagos Eliminados" },
     ],
   },
   {

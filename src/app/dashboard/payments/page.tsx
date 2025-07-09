@@ -106,7 +106,7 @@ export default function PaymentsPage() {
 
   return (
     <div className="flex flex-col flex-1 gap-4">
-      <h1 className="text-lg font-bold font-headline">Listar Pagos</h1>
+      <h1 className="text-lg font-bold font-headline">Pagos</h1>
       <Card className="flex flex-col flex-1">
         <CardHeader className="p-2 border-b bg-muted/30 flex flex-row items-center gap-2">
             <Button size="sm" variant="outline" className="text-xs h-7"><FilterRegular className="mr-1 h-3.5 w-3.5" />Filtrar</Button>

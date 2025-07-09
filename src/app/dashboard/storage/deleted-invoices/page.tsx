@@ -1,3 +1,4 @@
+
 "use client";
 
 import { FilterRegular, ChevronDoubleLeftRegular, ChevronDoubleRightRegular, ChevronLeftRegular, ChevronRightRegular, ChevronDownRegular } from "@fluentui/react-icons"
@@ -85,7 +86,7 @@ export default function DeletedInvoicesPage() {
   
   return (
     <div className="flex flex-col flex-1 gap-4">
-        <h1 className="text-lg font-bold font-headline">Listar CFDI Eliminados</h1>
+        <h1 className="text-lg font-bold font-headline">CFDI Eliminados</h1>
         <Card className="flex flex-col flex-1">
             <CardHeader className="p-2 border-b bg-muted/30 flex flex-row justify-between items-center">
                 <span className="text-sm">No se encontraron documentos eliminados Periodo: {new Date().toLocaleString('es-MX', { month: 'long' }).toUpperCase()} {new Date().getFullYear()}</span>

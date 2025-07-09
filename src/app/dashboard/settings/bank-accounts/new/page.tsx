@@ -89,7 +89,7 @@ export default function NewBankAccountPage() {
                 <div className="flex items-center justify-between">
                     <h1 className="text-lg font-bold font-headline">Crear Cuenta Bancaria</h1>
                      <Button asChild variant="outline" size="sm">
-                        <Link href="/dashboard/settings/bank-accounts">Listar Cuentas Bancarias</Link>
+                        <Link href="/dashboard/settings/bank-accounts">Cuentas Bancarias</Link>
                     </Button>
                 </div>
                 

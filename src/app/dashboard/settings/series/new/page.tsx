@@ -68,7 +68,7 @@ export default function NewSeriePage() {
                 <div className="flex items-center justify-between">
                     <h1 className="text-lg font-bold font-headline">Crear Serie y Folio</h1>
                      <Button asChild variant="outline" size="sm">
-                        <Link href="/dashboard/settings/series">Listar Series y Folios</Link>
+                        <Link href="/dashboard/settings/series">Series y Folios</Link>
                     </Button>
                 </div>
                 
