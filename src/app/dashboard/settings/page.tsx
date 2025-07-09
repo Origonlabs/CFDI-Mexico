@@ -28,7 +28,18 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 
 interface Certificate {
@@ -45,6 +56,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [certificate, setCertificate] = useState<Certificate | null>(null);
   const [deletePassword, setDeletePassword] = useState('');
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
   // User profile state
   const [firstName, setFirstName] = useState('');
@@ -437,36 +449,53 @@ export default function SettingsPage() {
                                 Si eliminas tu cuenta, todos tus datos (empresa, clientes, facturas, etc.) serán borrados permanentemente. No podrás recuperarlos.
                             </p>
                         </div>
+                        <div className="flex justify-end pt-4">
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="destructive" disabled={isLoading}>Solicitar Eliminación de Cuenta</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>¿Estás realmente seguro?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Esta acción es irreversible. Se eliminarán permanentemente todos tus datos, incluyendo clientes, facturas y configuraciones.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => setIsPasswordDialogOpen(true)}>
+                                  Sí, eliminar mi cuenta
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
 
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <div className="flex justify-end pt-4">
-                                    <Button variant="destructive" disabled={isLoading}>Solicitar Eliminación de Cuenta</Button>
-                                </div>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>¿Estás absolutamente seguro?</DialogTitle>
-                                    <DialogDescription>
-                                        Esta acción no se puede deshacer. Para confirmar la eliminación permanente de tu cuenta, por favor ingresa tu contraseña.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="py-4">
-                                    <Label htmlFor="confirm-password-delete" className="sr-only">
-                                        Contraseña
-                                    </Label>
-                                    <Input
-                                        id="confirm-password-delete"
-                                        type="password"
-                                        placeholder="Ingresa tu contraseña"
-                                        value={deletePassword}
-                                        onChange={(e) => setDeletePassword(e.target.value)}
-                                    />
-                                </div>
-                                <DialogFooter>
-                                    <Button variant="destructive" onClick={handleAccountDelete} disabled={!deletePassword || isLoading}>Confirmar y Eliminar Cuenta</Button>
-                                </DialogFooter>
-                            </DialogContent>
+                        <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Confirma para eliminar tu cuenta</DialogTitle>
+                              <DialogDescription>
+                                Para confirmar esta acción, por favor ingresa tu contraseña.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="py-4">
+                              <Label htmlFor="confirm-password-delete" className="sr-only">
+                                Contraseña
+                              </Label>
+                              <Input
+                                id="confirm-password-delete"
+                                type="password"
+                                placeholder="Ingresa tu contraseña"
+                                value={deletePassword}
+                                onChange={(e) => setDeletePassword(e.target.value)}
+                              />
+                            </div>
+                            <DialogFooter>
+                               <Button variant="outline" onClick={() => setIsPasswordDialogOpen(false)}>Cancelar</Button>
+                              <Button variant="destructive" onClick={handleAccountDelete} disabled={!deletePassword || isLoading}>Confirmar y Eliminar Cuenta</Button>
+                            </DialogFooter>
+                          </DialogContent>
                         </Dialog>
                       </div>
                   </AccordionContent>
@@ -482,3 +511,4 @@ export default function SettingsPage() {
     </>
   );
 }
+
