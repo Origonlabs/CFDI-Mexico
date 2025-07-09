@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -58,17 +57,24 @@ import { OrigonLogo } from '@/components/logo';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { StarBorder } from '@/components/ui/star-border';
+import { AppleLoader } from '@/components/ui/apple-loader';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [user] = useAuthState(auth!);
+  const [user, loading] = useAuthState(auth!);
   const router = useRouter();
   const pathname = usePathname();
   const [openCategory, setOpenCategory] = React.useState<string | undefined>();
   const isSettingsActive = pathname.startsWith('/dashboard/settings');
+
+  React.useEffect(() => {
+    if (!loading && !user) {
+      router.push('/');
+    }
+  }, [user, loading, router]);
 
   React.useEffect(() => {
     const activeItem = navigationLinks.find((item: any) =>
@@ -153,6 +159,14 @@ export default function DashboardLayout({
       </Collapsible>
     );
   };
+  
+  if (loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-[#1A1A1A]">
+        <AppleLoader />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen w-full flex-col bg-[#1A1A1A]">
