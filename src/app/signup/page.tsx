@@ -16,6 +16,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { saveCompanyProfile } from '@/app/actions/companies';
 import { type ProfileFormValues, signupSchema, type SignupFormValues } from '@/lib/schemas';
+import { EyeRegular, EyeOffRegular } from '@fluentui/react-icons';
 
 import {
   Form,
@@ -30,6 +31,7 @@ export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -143,7 +145,14 @@ export default function SignupPage() {
                              <FormField control={form.control} name="passwordCertificado" render={({ field }) => ( 
                                 <FormItem className="md:col-span-2">
                                     <FormLabel>*Contraseña del Certificado:</FormLabel>
-                                    <FormControl><Input type="password" {...field} /></FormControl>
+                                    <FormControl>
+                                      <div className="relative">
+                                        <Input type={showPassword ? "text" : "password"} {...field} />
+                                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
+                                            {showPassword ? <EyeOffRegular className="h-4 w-4" /> : <EyeRegular className="h-4 w-4" />}
+                                        </button>
+                                      </div>
+                                    </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
