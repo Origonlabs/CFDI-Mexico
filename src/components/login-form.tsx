@@ -135,7 +135,7 @@ export function LoginForm({
         <CardContent>
           <div className="grid gap-6">
               <div className="flex flex-col gap-4">
-                <Button variant="outline" className="w-full" onClick={handleMicrosoftSignIn} disabled={!firebaseEnabled || isSubmitting}>
+                <Button variant="outline" className="w-full" onClick={handleMicrosoftSignIn} disabled>
                   <MicrosoftIcon />
                   Iniciar con Microsoft
                 </Button>
