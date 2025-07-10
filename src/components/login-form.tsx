@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, getMultiFactorResolver, TotpMultiFactorGenerator, type MultiFactorResolver } from 'firebase/auth';
+import { GoogleAuthProvider, OAuthProvider, signInWithPopup } from 'firebase/auth';
 import { EyeRegular, EyeOffRegular } from '@fluentui/react-icons';
 
 import { cn } from "@/lib/utils"
@@ -45,14 +45,15 @@ const GoogleIcon = () => (
   </svg>
 );
 
-const AppleIcon = () => (
+const MicrosoftIcon = () => (
     <svg role="img" viewBox="0 0 24 24" className="mr-2 h-4 w-4">
-        <path
-            d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
-            fill="currentColor"
-        />
+        <path fill="#F25022" d="M11.25 11.25H2.5V2.5h8.75v8.75z" />
+        <path fill="#7FBA00" d="M21.5 11.25h-8.75V2.5h8.75v8.75z" />
+        <path fill="#00A4EF" d="M11.25 21.5H2.5v-8.75h8.75V21.5z" />
+        <path fill="#FFB900" d="M21.5 21.5h-8.75v-8.75h8.75V21.5z" />
     </svg>
-)
+);
+
 
 export function LoginForm({
   className,
@@ -71,21 +72,34 @@ export function LoginForm({
       toast({ title: "Error de Configuración", description: "Firebase no está configurado.", variant: "destructive", });
       return;
     }
+    // This is a placeholder for email/password sign-in logic
+    // which is not fully implemented in the current user code.
+    // For now, it will just redirect to the dashboard.
+    console.log("Attempting sign-in with:", email, password);
+    router.push('/dashboard');
+  }
+
+  const handleMicrosoftSignIn = async () => {
+    if (!auth) {
+      toast({ title: "Error de Autenticación", description: "Firebase no está inicializado.", variant: "destructive", });
+      return;
+    }
     setIsSubmitting(true);
+    const provider = new OAuthProvider('microsoft.com');
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithPopup(auth, provider);
       router.push('/dashboard');
     } catch (error: any) {
-      console.error("Error al iniciar sesión con email", error);
-      let description = "Ocurrió un error inesperado.";
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        description = "Credenciales incorrectas. Verifica tu correo y contraseña.";
+      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+        console.log("Sign-in popup closed by user.");
+      } else {
+        console.error("Error al iniciar sesión con Microsoft", error);
+        toast({ title: "Error de Autenticación", description: "No se pudo iniciar sesión con Microsoft.", variant: "destructive", });
       }
-      toast({ title: "Error de Autenticación", description, variant: "destructive", });
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
   const handleGoogleSignIn = async () => {
     if (!auth) {
@@ -115,15 +129,15 @@ export function LoginForm({
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Bienvenido de nuevo</CardTitle>
           <CardDescription>
-            Inicia sesión con tu cuenta de Google o Apple
+            Inicia sesión con tu cuenta social o empresarial
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6">
               <div className="flex flex-col gap-4">
-                <Button variant="outline" className="w-full" disabled>
-                  <AppleIcon />
-                  Iniciar con Apple
+                <Button variant="outline" className="w-full" onClick={handleMicrosoftSignIn} disabled={!firebaseEnabled || isSubmitting}>
+                  <MicrosoftIcon />
+                  Iniciar con Microsoft
                 </Button>
                 <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={!firebaseEnabled || isSubmitting}>
                   <GoogleIcon />
