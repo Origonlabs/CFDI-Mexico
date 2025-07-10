@@ -190,9 +190,7 @@ export type PasswordChangeValues = z.infer<typeof passwordChangeSchema>;
 
 
 // --- Signup ---
-const MAX_FILE_SIZE = 500000;
-const ACCEPTED_CERT_TYPES = [".cer"];
-const ACCEPTED_KEY_TYPES = [".key"];
+const MAX_FILE_SIZE = 500000; // 500KB
 
 export const signupSchema = z.object({
     nombre: z.string().min(1, "El nombre es requerido."),
@@ -204,16 +202,18 @@ export const signupSchema = z.object({
     passwordCertificado: z.string().min(1, "La contraseña del certificado es requerida."),
     archivoCer: z
       .any()
-      .refine((file) => file?.size <= MAX_FILE_SIZE, `El tamaño máximo es 5MB.`)
+      .refine((file) => !!file, "El archivo .cer es obligatorio.")
+      .refine((file) => file?.size <= MAX_FILE_SIZE, `El tamaño máximo es 500KB.`)
       .refine(
-        (file) => ACCEPTED_CERT_TYPES.includes(`.${file?.name.split('.').pop()}`),
+        (file) => file?.name?.endsWith(".cer"),
         "Solo se aceptan archivos .cer"
       ),
     archivoKey: z
       .any()
-      .refine((file) => file?.size <= MAX_FILE_SIZE, `El tamaño máximo es 5MB.`)
+      .refine((file) => !!file, "El archivo .key es obligatorio.")
+      .refine((file) => file?.size <= MAX_FILE_SIZE, `El tamaño máximo es 500KB.`)
       .refine(
-        (file) => ACCEPTED_KEY_TYPES.includes(`.${file?.name.split('.').pop()}`),
+        (file) => file?.name?.endsWith(".key"),
         "Solo se aceptan archivos .key"
       ),
 }).refine(data => data.email === data.confirmEmail, {
