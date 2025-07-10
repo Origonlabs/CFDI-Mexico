@@ -139,10 +139,12 @@ export function LoginForm({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="outline" className="w-full" onClick={handleMicrosoftSignIn} disabled>
-                        <MicrosoftIcon />
-                        Iniciar con Microsoft
-                      </Button>
+                      <span className="w-full" tabIndex={0}>
+                        <Button variant="outline" className="w-full" onClick={handleMicrosoftSignIn} disabled>
+                          <MicrosoftIcon />
+                          Iniciar con Microsoft
+                        </Button>
+                      </span>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Próximamente</p>
