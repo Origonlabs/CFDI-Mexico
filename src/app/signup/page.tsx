@@ -216,7 +216,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="bg-muted flex min-h-svh w-full flex-col items-center justify-center gap-6 p-6 md:p-10">
+    <div className="bg-muted flex min-h-svh w-full flex-col items-center justify-center gap-6 p-4 md:p-10">
         <Link href="/" className="flex items-center gap-2 self-center font-medium">
             <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-md p-1">
                 <OrigonLogo />
@@ -232,15 +232,13 @@ export default function SignupPage() {
             </CardHeader>
             <CardContent>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-2">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-4">
                             <FormField control={form.control} name="tipoPersona" render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>Tipo de Persona*</FormLabel>
+                                <FormItem className="flex flex-col"><FormLabel>Tipo de Persona*</FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccione"/></SelectTrigger></FormControl>
                                         <SelectContent><SelectItem value="fisica">Persona Física</SelectItem><SelectItem value="moral">Persona Moral</SelectItem></SelectContent>
-                                    </Select>
-                                    <FormMessage />
+                                    </Select><FormMessage />
                                 </FormItem>
                             )} />
                             <FormField control={form.control} name="companyName" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Nombre / Razón Social*</FormLabel><FormControl><Input placeholder="Razón Social" {...field} /></FormControl><FormMessage /></FormItem> )} />
@@ -253,8 +251,7 @@ export default function SignupPage() {
                                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
                                             {showPassword ? <EyeOffRegular className="h-4 w-4" /> : <EyeRegular className="h-4 w-4" />}
                                         </button>
-                                    </div>
-                                    <FormMessage />
+                                    </div><FormMessage />
                                 </FormItem>
                             )} />
                              <FormField control={form.control} name="confirmPassword" render={({ field }) => (
@@ -263,8 +260,7 @@ export default function SignupPage() {
                                         <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
                                             {showConfirmPassword ? <EyeOffRegular className="h-4 w-4" /> : <EyeRegular className="h-4 w-4" />}
                                         </button>
-                                    </div>
-                                    <FormMessage />
+                                    </div><FormMessage />
                                 </FormItem>
                             )} />
                             <FormField control={form.control} name="email" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Correo*</FormLabel><FormControl><Input type="email" placeholder="Correo Electrónico" {...field} /></FormControl><FormMessage /></FormItem> )} />
@@ -273,94 +269,60 @@ export default function SignupPage() {
                             <FormField control={form.control} name="contactName" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Nombre de contacto*</FormLabel><FormControl><Input placeholder="Nombre de contacto" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="contactPhone" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Teléfono del Contacto*</FormLabel><FormControl><Input placeholder="Teléfono a contactar" {...field} /></FormControl><FormMessage /></FormItem> )} />
                              <FormField control={form.control} name="timeZone" render={({ field }) => (
-                                <FormItem className="lg:col-span-2 flex flex-col">
-                                    <FormLabel>Zona Horaria*</FormLabel>
+                                <FormItem className="lg:col-span-2 flex flex-col"><FormLabel>Zona Horaria*</FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccione su zona horaria"/></SelectTrigger></FormControl>
                                         <SelectContent><SelectItem value="Central">Centro</SelectItem><SelectItem value="Pacific">Pacífico</SelectItem></SelectContent>
-                                    </Select>
-                                    <FormMessage />
+                                    </Select><FormMessage />
                                 </FormItem>
                             )} />
                         </div>
-                        <h3 className="font-semibold pt-4 md:col-span-2 lg:col-span-4">Dirección del cliente</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-2">
-                            <FormField control={form.control} name="zip" render={({ field }) => ( 
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>Código Postal*</FormLabel>
-                                    <FormControl>
-                                        <div className="relative">
-                                            <Input placeholder="Escribe tu CP" {...field} />
-                                            {addressLoading && <div className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent" />}
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem> 
-                            )} />
-
-                            <FormField control={form.control} name="state" render={({ field }) => ( 
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>Estado*</FormLabel>
-                                    <FormControl><Input placeholder="Se llena automáticamente" {...field} disabled /></FormControl>
-                                    <FormMessage />
-                                </FormItem> 
-                            )} />
-
-                            <FormField control={form.control} name="municipality" render={({ field }) => ( 
-                                <FormItem className="md:col-span-2 flex flex-col">
-                                    <FormLabel>Municipio*</FormLabel>
-                                    <FormControl><Input placeholder="Se llena automáticamente" {...field} disabled /></FormControl>
-                                    <FormMessage />
-                                </FormItem> 
-                            )} />
-
-                            <FormField control={form.control} name="neighborhood" render={({ field }) => ( 
-                                <FormItem className="lg:col-span-2 flex flex-col">
-                                    <FormLabel>Colonia*</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value} disabled={colonias.length === 0 || addressLoading}>
+                        
+                        <div className="pt-4 space-y-4">
+                            <h3 className="font-semibold md:col-span-2 lg:col-span-4">Dirección del cliente</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-4">
+                                <FormField control={form.control} name="zip" render={({ field }) => ( 
+                                    <FormItem className="flex flex-col"><FormLabel>Código Postal*</FormLabel>
                                         <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder={addressLoading ? "Cargando..." : "Selecciona una colonia"}/>
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {colonias.map(colonia => (
-                                                <SelectItem key={colonia} value={colonia}>{colonia}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem> 
-                            )} />
-
-                            <FormField control={form.control} name="street" render={({ field }) => ( 
-                                <FormItem className="lg:col-span-2 flex flex-col">
-                                    <FormLabel>Calle</FormLabel>
-                                    <FormControl><Input placeholder="Calle" {...field} /></FormControl>
-                                    <FormMessage />
-                                </FormItem> 
-                            )} />
-
-                            <FormField control={form.control} name="exteriorNumber" render={({ field }) => ( 
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>N° Exterior</FormLabel>
-                                    <FormControl><Input placeholder="Ej: 23" {...field} /></FormControl>
-                                    <FormMessage />
-                                </FormItem> 
-                            )} />
-
-                            <FormField control={form.control} name="interiorNumber" render={({ field }) => ( 
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>N° Interior</FormLabel>
-                                    <FormControl><Input placeholder="Ej: A" {...field} /></FormControl>
-                                    <FormMessage />
-                                </FormItem> 
-                            )} />
+                                            <div className="relative">
+                                                <Input placeholder="Escribe tu CP" {...field} />
+                                                {addressLoading && <div className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent" />}
+                                            </div>
+                                        </FormControl><FormMessage />
+                                    </FormItem> 
+                                )} />
+                                <FormField control={form.control} name="state" render={({ field }) => ( 
+                                    <FormItem className="flex flex-col"><FormLabel>Estado*</FormLabel><FormControl><Input placeholder="Se llena automáticamente" {...field} disabled /></FormControl><FormMessage /></FormItem> 
+                                )} />
+                                <FormField control={form.control} name="municipality" render={({ field }) => ( 
+                                    <FormItem className="lg:col-span-2 flex flex-col"><FormLabel>Municipio*</FormLabel><FormControl><Input placeholder="Se llena automáticamente" {...field} disabled /></FormControl><FormMessage /></FormItem> 
+                                )} />
+                                <FormField control={form.control} name="neighborhood" render={({ field }) => ( 
+                                    <FormItem className="lg:col-span-2 flex flex-col"><FormLabel>Colonia*</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value} disabled={colonias.length === 0 || addressLoading}>
+                                            <FormControl>
+                                                <SelectTrigger><SelectValue placeholder={addressLoading ? "Cargando..." : "Selecciona una colonia"}/></SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {colonias.map(colonia => (<SelectItem key={colonia} value={colonia}>{colonia}</SelectItem>))}
+                                            </SelectContent>
+                                        </Select><FormMessage />
+                                    </FormItem> 
+                                )} />
+                                <FormField control={form.control} name="street" render={({ field }) => ( 
+                                    <FormItem className="lg:col-span-2 flex flex-col"><FormLabel>Calle</FormLabel><FormControl><Input placeholder="Calle" {...field} /></FormControl><FormMessage /></FormItem> 
+                                )} />
+                                <FormField control={form.control} name="exteriorNumber" render={({ field }) => ( 
+                                    <FormItem className="flex flex-col"><FormLabel>N° Exterior</FormLabel><FormControl><Input placeholder="Ej: 23" {...field} /></FormControl><FormMessage /></FormItem> 
+                                )} />
+                                <FormField control={form.control} name="interiorNumber" render={({ field }) => ( 
+                                    <FormItem className="flex flex-col"><FormLabel>N° Interior</FormLabel><FormControl><Input placeholder="Ej: A" {...field} /></FormControl><FormMessage /></FormItem> 
+                                )} />
+                            </div>
                         </div>
+
                          <FormField control={form.control} name="taxRegime" render={({ field }) => (
-                            <FormItem className="pt-4 flex flex-col">
-                                <FormLabel>Régimen Fiscal*</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl><SelectTrigger><SelectValue placeholder="Selecciona un régimen fiscal" /></SelectTrigger></FormControl>
+                            <FormItem className="pt-4 flex flex-col"><FormLabel>Régimen Fiscal*</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Selecciona un régimen fiscal" /></SelectTrigger></FormControl>
                                      <SelectContent>
                                         <SelectItem value="601">601 – General de Ley Personas Morales</SelectItem>
                                         <SelectItem value="612">612 – Personas físicas con actividades empresariales y profesionales</SelectItem>
@@ -368,12 +330,11 @@ export default function SignupPage() {
                                         <SelectItem value="606">606 – Arrendamiento</SelectItem>
                                         <SelectItem value="603">603 – Fines no lucrativos</SelectItem>
                                     </SelectContent>
-                                </Select>
-                                <FormMessage />
+                                </Select><FormMessage />
                             </FormItem>
                         )} />
 
-                        <CardFooter className="px-0 pt-6 flex-col items-center gap-4">
+                        <CardFooter className="flex-col gap-4 px-0 pt-6">
                            <p className="text-xs text-muted-foreground">- Los campos marcados con un * son requeridos.</p>
                            <div className="flex gap-4">
                              <Button type="submit" disabled={!firebaseEnabled || isSubmitting}>
@@ -384,7 +345,7 @@ export default function SignupPage() {
                              </Button>
                            </div>
                            {!firebaseEnabled && (
-                            <p className="text-center text-xs text-destructive pt-2">
+                            <p className="pt-2 text-center text-xs text-destructive">
                             La configuración de Firebase está incompleta. La autenticación está deshabilitada.
                             </p>
                            )}
