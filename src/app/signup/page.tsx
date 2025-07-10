@@ -233,9 +233,9 @@ export default function SignupPage() {
             <CardContent>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-2">
                             <FormField control={form.control} name="tipoPersona" render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="flex flex-col">
                                     <FormLabel>Tipo de Persona*</FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccione"/></SelectTrigger></FormControl>
                                         <SelectContent><SelectItem value="fisica">Persona Física</SelectItem><SelectItem value="moral">Persona Moral</SelectItem></SelectContent>
@@ -243,12 +243,12 @@ export default function SignupPage() {
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <FormField control={form.control} name="companyName" render={({ field }) => ( <FormItem><FormLabel>Nombre / Razón Social*</FormLabel><FormControl><Input placeholder="Razón Social" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="rfc" render={({ field }) => ( <FormItem><FormLabel>RFC*</FormLabel><FormControl><Input placeholder="XAXX010101000" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="officePhone" render={({ field }) => ( <FormItem><FormLabel>Teléfono de oficina*</FormLabel><FormControl><Input placeholder="Teléfono a 10 Digitos" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="companyName" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Nombre / Razón Social*</FormLabel><FormControl><Input placeholder="Razón Social" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="rfc" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>RFC*</FormLabel><FormControl><Input placeholder="XAXX010101000" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="officePhone" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Teléfono de oficina*</FormLabel><FormControl><Input placeholder="Teléfono a 10 Digitos" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             
                             <FormField control={form.control} name="password" render={({ field }) => (
-                                <FormItem><FormLabel>Contraseña*</FormLabel>
+                                <FormItem className="flex flex-col"><FormLabel>Contraseña*</FormLabel>
                                     <div className="relative"><FormControl><Input type={showPassword ? "text" : "password"} {...field} /></FormControl>
                                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
                                             {showPassword ? <EyeOffRegular className="h-4 w-4" /> : <EyeRegular className="h-4 w-4" />}
@@ -258,7 +258,7 @@ export default function SignupPage() {
                                 </FormItem>
                             )} />
                              <FormField control={form.control} name="confirmPassword" render={({ field }) => (
-                                <FormItem><FormLabel>Confirmar Contraseña*</FormLabel>
+                                <FormItem className="flex flex-col"><FormLabel>Confirmar Contraseña*</FormLabel>
                                     <div className="relative"><FormControl><Input type={showConfirmPassword ? "text" : "password"} {...field} /></FormControl>
                                         <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
                                             {showConfirmPassword ? <EyeOffRegular className="h-4 w-4" /> : <EyeRegular className="h-4 w-4" />}
@@ -267,13 +267,13 @@ export default function SignupPage() {
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <FormField control={form.control} name="email" render={({ field }) => ( <FormItem><FormLabel>Correo*</FormLabel><FormControl><Input type="email" placeholder="Correo Electrónico" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="secondaryEmail" render={({ field }) => ( <FormItem><FormLabel>Correo Secundario</FormLabel><FormControl><Input type="email" placeholder="Correo Electrónico Secundario" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="email" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Correo*</FormLabel><FormControl><Input type="email" placeholder="Correo Electrónico" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="secondaryEmail" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Correo Secundario</FormLabel><FormControl><Input type="email" placeholder="Correo Electrónico Secundario" {...field} /></FormControl><FormMessage /></FormItem> )} />
 
-                            <FormField control={form.control} name="contactName" render={({ field }) => ( <FormItem><FormLabel>Nombre de contacto*</FormLabel><FormControl><Input placeholder="Nombre de contacto" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="contactPhone" render={({ field }) => ( <FormItem><FormLabel>Teléfono del Contacto*</FormLabel><FormControl><Input placeholder="Teléfono a contactar" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="contactName" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Nombre de contacto*</FormLabel><FormControl><Input placeholder="Nombre de contacto" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="contactPhone" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Teléfono del Contacto*</FormLabel><FormControl><Input placeholder="Teléfono a contactar" {...field} /></FormControl><FormMessage /></FormItem> )} />
                              <FormField control={form.control} name="timeZone" render={({ field }) => (
-                                <FormItem className="lg:col-span-2">
+                                <FormItem className="lg:col-span-2 flex flex-col">
                                     <FormLabel>Zona Horaria*</FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Seleccione su zona horaria"/></SelectTrigger></FormControl>
                                         <SelectContent><SelectItem value="Central">Centro</SelectItem><SelectItem value="Pacific">Pacífico</SelectItem></SelectContent>
@@ -283,9 +283,9 @@ export default function SignupPage() {
                             )} />
                         </div>
                         <h3 className="font-semibold pt-4 md:col-span-2 lg:col-span-4">Dirección del cliente</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-2">
                             <FormField control={form.control} name="zip" render={({ field }) => ( 
-                                <FormItem>
+                                <FormItem className="flex flex-col">
                                     <FormLabel>Código Postal*</FormLabel>
                                     <FormControl>
                                         <div className="relative">
@@ -298,7 +298,7 @@ export default function SignupPage() {
                             )} />
 
                             <FormField control={form.control} name="state" render={({ field }) => ( 
-                                <FormItem>
+                                <FormItem className="flex flex-col">
                                     <FormLabel>Estado*</FormLabel>
                                     <FormControl><Input placeholder="Se llena automáticamente" {...field} disabled /></FormControl>
                                     <FormMessage />
@@ -306,7 +306,7 @@ export default function SignupPage() {
                             )} />
 
                             <FormField control={form.control} name="municipality" render={({ field }) => ( 
-                                <FormItem className="md:col-span-2">
+                                <FormItem className="md:col-span-2 flex flex-col">
                                     <FormLabel>Municipio*</FormLabel>
                                     <FormControl><Input placeholder="Se llena automáticamente" {...field} disabled /></FormControl>
                                     <FormMessage />
@@ -314,7 +314,7 @@ export default function SignupPage() {
                             )} />
 
                             <FormField control={form.control} name="neighborhood" render={({ field }) => ( 
-                                <FormItem className="lg:col-span-2">
+                                <FormItem className="lg:col-span-2 flex flex-col">
                                     <FormLabel>Colonia*</FormLabel>
                                     <Select onValueChange={field.onChange} value={field.value} disabled={colonias.length === 0 || addressLoading}>
                                         <FormControl>
@@ -333,7 +333,7 @@ export default function SignupPage() {
                             )} />
 
                             <FormField control={form.control} name="street" render={({ field }) => ( 
-                                <FormItem className="lg:col-span-2">
+                                <FormItem className="lg:col-span-2 flex flex-col">
                                     <FormLabel>Calle</FormLabel>
                                     <FormControl><Input placeholder="Calle" {...field} /></FormControl>
                                     <FormMessage />
@@ -341,7 +341,7 @@ export default function SignupPage() {
                             )} />
 
                             <FormField control={form.control} name="exteriorNumber" render={({ field }) => ( 
-                                <FormItem>
+                                <FormItem className="flex flex-col">
                                     <FormLabel>N° Exterior</FormLabel>
                                     <FormControl><Input placeholder="Ej: 23" {...field} /></FormControl>
                                     <FormMessage />
@@ -349,7 +349,7 @@ export default function SignupPage() {
                             )} />
 
                             <FormField control={form.control} name="interiorNumber" render={({ field }) => ( 
-                                <FormItem>
+                                <FormItem className="flex flex-col">
                                     <FormLabel>N° Interior</FormLabel>
                                     <FormControl><Input placeholder="Ej: A" {...field} /></FormControl>
                                     <FormMessage />
@@ -357,7 +357,7 @@ export default function SignupPage() {
                             )} />
                         </div>
                          <FormField control={form.control} name="taxRegime" render={({ field }) => (
-                            <FormItem className="pt-4">
+                            <FormItem className="pt-4 flex flex-col">
                                 <FormLabel>Régimen Fiscal*</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl><SelectTrigger><SelectValue placeholder="Selecciona un régimen fiscal" /></SelectTrigger></FormControl>
