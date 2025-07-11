@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckRegular } from "@fluentui/react-icons";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 const plans = [
   {
@@ -78,36 +79,43 @@ export default function BillingPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-start">
         {plans.map((plan) => (
-          <Card key={plan.name} className={cn("flex flex-col h-full", plan.isPopular && "border-primary ring-2 ring-primary")}>
-            {plan.isPopular && (
-              <div className="bg-primary text-primary-foreground text-xs font-bold text-center py-1 rounded-t-lg">
-                MÁS POPULAR
-              </div>
-            )}
-            <CardHeader>
-              <CardTitle className="font-headline text-lg">{plan.name}</CardTitle>
-              <CardDescription>{plan.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow space-y-6">
-              <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-bold">{plan.price}</span>
-                {plan.pricePeriod && <span className="text-muted-foreground">{plan.pricePeriod}</span>}
-              </div>
-              <ul className="space-y-3 text-sm">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2">
-                    <CheckRegular className="h-4 w-4 mt-0.5 text-green-500 flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full">
-                {plan.name === 'Empresarial' ? 'Contactar Ventas' : 'Seleccionar Plan'}
-              </Button>
-            </CardFooter>
-          </Card>
+          <motion.div
+            key={plan.name}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="h-full"
+          >
+            <Card className={cn("flex flex-col h-full", plan.isPopular && "border-primary ring-2 ring-primary")}>
+              {plan.isPopular && (
+                <div className="bg-primary text-primary-foreground text-xs font-bold text-center py-1 rounded-t-lg">
+                  MÁS POPULAR
+                </div>
+              )}
+              <CardHeader>
+                <CardTitle className="font-headline text-lg">{plan.name}</CardTitle>
+                <CardDescription>{plan.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow space-y-6">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-bold">{plan.price}</span>
+                  {plan.pricePeriod && <span className="text-muted-foreground">{plan.pricePeriod}</span>}
+                </div>
+                <ul className="space-y-3 text-sm">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2">
+                      <CheckRegular className="h-4 w-4 mt-0.5 text-green-500 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button className="w-full">
+                  {plan.name === 'Empresarial' ? 'Contactar Ventas' : 'Seleccionar Plan'}
+                </Button>
+              </CardFooter>
+            </Card>
+          </motion.div>
         ))}
       </div>
     </div>
