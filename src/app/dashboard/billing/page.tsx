@@ -81,7 +81,11 @@ export default function BillingPage() {
         {plans.map((plan) => (
           <motion.div
             key={plan.name}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ 
+              scale: 1.05, 
+              y: -5,
+              boxShadow: "0px 10px 30px -5px hsl(var(--primary) / 0.2)"
+            }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="h-full"
           >
