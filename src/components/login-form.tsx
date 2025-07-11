@@ -140,7 +140,7 @@ export function LoginForm({
         // This is where you would implement the UI flow for MFA.
       } else {
         console.error("Error al iniciar sesión con Google", error);
-        toast({ title: "Error de Autenticación", description: "No se pudo iniciar sesión con Google.", variant: "destructive", });
+        toast({ title: "Error de Autenticación", description: "No se pudo iniciar sesión con Google. Revisa la configuración de tu proyecto en Firebase.", variant: "destructive", });
       }
     } finally {
       setIsSubmitting(false);
@@ -159,21 +159,10 @@ export function LoginForm({
         <CardContent>
           <div className="grid gap-6">
               <div className="flex flex-col gap-4">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="w-full" tabIndex={0}>
-                        <Button variant="outline" className="w-full" onClick={handleMicrosoftSignIn} disabled>
-                          <MicrosoftIcon />
-                          Iniciar con Microsoft
-                        </Button>
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Próximamente</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Button variant="outline" className="w-full" onClick={handleMicrosoftSignIn} disabled>
+                  <MicrosoftIcon />
+                  Iniciar con Microsoft
+                </Button>
                 <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={!firebaseEnabled || isSubmitting}>
                   <GoogleIcon />
                   Iniciar con Google
