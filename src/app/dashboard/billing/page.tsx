@@ -1,9 +1,9 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -16,7 +16,7 @@ const plans = [
   {
     name: "Estandar",
     price: "Gratis",
-    pricePeriod: "",
+    frequency: "mes",
     description: "Para empezar a facturar sin costo y conocer la plataforma.",
     features: [
       "Hasta 5 CFDIs al mes",
@@ -25,11 +25,12 @@ const plans = [
       "Almacenamiento por 6 meses",
     ],
     isPopular: false,
+    button: { content: "Seleccionar Plan" },
   },
   {
     name: "Básico",
     price: "$99",
-    pricePeriod: "/mes",
+    frequency: "mes",
     description: "Ideal para freelancers y pequeños negocios que recién comienzan.",
     features: [
       "Hasta 50 CFDIs al mes",
@@ -39,11 +40,12 @@ const plans = [
       "Almacenamiento por 1 año",
     ],
     isPopular: false,
+    button: { content: "Seleccionar Plan" },
   },
   {
     name: "Profesional",
     price: "$720",
-    pricePeriod: "/mes",
+    frequency: "mes",
     description: "Perfecto para empresas en crecimiento con mayor volumen de facturación.",
     features: [
       "Hasta 250 CFDIs al mes",
@@ -54,11 +56,12 @@ const plans = [
       "Almacenamiento por 5 años",
     ],
     isPopular: true,
+    button: { content: "Seleccionar Plan" },
   },
   {
     name: "Empresarial",
     price: "Contacto",
-    pricePeriod: "",
+    frequency: "mes",
     description: "Soluciones a la medida para grandes corporaciones y necesidades específicas.",
     features: [
       "CFDIs ilimitados",
@@ -69,6 +72,7 @@ const plans = [
       "Auditoría y logs de actividad",
     ],
     isPopular: false,
+    button: { content: "Contactar Ventas" },
   },
 ];
 
@@ -100,14 +104,14 @@ export default function BillingPage() {
 
   if (loading || authLoading) {
       return (
-          <div className="flex flex-col flex-1 gap-6 max-w-7xl mx-auto py-8">
-              <div className="text-center">
+          <div className="flex flex-col flex-1 max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
                   <Skeleton className="h-10 w-64 mx-auto" />
                   <Skeleton className="h-4 w-96 mx-auto mt-4" />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-start">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 items-start justify-center">
                   {plans.map((plan) => (
-                      <Card key={plan.name} className="h-full">
+                      <Card key={plan.name} className="w-72">
                           <CardHeader><Skeleton className="h-6 w-32" /><Skeleton className="h-4 w-48 mt-2" /></CardHeader>
                           <CardContent><Skeleton className="h-40 w-full" /></CardContent>
                           <CardFooter><Skeleton className="h-10 w-full" /></CardFooter>
@@ -119,70 +123,73 @@ export default function BillingPage() {
   }
 
   return (
-    <div className="flex flex-col flex-1 gap-6 max-w-7xl mx-auto py-8">
-      <div className="text-center">
+    <div className="flex flex-col flex-1 max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <div className="text-center mb-12">
         <h1 className="text-3xl font-bold font-headline">Planes de Suscripción</h1>
         <p className="text-muted-foreground mt-2 max-w-xl mx-auto">
           Elige el plan que mejor se adapte a tus necesidades de facturación. Todos los precios están en MXN.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 items-start justify-center">
         {plans.map((plan) => {
           const isCurrentPlan = activePlan === plan.name;
           const hasActivePlan = !!activePlan;
 
           return (
-            <div key={plan.name} className="relative h-full">
+            <div key={plan.name} className={cn(
+                "relative w-72 rounded-xl transition-transform duration-300 ease-in-out hover:scale-105",
+                plan.isPopular && "shadow-[0px_0px_15px_4px_#CDFEE1] dark:shadow-[0px_0px_15px_4px_rgba(205,254,225,0.2)]"
+            )}>
               {plan.isPopular && (
-                <Badge variant="default" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 hover:bg-green-500">
-                  MÁS POPULAR
-                </Badge>
+                <div className="absolute -top-3 right-1.5 z-10">
+                    <Badge className="bg-green-100 text-green-800 border-green-200 hover:bg-green-200 text-sm">MÁS POPULAR</Badge>
+                </div>
               )}
                {isCurrentPlan && (
-                  <Badge variant="default" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 hover:bg-blue-500">
-                      Plan Actual
-                  </Badge>
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                    <Badge className="bg-primary/20 text-primary border-primary/30 text-sm">Plan Actual</Badge>
+                  </div>
               )}
               <Card className={cn(
                   "flex flex-col h-full", 
-                  plan.isPopular && "border-green-300 ring-2 ring-green-300",
-                  isCurrentPlan && "border-blue-500 ring-2 ring-blue-500"
+                  isCurrentPlan && "ring-2 ring-primary"
               )}>
-                <CardHeader>
-                  <CardTitle className="font-headline text-xl">{plan.name}</CardTitle>
-                  <CardDescription>{plan.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow space-y-6">
-                  <div className="flex flex-col">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-bold">{plan.price}</span>
-                      {plan.pricePeriod && <span className="text-muted-foreground">{plan.pricePeriod}</span>}
-                    </div>
-                    {plan.price !== 'Gratis' && plan.price !== 'Contacto' && <span className="text-xs text-muted-foreground mt-1">no incluye iva</span>}
+                <CardContent className="p-6 flex flex-col gap-4">
+                  {/* Title and Description */}
+                  <div className="flex flex-col gap-2 text-left">
+                    <h3 className="text-lg font-bold font-headline">{plan.name}</h3>
+                     <p className="text-sm text-muted-foreground">{plan.description}</p>
                   </div>
-                  <ul className="space-y-3 text-sm">
+                  
+                  {/* Price */}
+                  <div className="flex items-end gap-1 text-left">
+                    <h2 className="text-4xl font-bold">{plan.price}</h2>
+                    {plan.price !== 'Gratis' && plan.price !== 'Contacto' && <p className="text-sm text-muted-foreground pb-1">/ {plan.frequency}</p>}
+                  </div>
+
+                  {/* Features */}
+                  <div className="flex flex-col gap-2 text-left pt-2">
                     {plan.features.map((feature) => (
-                      <li key={feature}>
-                        {feature}
-                      </li>
+                      <p key={feature} className="text-sm text-muted-foreground">{feature}</p>
                     ))}
-                  </ul>
+                  </div>
+
+                  {/* Button */}
+                  <div className="pt-4 pb-2">
+                     <Button 
+                        className="w-full" 
+                        onClick={() => handleSelectPlan(plan.name)}
+                        disabled={hasActivePlan && !isCurrentPlan}
+                      >
+                        {isCurrentPlan 
+                          ? 'Administrar Suscripción'
+                          : plan.button.content
+                        }
+                      </Button>
+                  </div>
+
                 </CardContent>
-                <CardFooter>
-                  <Button 
-                    className="w-full bg-slate-900 hover:bg-slate-800 text-white" 
-                    onClick={() => handleSelectPlan(plan.name)}
-                    disabled={hasActivePlan && !isCurrentPlan}
-                  >
-                    {isCurrentPlan 
-                      ? 'Administrar Suscripción'
-                      : plan.name === 'Empresarial' 
-                        ? 'Contactar Ventas' 
-                        : 'Seleccionar Plan'
-                    }
-                  </Button>
-                </CardFooter>
               </Card>
             </div>
           )
