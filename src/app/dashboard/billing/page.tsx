@@ -4,9 +4,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckRegular, SparkleFilled } from "@fluentui/react-icons";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/lib/firebase/client";
@@ -135,34 +133,24 @@ export default function BillingPage() {
           const hasActivePlan = !!activePlan;
 
           return (
-            <motion.div
-              key={plan.name}
-              whileHover={{ 
-                scale: 1.05, 
-                y: -5,
-                boxShadow: "0px 10px 30px -5px hsl(var(--primary) / 0.2)"
-              }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="h-full"
-            >
+            <div key={plan.name} className="relative h-full">
+              {plan.isPopular && (
+                <Badge variant="default" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 hover:bg-green-500">
+                  MÁS POPULAR
+                </Badge>
+              )}
+               {isCurrentPlan && (
+                  <Badge variant="default" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 hover:bg-blue-500">
+                      Plan Actual
+                  </Badge>
+              )}
               <Card className={cn(
                   "flex flex-col h-full", 
-                  plan.isPopular && !isCurrentPlan && "border-primary ring-2 ring-primary",
-                  isCurrentPlan && "border-green-500 ring-2 ring-green-500"
+                  plan.isPopular && "border-green-300 ring-2 ring-green-300",
+                  isCurrentPlan && "border-blue-500 ring-2 ring-blue-500"
               )}>
-                {plan.isPopular && !isCurrentPlan && (
-                  <div className="bg-primary text-primary-foreground text-xs font-bold text-center py-1 rounded-t-lg">
-                    MÁS POPULAR
-                  </div>
-                )}
-                 {isCurrentPlan && (
-                    <Badge variant="default" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-600 hover:bg-green-600">
-                        <SparkleFilled className="mr-1.5 h-3.5 w-3.5" />
-                        Plan Actual
-                    </Badge>
-                )}
                 <CardHeader>
-                  <CardTitle className="font-headline text-lg">{plan.name}</CardTitle>
+                  <CardTitle className="font-headline text-xl">{plan.name}</CardTitle>
                   <CardDescription>{plan.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow space-y-6">
@@ -175,19 +163,17 @@ export default function BillingPage() {
                   </div>
                   <ul className="space-y-3 text-sm">
                     {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2">
-                        <CheckRegular className="h-4 w-4 mt-0.5 text-green-500 flex-shrink-0" />
-                        <span>{feature}</span>
+                      <li key={feature}>
+                        {feature}
                       </li>
                     ))}
                   </ul>
                 </CardContent>
                 <CardFooter>
                   <Button 
-                    className="w-full" 
+                    className="w-full bg-slate-900 hover:bg-slate-800 text-white" 
                     onClick={() => handleSelectPlan(plan.name)}
                     disabled={hasActivePlan && !isCurrentPlan}
-                    variant={isCurrentPlan ? "outline" : "default"}
                   >
                     {isCurrentPlan 
                       ? 'Administrar Suscripción'
@@ -198,7 +184,7 @@ export default function BillingPage() {
                   </Button>
                 </CardFooter>
               </Card>
-            </motion.div>
+            </div>
           )
         })}
       </div>
