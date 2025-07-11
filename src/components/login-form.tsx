@@ -10,6 +10,7 @@ import { EyeRegular, EyeOffRegular } from '@fluentui/react-icons';
 import { cn } from "@/lib/utils"
 import { auth, firebaseEnabled } from '@/lib/firebase/client';
 import { useToast } from "@/hooks/use-toast";
+import { createAssessment } from '@/app/actions/recaptcha';
 
 import { Button } from "@/components/ui/button"
 import {
@@ -76,8 +77,16 @@ export function LoginForm({
 
     (window as any).grecaptcha.enterprise.ready(async () => {
       const token = await (window as any).grecaptcha.enterprise.execute('6LfKgn4rAAAAAJpwi5gtDUmSLD3_jCjhdPGbQ6es', {action: 'LOGIN'});
-      // In a real application, you would send this token to your backend for verification.
-      console.log('reCAPTCHA Token:', token);
+      
+      const score = await createAssessment({ token, recaptchaAction: 'LOGIN' });
+      
+      // For now, we'll just log the score. In a real app, you'd check if the score is above a threshold.
+      console.log("reCAPTCHA score:", score);
+      
+      // if (score === null || score < 0.5) {
+      //   toast({ title: "Verificación fallida", description: "No se pudo verificar que no eres un robot.", variant: "destructive" });
+      //   return;
+      // }
 
       setIsSubmitting(true);
       try {
