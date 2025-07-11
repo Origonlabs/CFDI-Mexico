@@ -44,7 +44,7 @@ const plans = [
   },
   {
     name: "Profesional",
-    price: "$299",
+    price: "$720",
     pricePeriod: "/mes",
     description: "Perfecto para empresas en crecimiento con mayor volumen de facturación.",
     features: [
@@ -166,9 +166,12 @@ export default function BillingPage() {
                   <CardDescription>{plan.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow space-y-6">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold">{plan.price}</span>
-                    {plan.pricePeriod && <span className="text-muted-foreground">{plan.pricePeriod}</span>}
+                  <div className="flex flex-col">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-4xl font-bold">{plan.price}</span>
+                      {plan.pricePeriod && <span className="text-muted-foreground">{plan.pricePeriod}</span>}
+                    </div>
+                    {plan.price !== 'Gratis' && plan.price !== 'Contacto' && <span className="text-xs text-muted-foreground mt-1">no incluye iva</span>}
                   </div>
                   <ul className="space-y-3 text-sm">
                     {plan.features.map((feature) => (
