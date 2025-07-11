@@ -59,6 +59,7 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { StarBorder } from '@/components/ui/star-border';
 import { AppleLoader } from '@/components/ui/apple-loader';
+import { useSessionTimeout } from '@/hooks/use-session-timeout';
 
 export default function DashboardLayout({
   children,
@@ -70,6 +71,8 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [openCategory, setOpenCategory] = React.useState<string | undefined>();
   const isSettingsActive = pathname.startsWith('/dashboard/settings');
+
+  useSessionTimeout();
 
   React.useEffect(() => {
     if (!loading && !user) {
@@ -343,5 +346,3 @@ export default function DashboardLayout({
     </div>
   );
 }
-
-    
