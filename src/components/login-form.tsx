@@ -10,7 +10,6 @@ import { EyeRegular, EyeOffRegular } from '@fluentui/react-icons';
 import { cn } from "@/lib/utils"
 import { auth, firebaseEnabled } from '@/lib/firebase/client';
 import { useToast } from "@/hooks/use-toast";
-import { createAssessment } from '@/app/actions/recaptcha';
 
 import { Button } from "@/components/ui/button"
 import {
@@ -22,7 +21,6 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 
 const GoogleIcon = () => (
@@ -76,32 +74,18 @@ export function LoginForm({
     }
     
     setIsSubmitting(true);
-
-    (window as any).grecaptcha.enterprise.ready(async () => {
-      try {
-        const token = await (window as any).grecaptcha.enterprise.execute('6LfKgn4rAAAAAJpwi5gtDUmSLD3_jCjhdPGbQ6es', {action: 'LOGIN'});
-        
-        const score = await createAssessment({ token, recaptchaAction: 'LOGIN' });
-        
-        // In a real app, you would check if the score is above a threshold.
-        // For example: if (score === null || score < 0.5) { ... }
-        console.log("reCAPTCHA score:", score);
-        
-        await signInWithEmailAndPassword(auth, email, password);
-        router.push('/dashboard');
-
-      } catch (error: any) {
-        let description = "Ocurrió un error inesperado.";
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-          description = "El correo electrónico o la contraseña son incorrectos.";
-        } else if (error.message.includes("reCAPTCHA")) {
-          description = "No se pudo verificar que no eres un robot. Inténtalo de nuevo.";
-        }
-        toast({ title: "Error de Autenticación", description, variant: "destructive" });
-      } finally {
-        setIsSubmitting(false);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push('/dashboard');
+    } catch (error: any) {
+      let description = "Ocurrió un error inesperado.";
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        description = "El correo electrónico o la contraseña son incorrectos.";
       }
-    });
+      toast({ title: "Error de Autenticación", description, variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const handleMicrosoftSignIn = async () => {
@@ -144,16 +128,12 @@ export function LoginForm({
 
       if (error.code === 'auth/multi-factor-required') {
         const resolver = getMultiFactorResolver(auth, error);
-        // Here you would typically show UI to the user to select a second factor
-        // and get the verification code.
-        // For now, we'll just log this state.
         console.log('MFA is required. Resolver:', resolver);
         toast({
           title: "Verificación Requerida",
           description: "Se necesita un segundo factor de autenticación para continuar.",
           variant: "default",
         });
-        // This is where you would implement the UI flow for MFA.
       } else {
         console.error("Error al iniciar sesión con Google", error);
         toast({ title: "Error de Autenticación", description: "No se pudo iniciar sesión con Google. Revisa la configuración de tu proyecto en Firebase.", variant: "destructive", });
