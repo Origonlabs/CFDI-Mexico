@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GoogleAuthProvider, OAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, OAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
 import { EyeRegular, EyeOffRegular } from '@fluentui/react-icons';
 
 import { cn } from "@/lib/utils"
@@ -73,11 +73,19 @@ export function LoginForm({
       toast({ title: "Error de Configuración", description: "Firebase no está configurado.", variant: "destructive", });
       return;
     }
-    // This is a placeholder for email/password sign-in logic
-    // which is not fully implemented in the current user code.
-    // For now, it will just redirect to the dashboard.
-    console.log("Attempting sign-in with:", email, password);
-    router.push('/dashboard');
+    setIsSubmitting(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push('/dashboard');
+    } catch (error: any) {
+      let description = "Ocurrió un error inesperado.";
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        description = "El correo electrónico o la contraseña son incorrectos.";
+      }
+      toast({ title: "Error de Autenticación", description, variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const handleMicrosoftSignIn = async () => {
