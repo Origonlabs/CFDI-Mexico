@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -167,6 +167,8 @@ export default function BillingPage() {
                     <h2 className="text-4xl font-bold">{plan.price}</h2>
                     {plan.price !== 'Gratis' && plan.price !== 'Contacto' && <p className="text-sm text-muted-foreground pb-1">/ {plan.frequency}</p>}
                   </div>
+                  {plan.name === 'Profesional' && <p className="text-xs text-muted-foreground -mt-3">no incluye iva</p>}
+
 
                   {/* Features */}
                   <div className="flex flex-col gap-2 text-left pt-2">
