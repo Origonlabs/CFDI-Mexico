@@ -9,12 +9,14 @@ import { Label } from "@/components/ui/label";
 import GooglePayButton from "@google-pay/button-react";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeftRegular, CreditCardRegular, WalletRegular, BuildingBankRegular, CheckmarkCircleFilled, CheckmarkCircleRegular, InfoRegular } from "@fluentui/react-icons";
+import { ArrowLeftRegular, CreditCardRegular, WalletRegular, BuildingBankRegular, CheckmarkCircleFilled, CheckmarkCircleRegular, InfoRegular, ChevronDownRegular, ReceiptRegular } from "@fluentui/react-icons";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const plans = {
     'Básico': { price: '99.00', currency: 'MXN' },
@@ -47,6 +49,7 @@ export default function CheckoutPage() {
     const planName = searchParams.get('plan') as PlanName | null;
     const planDetails = planName ? plans[planName] : null;
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("card");
+    const [needsInvoice, setNeedsInvoice] = useState(false);
 
     return (
         <div className="flex flex-col lg:flex-row min-h-screen bg-muted/30 font-body">
@@ -63,6 +66,64 @@ export default function CheckoutPage() {
                                 <p className="text-sm">¿Ya tienes una cuenta? <Link href="/" className="text-primary hover:underline">Iniciar sesión</Link></p>
                             </div>
                             <Input id="email" placeholder="Correo electrónico" />
+                        </div>
+
+                        {/* Invoicing Section */}
+                        <div className="p-5 border rounded-lg bg-background space-y-4">
+                            <div className="flex items-center space-x-3">
+                                <Checkbox id="needs-invoice" checked={needsInvoice} onCheckedChange={(checked) => setNeedsInvoice(!!checked)} />
+                                <Label htmlFor="needs-invoice" className="text-base font-semibold cursor-pointer">
+                                    Necesito factura
+                                </Label>
+                            </div>
+                            {needsInvoice && (
+                                <div className="pt-4 border-t space-y-4 animate-in fade-in-0">
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <div className="space-y-1">
+                                            <Label htmlFor="razon-social">Razón Social</Label>
+                                            <Input id="razon-social" placeholder="Nombre completo o de la empresa" />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-1">
+                                                <Label htmlFor="rfc">RFC</Label>
+                                                <Input id="rfc" placeholder="RFC" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label htmlFor="cp-fiscal">Código Postal Fiscal</Label>
+                                                <Input id="cp-fiscal" placeholder="12345" />
+                                            </div>
+                                        </div>
+                                         <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-1">
+                                                <Label htmlFor="regimen-fiscal">Régimen Fiscal</Label>
+                                                <Select>
+                                                    <SelectTrigger id="regimen-fiscal">
+                                                        <SelectValue placeholder="Seleccionar..." />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="601">601 - General de Ley Personas Morales</SelectItem>
+                                                        <SelectItem value="612">612 - Personas Físicas con Actividades Empresariales</SelectItem>
+                                                        <SelectItem value="626">626 - Régimen Simplificado de Confianza (RESICO)</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label htmlFor="uso-cfdi">Uso de CFDI</Label>
+                                                <Select>
+                                                    <SelectTrigger id="uso-cfdi">
+                                                        <SelectValue placeholder="Seleccionar..." />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="G01">G01 - Adquisición de mercancías</SelectItem>
+                                                        <SelectItem value="G03">G03 - Gastos en general</SelectItem>
+                                                        <SelectItem value="I08">I08 - Otra maquinaria y equipo</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Payment Section */}
