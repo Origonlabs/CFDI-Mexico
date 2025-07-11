@@ -15,8 +15,8 @@ import { Badge } from "@/components/ui/badge";
 const plans = [
   {
     name: "Estandar",
-    price: "Gratis",
-    frequency: "mes",
+    price: { monthly: "Gratis", annual: "Gratis" },
+    frequency: { monthly: "mes", annual: "año" },
     description: "Para empezar a facturar sin costo y conocer la plataforma.",
     features: [
       "Hasta 5 CFDIs al mes",
@@ -29,8 +29,8 @@ const plans = [
   },
   {
     name: "Básico",
-    price: "$99",
-    frequency: "mes",
+    price: { monthly: "$99", annual: "$891" },
+    frequency: { monthly: "mes", annual: "año" },
     description: "Ideal para freelancers y pequeños negocios que recién comienzan.",
     features: [
       "Hasta 50 CFDIs al mes",
@@ -44,8 +44,8 @@ const plans = [
   },
   {
     name: "Profesional",
-    price: "$720",
-    frequency: "mes",
+    price: { monthly: "$720", annual: "$6480" },
+    frequency: { monthly: "mes", annual: "año" },
     description: "Perfecto para empresas en crecimiento con mayor volumen de facturación.",
     features: [
       "Hasta 250 CFDIs al mes",
@@ -60,8 +60,8 @@ const plans = [
   },
   {
     name: "Empresarial",
-    price: "Contacto",
-    frequency: "mes",
+    price: { monthly: "Contacto", annual: "Contacto" },
+    frequency: { monthly: "mes", annual: "año" },
     description: "Soluciones a la medida para grandes corporaciones y necesidades específicas.",
     features: [
       "CFDIs ilimitados",
@@ -81,6 +81,7 @@ export default function BillingPage() {
   const [user, authLoading] = useAuthState(auth);
   const [activePlan, setActivePlan] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
 
   useEffect(() => {
     async function fetchSubscription() {
@@ -131,10 +132,44 @@ export default function BillingPage() {
         </p>
       </div>
 
+      <div className="flex justify-center items-center mb-10">
+        <div className="relative flex items-center p-1 rounded-full border border-green-300 bg-white">
+          <button
+            onClick={() => setBillingCycle('monthly')}
+            className={cn(
+              "relative z-10 px-6 py-1.5 text-sm font-medium rounded-full transition-colors duration-300",
+              billingCycle === 'monthly' ? 'text-white' : 'text-gray-600 hover:text-gray-900'
+            )}
+          >
+            Pago mensual
+          </button>
+          <button
+            onClick={() => setBillingCycle('annual')}
+            className={cn(
+              "relative z-10 px-6 py-1.5 text-sm font-medium rounded-full transition-colors duration-300",
+               billingCycle === 'annual' ? 'text-white' : 'text-gray-600 hover:text-gray-900'
+            )}
+          >
+            Pago anual (ahorra un 25%)*
+          </button>
+           <div
+            className={cn(
+              "absolute h-[85%] bg-black rounded-full transition-transform duration-300 ease-in-out",
+              billingCycle === 'monthly'
+                ? 'w-[140px] transform translate-x-[4px]'
+                : 'w-[250px] transform translate-x-[140px]'
+            )}
+          />
+        </div>
+      </div>
+
+
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 items-start justify-center">
         {plans.map((plan) => {
           const isCurrentPlan = activePlan === plan.name;
           const hasActivePlan = !!activePlan;
+          const currentPrice = plan.price[billingCycle];
+          const currentFrequency = plan.frequency[billingCycle];
 
           return (
             <div key={plan.name} className={cn(
@@ -164,8 +199,8 @@ export default function BillingPage() {
                   
                   {/* Price */}
                   <div className="flex items-end gap-1 text-left">
-                    <h2 className="text-4xl font-bold">{plan.price}</h2>
-                    {plan.price !== 'Gratis' && plan.price !== 'Contacto' && <p className="text-sm text-muted-foreground pb-1">/ {plan.frequency}</p>}
+                    <h2 className="text-4xl font-bold">{currentPrice}</h2>
+                    {currentPrice !== 'Gratis' && currentPrice !== 'Contacto' && <p className="text-sm text-muted-foreground pb-1">/ {currentFrequency}</p>}
                   </div>
                   {plan.name === 'Profesional' && <p className="text-xs text-muted-foreground -mt-3">no incluye iva</p>}
 
