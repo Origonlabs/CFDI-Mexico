@@ -2,13 +2,19 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeftRegular } from "@fluentui/react-icons";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import GooglePayButton from "@google-pay/button-react";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { ArrowLeftRegular, CreditCardRegular, WalletRegular, BuildingBankRegular, CheckmarkCircleFilled, CheckmarkCircleRegular, InfoRegular } from "@fluentui/react-icons";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const plans = {
     'Básico': { price: '99.00', currency: 'MXN' },
@@ -18,100 +24,169 @@ const plans = {
 
 type PlanName = keyof typeof plans;
 
+const PaypalIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-paypal">
+        <path d="M19.34 7.6a1.5 1.5 0 0 0-2.4-1.3l-3.46 2.1a1.5 1.5 0 0 0-1.12 2.25l1.3 3.5a1.5 1.5 0 0 0 2.26 1.12l3.46-2.1a1.5 1.5 0 0 0 1.3-2.4l-1.3-3.51Z"/>
+        <path d="M13.83 14.86a1.5 1.5 0 0 0-2.26 1.12l-1.3 3.5a1.5 1.5 0 0 0 1.3 2.4l3.46-2.1a1.5 1.5 0 0 0 1.12-2.25l-1.3-3.5Z"/>
+        <path d="M6.16 7.6a1.5 1.5 0 0 0-2.26 1.12l-1.3 3.5a1.5 1.5 0 0 0 1.3 2.4l3.46-2.1a1.5 1.5 0 0 0 1.12-2.25l-1.3-3.5Z"/>
+    </svg>
+);
+
+
 export default function CheckoutPage() {
     const searchParams = useSearchParams();
     const { toast } = useToast();
     const planName = searchParams.get('plan') as PlanName | null;
     const planDetails = planName ? plans[planName] : null;
-
-    const handlePaymentSuccess = (paymentData: google.payments.api.PaymentData) => {
-        console.log('Payment successful', paymentData);
-        toast({
-            title: "Pago Exitoso",
-            description: "Tu suscripción ha sido activada.",
-        });
-        // Aquí iría la lógica para verificar el pago en el backend
-    };
-    
-    const handlePaymentError = (error: google.payments.api.Error) => {
-        console.error('Payment error', error);
-        toast({
-            title: "Error en el Pago",
-            description: "No se pudo procesar tu pago. Por favor, intenta de nuevo.",
-            variant: "destructive"
-        });
-    };
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("card");
 
     return (
-        <div className="flex flex-col flex-1 items-center justify-center py-12">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle className="font-headline text-2xl">Confirmar Compra</CardTitle>
-                    <CardDescription>
-                        {planDetails ? `Estás a punto de suscribirte al plan: ${planName}.` : "No se ha seleccionado ningún plan."}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {planDetails && (
-                        <>
-                            <div className="flex justify-between items-center text-lg">
-                                <span className="font-medium">Plan {planName}</span>
-                                <span className="font-bold">${planDetails.price} {planDetails.currency}</span>
+        <div className="flex flex-col lg:flex-row min-h-screen bg-muted/30 font-body">
+            {/* Main content */}
+            <main className="lg:w-1/2 xl:w-3/5 p-6 sm:p-12">
+                <div className="max-w-xl mx-auto">
+                    <h1 className="text-2xl font-bold font-headline text-primary mb-6">OrigonCFDI</h1>
+                    
+                    <div className="space-y-8">
+                        {/* Contact Information */}
+                        <div className="p-5 border rounded-lg bg-background">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-lg font-semibold">Contacto</h2>
+                                <p className="text-sm">¿Ya tienes una cuenta? <Link href="/" className="text-primary hover:underline">Iniciar sesión</Link></p>
+                            </div>
+                            <Input id="email" placeholder="Correo electrónico" />
+                        </div>
+
+                        {/* Payment Section */}
+                        <div className="space-y-4">
+                             <h2 className="text-lg font-semibold">Pago</h2>
+                             <p className="text-sm text-muted-foreground">Todas las transacciones son seguras y están encriptadas.</p>
+                             <RadioGroup defaultValue="card" onValueChange={setSelectedPaymentMethod} className="border rounded-lg bg-background">
+                                <div className={cn("flex items-center space-x-4 p-4", selectedPaymentMethod === "card" && "bg-primary/5")}>
+                                    <RadioGroupItem value="card" id="card" />
+                                    <Label htmlFor="card" className="flex-1 cursor-pointer">Tarjeta de crédito</Label>
+                                    <div className="flex items-center gap-1">
+                                        <Image src="https://img.buoucoding.com/visa.svg" alt="Visa" width={32} height={20} />
+                                        <Image src="https://img.buoucoding.com/mastercard.svg" alt="Mastercard" width={32} height={20} />
+                                        <Image src="https://img.buoucoding.com/amex.svg" alt="American Express" width={32} height={20} />
+                                    </div>
+                                </div>
+                                {selectedPaymentMethod === "card" && (
+                                    <div className="p-5 border-t bg-muted/50">
+                                       <div className="space-y-4">
+                                            <Input placeholder="Número de tarjeta" />
+                                            <Input placeholder="Nombre en la tarjeta" />
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <Input placeholder="MM / AA" />
+                                                <Input placeholder="CVC" />
+                                            </div>
+                                       </div>
+                                    </div>
+                                )}
+                                <Separator />
+                                <div className={cn("flex items-center space-x-4 p-4", selectedPaymentMethod === "paypal" && "bg-primary/5")}>
+                                     <RadioGroupItem value="paypal" id="paypal" />
+                                     <Label htmlFor="paypal" className="flex-1 cursor-pointer">PayPal</Label>
+                                     <PaypalIcon />
+                                </div>
+                                {selectedPaymentMethod === "paypal" && (
+                                     <div className="p-5 border-t bg-muted/50 flex justify-center">
+                                       <Button className="bg-[#0070ba] hover:bg-[#005ea6] text-white w-full">
+                                         Pagar con PayPal
+                                       </Button>
+                                     </div>
+                                )}
+                                <Separator />
+                                <div className={cn("flex items-center space-x-4 p-4", selectedPaymentMethod === "gpay" && "bg-primary/5")}>
+                                    <RadioGroupItem value="gpay" id="gpay" />
+                                    <Label htmlFor="gpay" className="flex-1 cursor-pointer">Google Pay</Label>
+                                </div>
+                                 {selectedPaymentMethod === "gpay" && (
+                                     <div className="p-5 border-t bg-muted/50 flex justify-center">
+                                       <GooglePayButton
+                                            environment="TEST"
+                                            paymentRequest={{
+                                                apiVersion: 2,
+                                                apiVersionMinor: 0,
+                                                allowedPaymentMethods: [{
+                                                    type: 'CARD',
+                                                    parameters: { allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'], allowedCardNetworks: ['MASTERCARD', 'VISA'] },
+                                                    tokenizationSpecification: { type: 'PAYMENT_GATEWAY', parameters: { gateway: 'example', gatewayMerchantId: 'exampleGatewayMerchantId' } },
+                                                }],
+                                                merchantInfo: { merchantId: '12345678901234567890', merchantName: 'OrigonCFDI' },
+                                                transactionInfo: {
+                                                    totalPriceStatus: 'FINAL',
+                                                    totalPriceLabel: 'Total',
+                                                    totalPrice: planDetails?.price || '0.00',
+                                                    currencyCode: planDetails?.currency || 'MXN',
+                                                    countryCode: 'MX',
+                                                },
+                                            }}
+                                            onLoadPaymentData={(paymentData) => { console.log('load payment data', paymentData); }}
+                                            buttonType="pay"
+                                            buttonColor="black"
+                                        />
+                                     </div>
+                                )}
+                             </RadioGroup>
+                        </div>
+                    </div>
+                     <div className="mt-8">
+                        <Button className="w-full">
+                            {planDetails ? `Pagar $${planDetails.price} ${planDetails.currency}` : "Completar pago"}
+                        </Button>
+                        <Button variant="ghost" asChild className="w-full mt-2">
+                             <Link href="/dashboard/billing">
+                                <ArrowLeftRegular className="mr-2 h-4 w-4" />
+                                Volver a Planes
+                            </Link>
+                        </Button>
+                     </div>
+                </div>
+            </main>
+
+            {/* Order Summary */}
+            <aside className="lg:w-1/2 xl:w-2/5 p-6 sm:p-12 bg-background border-l">
+                 <div className="max-w-md mx-auto">
+                    <h2 className="text-lg font-semibold mb-4">Resumen de la orden</h2>
+                    {planDetails ? (
+                         <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-muted p-2 rounded-lg">
+                                        <WalletRegular className="h-6 w-6 text-primary" />
+                                    </div>
+                                    <div>
+                                        <p className="font-medium">Plan {planName}</p>
+                                        <p className="text-sm text-muted-foreground">Suscripción mensual</p>
+                                    </div>
+                                </div>
+                                <p className="font-semibold">${planDetails.price}</p>
                             </div>
                             <Separator />
-                             <p className="text-sm text-center text-muted-foreground pt-4">Paga de forma rápida y segura con Google Pay.</p>
-                             <div className="flex justify-center">
-                                <GooglePayButton
-                                    environment="TEST" // Cambiar a "PRODUCTION" cuando estés listo
-                                    paymentRequest={{
-                                        apiVersion: 2,
-                                        apiVersionMinor: 0,
-                                        allowedPaymentMethods: [
-                                            {
-                                                type: 'CARD',
-                                                parameters: {
-                                                    allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
-                                                    allowedCardNetworks: ['MASTERCARD', 'VISA'],
-                                                },
-                                                tokenizationSpecification: {
-                                                    type: 'PAYMENT_GATEWAY',
-                                                    parameters: {
-                                                        gateway: 'example', // Reemplazar con tu gateway
-                                                        gatewayMerchantId: 'exampleGatewayMerchantId',
-                                                    },
-                                                },
-                                            },
-                                        ],
-                                        merchantInfo: {
-                                            merchantId: '12345678901234567890', // Reemplazar con tu Merchant ID
-                                            merchantName: 'OrigonCFDI',
-                                        },
-                                        transactionInfo: {
-                                            totalPriceStatus: 'FINAL',
-                                            totalPriceLabel: 'Total',
-                                            totalPrice: planDetails.price,
-                                            currencyCode: planDetails.currency,
-                                            countryCode: 'MX',
-                                        },
-                                    }}
-                                    onLoadPaymentData={handlePaymentSuccess}
-                                    onError={handlePaymentError}
-                                    buttonColor="black"
-                                    buttonType="pay"
-                                />
-                             </div>
-                        </>
+                            <div className="flex justify-between text-sm">
+                                <p className="text-muted-foreground">Subtotal</p>
+                                <p>${planDetails.price}</p>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                                <p className="text-muted-foreground">Impuestos (IVA 16%)</p>
+                                <p>${(parseFloat(planDetails.price) * 0.16).toFixed(2)}</p>
+                            </div>
+                            <Separator />
+                            <div className="flex justify-between font-bold text-lg">
+                                <p>Total</p>
+                                <p>
+                                    <span className="text-sm text-muted-foreground font-normal mr-2">{planDetails.currency}</span>
+                                    ${(parseFloat(planDetails.price) * 1.16).toFixed(2)}
+                                </p>
+                            </div>
+                         </div>
+                    ) : (
+                        <p className="text-muted-foreground">No hay ningún plan seleccionado.</p>
                     )}
-                </CardContent>
-                <CardFooter className="flex-col items-stretch gap-4 pt-4">
-                    <Button variant="ghost" asChild>
-                        <Link href="/dashboard/billing">
-                            <ArrowLeftRegular className="mr-2 h-4 w-4" />
-                            Volver a Planes
-                        </Link>
-                    </Button>
-                </CardFooter>
-            </Card>
+                 </div>
+            </aside>
         </div>
     );
 }
+
