@@ -73,19 +73,26 @@ export function LoginForm({
       toast({ title: "Error de Configuración", description: "Firebase no está configurado.", variant: "destructive", });
       return;
     }
-    setIsSubmitting(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push('/dashboard');
-    } catch (error: any) {
-      let description = "Ocurrió un error inesperado.";
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        description = "El correo electrónico o la contraseña son incorrectos.";
+
+    (window as any).grecaptcha.enterprise.ready(async () => {
+      const token = await (window as any).grecaptcha.enterprise.execute('6LfKgn4rAAAAAJpwi5gtDUmSLD3_jCjhdPGbQ6es', {action: 'LOGIN'});
+      // In a real application, you would send this token to your backend for verification.
+      console.log('reCAPTCHA Token:', token);
+
+      setIsSubmitting(true);
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        router.push('/dashboard');
+      } catch (error: any) {
+        let description = "Ocurrió un error inesperado.";
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+          description = "El correo electrónico o la contraseña son incorrectos.";
+        }
+        toast({ title: "Error de Autenticación", description, variant: "destructive" });
+      } finally {
+        setIsSubmitting(false);
       }
-      toast({ title: "Error de Autenticación", description, variant: "destructive" });
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   }
 
   const handleMicrosoftSignIn = async () => {
