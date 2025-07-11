@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GoogleAuthProvider, OAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
+import { GoogleAuthProvider, OAuthProvider, signInWithPopup, signInWithEmailAndPassword, getMultiFactorResolver } from 'firebase/auth';
 import { EyeRegular, EyeOffRegular } from '@fluentui/react-icons';
 
 import { cn } from "@/lib/utils"
@@ -121,8 +121,23 @@ export function LoginForm({
       await signInWithPopup(auth, provider);
       router.push('/dashboard');
     } catch (error: any) {
-      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+      if (error.code === 'auth/popup-closed-by-user') {
         console.log("Sign-in popup closed by user.");
+        return;
+      }
+
+      if (error.code === 'auth/multi-factor-required') {
+        const resolver = getMultiFactorResolver(auth, error);
+        // Here you would typically show UI to the user to select a second factor
+        // and get the verification code.
+        // For now, we'll just log this state.
+        console.log('MFA is required. Resolver:', resolver);
+        toast({
+          title: "Verificación Requerida",
+          description: "Se necesita un segundo factor de autenticación para continuar.",
+          variant: "default",
+        });
+        // This is where you would implement the UI flow for MFA.
       } else {
         console.error("Error al iniciar sesión con Google", error);
         toast({ title: "Error de Autenticación", description: "No se pudo iniciar sesión con Google.", variant: "destructive", });
