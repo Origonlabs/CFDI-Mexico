@@ -89,8 +89,8 @@ export function LoginForm({
   }
 
   const handleMicrosoftSignIn = async () => {
-    if (!auth) {
-      toast({ title: "Error de Autenticación", description: "Firebase no está inicializado.", variant: "destructive", });
+    if (!firebaseEnabled || !auth) {
+      toast({ title: "Error de Configuración", description: "Firebase no está configurado.", variant: "destructive", });
       return;
     }
     setIsSubmitting(true);
@@ -111,8 +111,8 @@ export function LoginForm({
   };
 
   const handleGoogleSignIn = async () => {
-    if (!auth) {
-      toast({ title: "Error de Autenticación", description: "Firebase no está inicializado.", variant: "destructive", });
+    if (!firebaseEnabled || !auth) {
+      toast({ title: "Error de Configuración", description: "Firebase no está configurado.", variant: "destructive", });
       return;
     }
     setIsSubmitting(true);
