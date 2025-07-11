@@ -209,3 +209,19 @@ export const bankAccounts = pgTable('bank_accounts', {
   isActive: boolean('is_active').default(true).notNull(),
   isDefault: boolean('is_default').default(false).notNull(),
 });
+
+// --- Suscripciones de la App ---
+export const subscriptionStatusEnum = pgEnum('subscription_status', ['active', 'canceled', 'past_due', 'unpaid']);
+
+export const subscriptions = pgTable('subscriptions', {
+  id: serial('id').primaryKey(),
+  userId: varchar('user_id', { length: 256 }).notNull().unique(),
+  planName: text('plan_name').notNull(),
+  status: subscriptionStatusEnum('status').notNull(),
+  paymentProvider: text('payment_provider'), // e.g., 'stripe', 'paypal'
+  providerSubscriptionId: text('provider_subscription_id').unique(),
+  currentPeriodStart: timestamp('current_period_start').notNull(),
+  currentPeriodEnd: timestamp('current_period_end').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
