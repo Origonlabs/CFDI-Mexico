@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { CheckRegular } from "@fluentui/react-icons";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 const plans = [
   {
@@ -68,6 +69,14 @@ const plans = [
 ];
 
 export default function BillingPage() {
+  const router = useRouter();
+
+  const handleSelectPlan = (planName: string) => {
+    if (planName !== 'Estandar') {
+        router.push(`/dashboard/checkout?plan=${encodeURIComponent(planName)}`);
+    }
+  };
+
   return (
     <div className="flex flex-col flex-1 gap-6 max-w-7xl mx-auto py-8">
       <div className="text-center">
@@ -114,7 +123,7 @@ export default function BillingPage() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button className="w-full">
+                <Button className="w-full" onClick={() => handleSelectPlan(plan.name)}>
                   {plan.name === 'Empresarial' ? 'Contactar Ventas' : 'Seleccionar Plan'}
                 </Button>
               </CardFooter>
