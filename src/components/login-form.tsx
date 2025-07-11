@@ -74,28 +74,28 @@ export function LoginForm({
       toast({ title: "Error de Configuración", description: "Firebase no está configurado.", variant: "destructive", });
       return;
     }
+    
+    setIsSubmitting(true);
 
     (window as any).grecaptcha.enterprise.ready(async () => {
-      const token = await (window as any).grecaptcha.enterprise.execute('6LfKgn4rAAAAAJpwi5gtDUmSLD3_jCjhdPGbQ6es', {action: 'LOGIN'});
-      
-      const score = await createAssessment({ token, recaptchaAction: 'LOGIN' });
-      
-      // For now, we'll just log the score. In a real app, you'd check if the score is above a threshold.
-      console.log("reCAPTCHA score:", score);
-      
-      // if (score === null || score < 0.5) {
-      //   toast({ title: "Verificación fallida", description: "No se pudo verificar que no eres un robot.", variant: "destructive" });
-      //   return;
-      // }
-
-      setIsSubmitting(true);
       try {
+        const token = await (window as any).grecaptcha.enterprise.execute('6LfKgn4rAAAAAJpwi5gtDUmSLD3_jCjhdPGbQ6es', {action: 'LOGIN'});
+        
+        const score = await createAssessment({ token, recaptchaAction: 'LOGIN' });
+        
+        // In a real app, you would check if the score is above a threshold.
+        // For example: if (score === null || score < 0.5) { ... }
+        console.log("reCAPTCHA score:", score);
+        
         await signInWithEmailAndPassword(auth, email, password);
         router.push('/dashboard');
+
       } catch (error: any) {
         let description = "Ocurrió un error inesperado.";
         if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
           description = "El correo electrónico o la contraseña son incorrectos.";
+        } else if (error.message.includes("reCAPTCHA")) {
+          description = "No se pudo verificar que no eres un robot. Inténtalo de nuevo.";
         }
         toast({ title: "Error de Autenticación", description, variant: "destructive" });
       } finally {
