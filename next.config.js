@@ -11,12 +11,6 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'placehold.co',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
         hostname: 'img.buoucoding.com',
         port: '',
         pathname: '/**',
@@ -26,6 +20,8 @@ const nextConfig = {
         hostname: 'firebasestorage.googleapis.com',
       },
     ],
+    // Permitir imágenes desde el mismo dominio para el logo.
+    // Esto se infiere y no necesita un 'hostname' explícito cuando es el mismo servidor.
   },
 };
 
