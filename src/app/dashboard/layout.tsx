@@ -181,7 +181,7 @@ export default function DashboardLayout({
             href="/dashboard"
             className="flex items-center gap-2 font-semibold text-current"
           >
-            <Image src="/LogoOrigonCFDI.png" alt="Origon CFDI" width={28} height={28} className="h-7 w-7" unoptimized={true} />
+            <Image src="/LogoOrigonCFDI.webp" alt="Origon CFDI" width={28} height={28} className="h-7 w-7" unoptimized={true} />
             <span className="font-headline text-lg hidden sm:inline-block">
               Origon
             </span>
