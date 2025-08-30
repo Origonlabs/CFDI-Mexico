@@ -1,4 +1,5 @@
 
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
@@ -19,9 +20,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'firebasestorage.googleapis.com',
       },
+       {
+        protocol: 'https',
+        hostname: '6000-firebase-studio-1751667472332.cluster-joak5ukfbnbyqspg4tewa33d24.cloudworkstations.dev',
+      }
     ],
-    // Permitir imágenes desde el mismo dominio para el logo.
-    // Esto se infiere y no necesita un 'hostname' explícito cuando es el mismo servidor.
   },
 };
 
