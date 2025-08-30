@@ -70,6 +70,17 @@ body {
   }
 }
 
+.login-background {
+  background-image: url('/Origon_web_light.webp');
+}
+
+@media (prefers-color-scheme: dark) {
+  .login-background {
+    background-image: url('/Origon_web_dark.webp');
+  }
+}
+
+
 /* Apple Loader Animation */
 @keyframes apple-loader-fade {
   from {
