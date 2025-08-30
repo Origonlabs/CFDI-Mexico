@@ -436,13 +436,29 @@ export default function NewInvoicePage() {
 
             <Card>
                 <CardContent className="pt-6">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <FormField control={form.control} name="moneda" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>* Moneda</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                                     <SelectContent><SelectItem value="MXN">MXN - Peso Mexicano</SelectItem></SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                         <FormField control={form.control} name="formaPago" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>* Forma de Pago</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl><SelectTrigger><SelectValue placeholder="Forma de Pago" /></SelectTrigger></FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="01">01 - Efectivo</SelectItem>
+                                        <SelectItem value="03">03 - Transferencia electrónica</SelectItem>
+                                        <SelectItem value="04">04 - Tarjeta de crédito</SelectItem>
+                                        <SelectItem value="28">28 - Tarjeta de débito</SelectItem>
+                                        <SelectItem value="99">99 - Por definir</SelectItem>
+                                    </SelectContent>
                                 </Select>
                                 <FormMessage />
                             </FormItem>
@@ -455,22 +471,6 @@ export default function NewInvoicePage() {
                                     <SelectContent>
                                         <SelectItem value="PUE">PUE - Pago en una sola exhibición</SelectItem>
                                         <SelectItem value="PPD">PPD - Pago en parcialidades o diferido</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                        <FormField control={form.control} name="formaPago" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>* Forma de Pago</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl><SelectTrigger><SelectValue placeholder="Forma de Pago" /></SelectTrigger></FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="01">01 - Efectivo</SelectItem>
-                                        <SelectItem value="03">03 - Transferencia electrónica</SelectItem>
-                                        <SelectItem value="04">04 - Tarjeta de crédito</SelectItem>
-                                        <SelectItem value="28">28 - Tarjeta de débito</SelectItem>
-                                        <SelectItem value="99">99 - Por definir</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
