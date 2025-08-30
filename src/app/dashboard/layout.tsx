@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { signOut as firebaseSignOut } from 'firebase/auth';
+import Image from 'next/image';
 import {
   SettingsRegular,
   ChevronDownFilled,
@@ -54,7 +55,6 @@ import {
 import { auth } from '@/lib/firebase/client';
 import { navigationLinks } from './components/nav-links';
 import { Button } from '@/components/ui/button';
-import { OrigonLogo } from '@/components/logo';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { StarBorder } from '@/components/ui/star-border';
@@ -181,7 +181,7 @@ export default function DashboardLayout({
             href="/dashboard"
             className="flex items-center gap-2 font-semibold text-current"
           >
-            <OrigonLogo className="h-7 w-7" />
+            <Image src="/LogoOrigonCFDI.png" alt="Origon CFDI" width={28} height={28} className="h-7 w-7" />
             <span className="font-headline text-lg hidden sm:inline-block">
               Origon
             </span>
