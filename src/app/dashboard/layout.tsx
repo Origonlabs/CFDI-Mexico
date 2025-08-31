@@ -358,7 +358,7 @@ export default function DashboardLayout({
                         </div>
                         <div className="flex justify-between">
                             <span className="text-muted-foreground">Desarrollador:</span>
-                            <span className="font-medium">Origon Cloud Platform</span>
+                            <span className="font-medium">Opendex Cloud Platform</span>
                         </div>
                         <div className="space-y-1">
                              <span className="text-muted-foreground">Licencias:</span>
