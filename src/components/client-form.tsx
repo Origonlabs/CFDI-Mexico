@@ -185,7 +185,7 @@ export function ClientForm({ onSubmit, initialData = null, onCancel }: ClientFor
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Régimen Fiscal</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Selecciona un régimen fiscal" />
