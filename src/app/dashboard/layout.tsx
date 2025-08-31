@@ -60,6 +60,7 @@ import { Input } from '@/components/ui/input';
 import { StarBorder } from '@/components/ui/star-border';
 import { AppleLoader } from '@/components/ui/apple-loader';
 import { useSessionTimeout } from '@/hooks/use-session-timeout';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function DashboardLayout({
   children,
@@ -174,7 +175,7 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen w-full flex-col bg-[#1A1A1A]">
-      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-4 bg-[#1A1A1A] px-4 text-primary-foreground">
+      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-4 bg-card px-4 text-primary-foreground border-b">
         {/* Left side */}
         <div className="flex items-center gap-3">
           <Link
@@ -214,6 +215,7 @@ export default function DashboardLayout({
            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-neutral-800 hover:text-white">
             <AlertRegular className="h-5 w-5" />
           </Button>
+          <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
@@ -254,8 +256,8 @@ export default function DashboardLayout({
           </DropdownMenu>
         </div>
       </header>
-      <div className="flex flex-1 overflow-hidden rounded-tl-[15px]">
-        <aside className="hidden w-[240px] flex-col bg-sidebar md:flex">
+      <div className="flex flex-1 overflow-hidden">
+        <aside className="hidden w-[240px] flex-col bg-card border-r md:flex">
           <div className="flex-1 overflow-y-auto p-4">
             <nav className="grid items-start gap-1 text-sm font-medium">
               {mainLinks.map((item: any) => {
