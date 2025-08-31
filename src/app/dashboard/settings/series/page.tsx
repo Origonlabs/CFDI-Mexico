@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { AddCircleRegular, ArrowClockwiseRegular, DeleteRegular, EditRegular } from "@fluentui/react-icons";
+import { PlusCircle, RefreshCw, Trash2, FilePenLine } from "lucide-react";
 import { User } from "firebase/auth";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
@@ -105,12 +105,12 @@ export default function SeriesListPage() {
           <div className="flex items-center gap-4 flex-wrap">
               <Button asChild size="sm">
                   <Link href="/dashboard/settings/series/new">
-                      <AddCircleRegular className="mr-2 h-4 w-4" />
+                      <PlusCircle className="mr-2 h-4 w-4" />
                       Agregar más folios
                   </Link>
               </Button>
               <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
-                  <ArrowClockwiseRegular className="mr-2 h-4 w-4" />
+                  <RefreshCw className="mr-2 h-4 w-4" />
                   Recargar
               </Button>
           </div>
@@ -151,11 +151,11 @@ export default function SeriesListPage() {
                       <TableCell>{formatDate(serie.createdAt)}</TableCell>
                       <TableCell className="text-right">
                           <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
-                              <DeleteRegular className="h-4 w-4" />
+                              <Trash2 className="h-4 w-4" />
                               <span className="sr-only">Eliminar</span>
                           </Button>
                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <EditRegular className="h-4 w-4" />
+                              <FilePenLine className="h-4 w-4" />
                               <span className="sr-only">Editar</span>
                           </Button>
                       </TableCell>

@@ -11,7 +11,7 @@ import { auth, firebaseEnabled } from '@/lib/firebase/client';
 import { useToast } from "@/hooks/use-toast";
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MailRegular, KeyRegular, LockClosedRegular } from "@fluentui/react-icons";
+import { Mail, Key, Lock } from "lucide-react";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -74,7 +74,7 @@ export default function ResetPasswordPage() {
             <CardContent>
                 {emailSent ? (
                     <div className="text-center space-y-4">
-                        <MailRegular className="mx-auto h-12 w-12 text-green-500" />
+                        <Mail className="mx-auto h-12 w-12 text-green-500" />
                         <h3 className="text-lg font-semibold">Revisa tu correo</h3>
                         <p className="text-muted-foreground">
                             Hemos enviado un enlace a <strong>{email}</strong>. Sigue las instrucciones del correo para crear tu nueva contraseña.

@@ -9,33 +9,24 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { signOut as firebaseSignOut } from 'firebase/auth';
 import Image from 'next/image';
 import {
-  SettingsRegular,
-  ChevronDownFilled,
-  GlobeSearchRegular,
-  AlertRegular,
-  ShoppingBagRegular,
-  BotSparkleRegular,
-  PersonRegular,
-  SettingsFilled,
-  ArrowExitRegular,
-  InfoRegular,
-  PremiumRegular,
-  HomeFilled,
-  HomeRegular,
-  DocumentTextFilled,
-  DocumentTextRegular,
-  PaymentFilled,
-  PaymentRegular,
-  BuildingPeopleFilled,
-  BuildingPeopleRegular,
-  DocumentSettingsFilled,
-  DocumentSettingsRegular,
-  DatabaseFilled,
-  DatabaseRegular,
-  ChatFilled,
-  ChatRegular,
-  QuestionCircleRegular,
-} from '@fluentui/react-icons';
+  Settings,
+  ChevronDown,
+  Globe,
+  Bell,
+  ShoppingBag,
+  Bot,
+  User as UserIcon,
+  LogOut,
+  Info,
+  Award,
+  Home,
+  FileText,
+  CreditCard,
+  Users,
+  FileCog,
+  Database,
+  MessageSquare,
+} from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -120,7 +111,7 @@ export default function DashboardLayout({
 
   const renderLinkGroup = (item: any) => {
     const isCategoryActive = item.sublinks?.some((link: any) => link.href !== '#' && pathname.startsWith(link.href));
-    const Icon = isCategoryActive ? item.activeIcon : item.icon;
+    const Icon = item.icon;
 
     return (
       <Collapsible
@@ -139,7 +130,7 @@ export default function DashboardLayout({
             >
               {Icon && <Icon className="h-4 w-4" />}
               <span className="flex-1 text-left">{item.title}</span>
-              <ChevronDownFilled className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+              <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent>
@@ -196,7 +187,7 @@ export default function DashboardLayout({
         <div className="flex-1 max-w-xl mx-auto hidden md:block">
           <StarBorder thickness={3} borderRadius={15} color="hsl(var(--primary))">
             <div className="relative flex h-9 items-center">
-              <GlobeSearchRegular className="absolute left-3.5 h-4 w-4 text-neutral-400" />
+              <Globe className="absolute left-3.5 h-4 w-4 text-neutral-400" />
               <Input
                 className="h-full w-full border-none bg-transparent pl-10 pr-24 placeholder:text-neutral-400 focus-visible:ring-0 focus-visible:ring-offset-0"
                 placeholder="Buscar"
@@ -216,7 +207,7 @@ export default function DashboardLayout({
         {/* Right side */}
         <div className="flex items-center gap-1">
            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-neutral-800 hover:text-white">
-            <AlertRegular className="h-5 w-5" />
+            <Bell className="h-5 w-5" />
           </Button>
           <ThemeToggle />
           <DropdownMenu>
@@ -245,14 +236,14 @@ export default function DashboardLayout({
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/settings">
-                    <PersonRegular className="mr-2 h-4 w-4" />
+                    <UserIcon className="mr-2 h-4 w-4" />
                     <span>Mi cuenta</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut}>
-                <ArrowExitRegular className="mr-2 h-4 w-4" />
+                <LogOut className="mr-2 h-4 w-4" />
                 <span>Cerrar sesión</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -269,7 +260,7 @@ export default function DashboardLayout({
                 }
                 
                 const isActive = pathname === item.href;
-                const Icon = isActive ? item.activeIcon || item.icon : item.icon;
+                const Icon = item.icon;
 
                 return (
                   <Button
@@ -297,43 +288,43 @@ export default function DashboardLayout({
                   variant="ghost"
                   className="w-full justify-start gap-2 px-2"
                 >
-                  {isSettingsActive ? <SettingsRegular className="h-4 w-4" /> : <SettingsFilled className="h-4 w-4" />}
+                  <Settings className="h-4 w-4" />
                   <span className="flex-1 text-left">Configuracion</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-64 mb-1" side="top" align="start">
                  <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <BotSparkleRegular className="mr-2 h-4 w-4" />
+                    <Bot className="mr-2 h-4 w-4" />
                     <span>Asistente de Configuración</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <PremiumRegular className="mr-2 h-4 w-4" />
+                    <Award className="mr-2 h-4 w-4" />
                     <span>Incrementa la vigencia</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/billing" className="cursor-pointer">
-                    <ShoppingBagRegular className="mr-2 h-4 w-4" />
+                    <ShoppingBag className="mr-2 h-4 w-4" />
                     <span>Planes y Suscripción</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/settings" className="cursor-pointer">
-                    <PersonRegular className="mr-2 h-4 w-4" />
+                    <UserIcon className="mr-2 h-4 w-4" />
                     <span>Mi cuenta</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setIsAboutDialogOpen(true)} className="cursor-pointer">
-                  <InfoRegular className="mr-2 h-4 w-4" />
+                  <Info className="mr-2 h-4 w-4" />
                   <span>Acerca de...</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={handleSignOut} className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
-                  <ArrowExitRegular className="mr-2 h-4 w-4" />
+                  <LogOut className="mr-2 h-4 w-4" />
                   <span>Cerrar sesión</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>

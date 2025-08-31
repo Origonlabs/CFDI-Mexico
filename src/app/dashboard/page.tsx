@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { User } from "firebase/auth";
-import { ErrorCircleRegular, InfoRegular, CheckmarkCircleRegular } from "@fluentui/react-icons";
+import { AlertCircle, Info, CheckCircle2 } from "lucide-react";
 
 import {
   Card,
@@ -114,17 +114,17 @@ export default function DashboardPage() {
     <div className="flex-1 space-y-4">
       {showSetupAlert && !loading && (
         <Alert>
-          <InfoRegular className="h-4 w-4" />
+          <Info className="h-4 w-4" />
           <AlertTitle>Completa la configuración de tu cuenta</AlertTitle>
           <AlertDescription>
             <p className="mb-2">Para una experiencia completa y segura, te recomendamos completar los siguientes pasos:</p>
             <ul className="space-y-1">
               <li className="flex items-center gap-2">
-                {setupStatus?.hasCsd ? <CheckmarkCircleRegular className="h-4 w-4 text-green-500" /> : <ErrorCircleRegular className="h-4 w-4 text-yellow-500" />}
+                {setupStatus?.hasCsd ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <AlertCircle className="h-4 w-4 text-yellow-500" />}
                 <span>Subir tu Certificado de Sello Digital (CSD).</span>
               </li>
               <li className="flex items-center gap-2">
-                {user?.emailVerified ? <CheckmarkCircleRegular className="h-4 w-4 text-green-500" /> : <ErrorCircleRegular className="h-4 w-4 text-yellow-500" />}
+                {user?.emailVerified ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <AlertCircle className="h-4 w-4 text-yellow-500" />}
                 <span>Verificar tu correo electrónico.</span>
                 {!user?.emailVerified && <span className="text-xs text-muted-foreground">(Revisa tu bandeja de entrada)</span>}
               </li>
@@ -138,7 +138,7 @@ export default function DashboardPage() {
 
       {!firebaseEnabled && (
         <Alert variant="destructive">
-          <ErrorCircleRegular className="h-4 w-4" />
+          <AlertCircle className="h-4 w-4" />
           <AlertTitle>Configuración Incompleta de Firebase</AlertTitle>
           <AlertDescription>
             Para habilitar la autenticación y todas las funcionalidades, agrega la configuración de tu proyecto de Firebase al archivo{" "}

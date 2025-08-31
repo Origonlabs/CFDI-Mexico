@@ -1,35 +1,25 @@
 
 import {
-  HomeFilled,
-  HomeRegular,
-  DocumentTextFilled,
-  DocumentTextRegular,
-  PaymentFilled,
-  PaymentRegular,
-  BuildingPeopleFilled,
-  BuildingPeopleRegular,
-  DocumentSettingsFilled,
-  DocumentSettingsRegular,
-  DatabaseFilled,
-  DatabaseRegular,
-  ChatFilled,
-  ChatRegular,
-  SettingsFilled,
-  SettingsRegular,
-  QuestionCircleRegular,
-} from "@fluentui/react-icons";
+  Home,
+  FileText,
+  CreditCard,
+  Users,
+  FileCog,
+  Database,
+  MessageSquare,
+  Settings,
+  HelpCircle,
+} from "lucide-react";
 
 export const navigationLinks = [
   {
     title: "Inicio",
-    icon: HomeFilled,
-    activeIcon: HomeRegular,
+    icon: Home,
     href: "/dashboard",
   },
   {
     title: "CFDI",
-    icon: DocumentTextFilled,
-    activeIcon: DocumentTextRegular,
+    icon: FileText,
     sublinks: [
       { href: "/dashboard/invoices/new", label: "Crear Facturas 4.0" },
       { href: "/dashboard/invoices", label: "Facturas" },
@@ -39,8 +29,7 @@ export const navigationLinks = [
   },
   {
     title: "Pagos",
-    icon: PaymentFilled,
-    activeIcon: PaymentRegular,
+    icon: CreditCard,
     sublinks: [
       { href: "/dashboard/payments/new", label: "Crear Pagos 4.0" },
       { href: "/dashboard/payments", label: "Pagos" },
@@ -49,8 +38,7 @@ export const navigationLinks = [
   },
   {
     title: "Empresa",
-    icon: BuildingPeopleFilled,
-    activeIcon: BuildingPeopleRegular,
+    icon: Users,
     sublinks: [
       { href: "/dashboard/clients/new", label: "Crear Clientes" },
       { href: "/dashboard/clients", label: "Clientes" },
@@ -64,16 +52,14 @@ export const navigationLinks = [
   },
   {
     title: "Configuración CFDI 4.0",
-    icon: DocumentSettingsFilled,
-    activeIcon: DocumentSettingsRegular,
+    icon: FileCog,
     sublinks: [
       { href: "/dashboard/settings/document-types", label: "Tipos de documentos" },
     ],
   },
   {
     title: "Almacenamiento",
-    icon: DatabaseFilled,
-    activeIcon: DatabaseRegular,
+    icon: Database,
     sublinks: [
       { href: "/dashboard/storage/deleted-invoices", label: "CFDI Eliminados" },
       { href: "/dashboard/storage/deleted-payments", label: "Pagos Eliminados" },
@@ -81,8 +67,7 @@ export const navigationLinks = [
   },
   {
     title: "Ayuda",
-    icon: ChatFilled,
-    activeIcon: ChatRegular,
+    icon: MessageSquare,
     sublinks: [
       { href: "#", label: "BD de Conocimiento" },
       { href: "#", label: "Manual del usuario" },
@@ -93,8 +78,7 @@ export const navigationLinks = [
   },
   {
     title: "Configuracion",
-    icon: SettingsFilled,
-    activeIcon: SettingsRegular,
+    icon: Settings,
     sublinks: [
       { href: "/dashboard/settings", label: "Perfil de Empresa" },
       { href: "/dashboard/settings", label: "Mi Cuenta" },

@@ -7,7 +7,7 @@ import * as z from "zod";
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { onAuthStateChanged, User, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword, deleteUser } from "firebase/auth";
-import { CheckRegular,DismissCircleRegular,WarningRegular } from "@fluentui/react-icons";
+import { Check, XCircle, AlertTriangle } from "lucide-react";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -206,9 +206,9 @@ export default function SettingsPage() {
     if (!status) return <Badge variant="secondary">Desconocido</Badge>;
 
     const config = {
-        active: { label: 'Activo', variant: 'default' as const, icon: <CheckRegular className="mr-1 h-3.5 w-3.5" /> },
-        revoked: { label: 'Revocado', variant: 'destructive' as const, icon: <DismissCircleRegular className="mr-1 h-3.5 w-3.5" /> },
-        expired: { label: 'Expirado', variant: 'secondary' as const, icon: <WarningRegular className="mr-1 h-3.5 w-3.5" /> },
+        active: { label: 'Activo', variant: 'default' as const, icon: <Check className="mr-1 h-3.5 w-3.5" /> },
+        revoked: { label: 'Revocado', variant: 'destructive' as const, icon: <XCircle className="mr-1 h-3.5 w-3.5" /> },
+        expired: { label: 'Expirado', variant: 'secondary' as const, icon: <AlertTriangle className="mr-1 h-3.5 w-3.5" /> },
     };
 
     const currentConfig = config[status];
@@ -243,7 +243,7 @@ export default function SettingsPage() {
                   <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Domicilio</AccordionTrigger>
                   <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
                     <Alert variant="destructive" className="mb-4">
-                      <WarningRegular className="h-4 w-4" />
+                      <AlertTriangle className="h-4 w-4" />
                       <AlertTitle>Información Crítica Requerida</AlertTitle>
                       <AlertDescription>
                         <p>Es fundamental que completes toda la información de domicilio de tu empresa.</p>

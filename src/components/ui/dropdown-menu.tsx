@@ -3,7 +3,7 @@
 
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
-import { CheckmarkRegular as Check, ChevronRightRegular as ChevronRight, CircleRegular as Circle } from "@fluentui/react-icons"
+import { Check, ChevronRight, Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
