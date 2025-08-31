@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { auth, firebaseEnabled } from '@/lib/firebase/client';
 import { useToast } from "@/hooks/use-toast";
 import { sendPasswordResetEmail } from 'firebase/auth';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -60,43 +61,45 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="mx-auto grid w-[350px] gap-6">
-            <div className="grid gap-2 text-center">
-                <h1 className="text-3xl font-bold font-headline">Restablecer Contraseña</h1>
-                <p className="text-balance text-muted-foreground">
+    <div className="login-background bg-cover bg-center flex items-center justify-center min-h-screen px-4">
+        <Card className="w-full max-w-sm">
+            <CardHeader className="text-center">
+                <CardTitle className="text-xl font-bold font-headline">Restablecer Contraseña</CardTitle>
+                <CardDescription>
                     Ingresa tu correo y te enviaremos un enlace para restablecerla.
-                </p>
-            </div>
-            <form onSubmit={handlePasswordReset} className="grid gap-4">
-                <div className="grid gap-2">
-                    <Label htmlFor="email">Correo electrónico</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        placeholder="GlobalID@Company.com"
-                        required
-                        disabled={!firebaseEnabled || isSubmitting}
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <form onSubmit={handlePasswordReset} className="grid gap-4">
+                    <div className="grid gap-2">
+                        <Label htmlFor="email">Correo electrónico</Label>
+                        <Input
+                            id="email"
+                            type="email"
+                            placeholder="GlobalID@Company.com"
+                            required
+                            disabled={!firebaseEnabled || isSubmitting}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <Button type="submit" className="w-full" disabled={!firebaseEnabled || isSubmitting}>
+                        {isSubmitting ? 'Enviando...' : 'Enviar Enlace'}
+                    </Button>
+                    {!firebaseEnabled && (
+                        <p className="text-center text-xs text-destructive pt-2">
+                        La configuración de Firebase está incompleta. La autenticación está deshabilitada.
+                        </p>
+                    )}
+                </form>
+                <div className="mt-4 text-center text-sm">
+                    ¿Recordaste tu contraseña?{' '}
+                    <Link href="/" className="underline">
+                        Iniciar sesión
+                    </Link>
                 </div>
-                <Button type="submit" className="w-full" disabled={!firebaseEnabled || isSubmitting}>
-                    {isSubmitting ? 'Enviando...' : 'Enviar Enlace'}
-                </Button>
-                {!firebaseEnabled && (
-                    <p className="text-center text-xs text-destructive pt-2">
-                    La configuración de Firebase está incompleta. La autenticación está deshabilitada.
-                    </p>
-                )}
-            </form>
-            <div className="mt-4 text-center text-sm">
-                ¿Recordaste tu contraseña?{' '}
-                <Link href="/" className="underline">
-                    Iniciar sesión
-                </Link>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     </div>
   );
 }
