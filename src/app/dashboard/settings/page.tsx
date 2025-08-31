@@ -236,7 +236,7 @@ export default function SettingsPage() {
       ) : (
       <Form {...profileForm}>
         <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
-          <Accordion type="multiple" defaultValue={['domicilio']} className="w-full space-y-4">
+          <Accordion type="single" collapsible className="w-full space-y-4">
               <AccordionItem value="domicilio">
                   <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Domicilio</AccordionTrigger>
                   <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
@@ -511,4 +511,3 @@ export default function SettingsPage() {
     </>
   );
 }
-
