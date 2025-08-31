@@ -52,14 +52,13 @@ export default function NewClientPage() {
 
     useEffect(() => {
         const subscription = watch((value, { name, type }) => {
-            const { name: clientName, rfc, zip, usoCfdi, taxRegime } = value;
+            const { name: clientName, rfc, zip, taxRegime } = value;
             let completedSteps = 0;
-            const totalSteps = 5;
+            const totalSteps = 4;
 
             if (clientName) completedSteps++;
             if (rfc && rfc.length >= 12) completedSteps++;
             if (zip && zip.length === 5) completedSteps++;
-            if (usoCfdi) completedSteps++;
             if (taxRegime) completedSteps++;
             
             const newProgress = Math.round((completedSteps / totalSteps) * 100);
@@ -274,30 +273,6 @@ export default function NewClientPage() {
                                     )}
                                 />
                             </div>
-                            <FormField
-                                control={form.control}
-                                name="usoCfdi"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Uso de CFDI</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Selecciona un uso de CFDI" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {usoCfdiOptions.map(option => (
-                                                    <SelectItem key={option.clave} value={option.clave}>
-                                                        {option.clave} - {option.descripcion}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
                         </CardContent>
                         <CardFooter className="flex justify-between">
                             <Button type="button" variant="outline" asChild>
@@ -313,3 +288,5 @@ export default function NewClientPage() {
         </div>
     );
 }
+
+    

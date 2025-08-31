@@ -18,7 +18,7 @@ export const clientSchema = z.object({
     .min(12, { message: "El RFC debe tener 12 o 13 caracteres." })
     .max(13, { message: "El RFC debe tener 12 o 13 caracteres." }),
   zip: z.string().length(5, { message: "El código postal debe tener 5 dígitos." }),
-  usoCfdi: z.string().min(1, { message: "El Uso del CFDI es obligatorio." }),
+  usoCfdi: z.string().optional(),
   taxRegime: z.string().min(1, { message: "El régimen fiscal es obligatorio." }),
   country: z.string().optional(),
   state: z.string().optional(),
@@ -221,3 +221,5 @@ export const signupSchema = z.object({
   path: ["confirmEmail"],
 });
 export type SignupFormValues = z.infer<typeof signupSchema>;
+
+    
