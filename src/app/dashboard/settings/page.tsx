@@ -40,6 +40,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 
 interface Certificate {
@@ -240,6 +241,17 @@ export default function SettingsPage() {
               <AccordionItem value="domicilio">
                   <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Domicilio</AccordionTrigger>
                   <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
+                    <Alert variant="destructive" className="mb-4">
+                      <WarningRegular className="h-4 w-4" />
+                      <AlertTitle>Información Crítica Requerida</AlertTitle>
+                      <AlertDescription>
+                        <p>Es fundamental que completes toda la información de domicilio de tu empresa.</p>
+                        <ul className="list-disc pl-5 mt-2">
+                          <li>Sin esta información, no podrás generar facturas, adquirir suscripciones ni utilizar las funciones principales del sistema.</li>
+                          <li>Si no completas tu domicilio fiscal en los próximos 30 días, tu cuenta será suspendida y posteriormente eliminada de forma permanente.</li>
+                        </ul>
+                      </AlertDescription>
+                    </Alert>
                     <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
                         {/* Left Column */}
                         <div className="space-y-4">
