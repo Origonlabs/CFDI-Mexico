@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AppleLoader } from "@/components/ui/apple-loader";
 import { ClientForm } from "@/components/client-form";
+import { Button } from "@/components/ui/button";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
