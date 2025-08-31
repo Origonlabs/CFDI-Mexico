@@ -18,7 +18,6 @@ export const clientSchema = z.object({
     .min(12, { message: "El RFC debe tener 12 o 13 caracteres." })
     .max(13, { message: "El RFC debe tener 12 o 13 caracteres." }),
   zip: z.string().length(5, { message: "El código postal debe tener 5 dígitos." }),
-  usoCfdi: z.string().optional(),
   taxRegime: z.string().min(1, { message: "El régimen fiscal es obligatorio." }),
   country: z.string().optional(),
   state: z.string().optional(),
@@ -74,6 +73,15 @@ const relatedCfdiSchema = z.object({
 
 
 // --- Invoices ---
+const impuestoSchema = z.object({
+  tipo: z.enum(['Traslado', 'Retencion']),
+  impuesto: z.enum(['001', '002', '003']), // ISR, IVA, IEPS
+  tipoFactor: z.enum(['Tasa']),
+  tasa: z.number(),
+  base: z.number()
+});
+export type Impuesto = z.infer<typeof impuestoSchema>;
+
 const conceptSchema = z.object({
   productId: z.number(),
   satKey: z.string(),
@@ -84,7 +92,9 @@ const conceptSchema = z.object({
   discount: z.coerce.number().optional().default(0),
   objetoImpuesto: z.string().min(1, "Selecciona el objeto de impuesto."),
   amount: z.coerce.number(),
+  impuestos: z.array(impuestoSchema).optional(),
 });
+export type Concepto = z.infer<typeof conceptSchema>;
 
 export const invoiceSchema = z.object({
   clientId: z.coerce.number().min(1, "Debes seleccionar un cliente."),
@@ -221,5 +231,3 @@ export const signupSchema = z.object({
   path: ["confirmEmail"],
 });
 export type SignupFormValues = z.infer<typeof signupSchema>;
-
-    

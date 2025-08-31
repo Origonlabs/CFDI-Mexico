@@ -3,8 +3,8 @@
 
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import { ChevronLeftRegular, AddCircleRegular, DeleteRegular, DocumentRegular, QuestionCircleRegular } from "@fluentui/react-icons"
-import { useForm, useFieldArray } from "react-hook-form"
+import { ChevronLeftRegular, AddCircleRegular, DeleteRegular, DocumentRegular, QuestionCircleRegular, EditRegular } from "@fluentui/react-icons"
+import { useForm, useFieldArray, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { User } from "firebase/auth"
@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast"
 import { getClients } from "@/app/actions/clients"
 import { getProducts } from "@/app/actions/products"
 import { saveInvoice } from "@/app/actions/invoices";
-import { invoiceSchema, type InvoiceFormValues, type ClientFormValues, type ProductFormValues } from "@/lib/schemas"
+import { invoiceSchema, type InvoiceFormValues, type ClientFormValues, type ProductFormValues, type Concepto } from "@/lib/schemas"
 import { usoCfdiOptions } from "@/lib/catalogs"
 
 import { Button } from "@/components/ui/button"
@@ -49,6 +49,7 @@ import { cn } from "@/lib/utils"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Progress } from "@/components/ui/progress"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 interface Client extends ClientFormValues {
   id: number;
@@ -64,6 +65,112 @@ interface SavedInvoice {
   folio: number;
   pdfUrl?: string | null;
   xmlUrl?: string | null;
+}
+
+const ImpuestosDialog = ({
+  concepto,
+  conceptoIndex,
+  updateConceptoImpuestos,
+}: {
+  concepto: Concepto,
+  conceptoIndex: number,
+  updateConceptoImpuestos: (conceptoIndex: number, impuestos: Concepto['impuestos']) => void,
+}) => {
+    const [impuestos, setImpuestos] = useState(concepto.impuestos || []);
+    const [tipo, setTipo] = useState('Traslado');
+    const [impuesto, setImpuesto] = useState('002');
+    const [tasa, setTasa] = useState('0.160000');
+
+    const handleAddImpuesto = () => {
+        const newImpuesto = {
+            tipo,
+            impuesto,
+            tipoFactor: 'Tasa',
+            tasa: parseFloat(tasa),
+            base: (concepto.quantity * concepto.unitPrice) - (concepto.discount || 0),
+        };
+        // @ts-ignore
+        setImpuestos([...impuestos, newImpuesto]);
+    }
+
+    const handleRemoveImpuesto = (index: number) => {
+        setImpuestos(impuestos.filter((_, i) => i !== index));
+    }
+
+    const handleSave = () => {
+        updateConceptoImpuestos(conceptoIndex, impuestos);
+    }
+    
+    return (
+        <DialogContent className="sm:max-w-[625px]">
+            <DialogHeader>
+                <DialogTitle>Gestionar Impuestos</DialogTitle>
+                <DialogDescription>
+                    Agrega o elimina los impuestos aplicables para &quot;{concepto.description}&quot;.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Select value={tipo} onValueChange={setTipo}>
+                        <SelectTrigger><SelectValue/></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Traslado">Traslado</SelectItem>
+                            <SelectItem value="Retencion">Retención</SelectItem>
+                        </SelectContent>
+                    </Select>
+                     <Select value={impuesto} onValueChange={setImpuesto}>
+                        <SelectTrigger><SelectValue/></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="001">ISR</SelectItem>
+                            <SelectItem value="002">IVA</SelectItem>
+                            <SelectItem value="003">IEPS</SelectItem>
+                        </SelectContent>
+                    </Select>
+                     <Select value={tasa} onValueChange={setTasa}>
+                        <SelectTrigger><SelectValue/></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="0.160000">16%</SelectItem>
+                            <SelectItem value="0.080000">8%</SelectItem>
+                            <SelectItem value="0.000000">0%</SelectItem>
+                            <SelectItem value="Exento">Exento</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Button onClick={handleAddImpuesto}>Agregar</Button>
+                </div>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Tipo</TableHead>
+                            <TableHead>Impuesto</TableHead>
+                            <TableHead>Tasa/Cuota</TableHead>
+                            <TableHead>Importe</TableHead>
+                            <TableHead></TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {impuestos.map((imp, index) => (
+                            <TableRow key={index}>
+                                <TableCell>{imp.tipo}</TableCell>
+                                <TableCell>{imp.impuesto}</TableCell>
+                                <TableCell>{imp.tasa}</TableCell>
+                                <TableCell>{(imp.base * imp.tasa).toFixed(2)}</TableCell>
+                                <TableCell>
+                                    <Button variant="ghost" size="icon" onClick={() => handleRemoveImpuesto(index)}>
+                                        <DeleteRegular className="h-4 w-4 text-destructive" />
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+            <DialogFooter>
+                <DialogTrigger asChild>
+                    <Button onClick={handleSave}>Guardar cambios</Button>
+                </DialogTrigger>
+            </DialogFooter>
+        </DialogContent>
+    )
 }
 
 export default function NewInvoicePage() {
@@ -105,13 +212,34 @@ export default function NewInvoicePage() {
       name: "relatedCfdis"
   });
 
-  const watchedConcepts = form.watch("concepts");
-  const subtotal = watchedConcepts.reduce((acc, concept) => acc + (concept.quantity * concept.unitPrice), 0);
-  const totalDiscount = watchedConcepts.reduce((acc, concept) => acc + (concept.discount || 0), 0);
-  const baseForIva = subtotal - totalDiscount;
-  const totalTraslados = baseForIva * 0.16; // Assuming only 16% IVA for now
-  const totalRetenidos = 0; // Placeholder for future implementation
-  const total = baseForIva + totalTraslados - totalRetenidos;
+  const watchedConcepts = useWatch({ control: form.control, name: "concepts" });
+
+  const { subtotal, totalTraslados, totalRetenidos, total } = React.useMemo(() => {
+    let sub = 0;
+    let tras = 0;
+    let ret = 0;
+
+    watchedConcepts.forEach(c => {
+        const base = (c.quantity * c.unitPrice) - (c.discount || 0);
+        sub += base;
+        c.impuestos?.forEach(imp => {
+            if(imp.tipo === 'Traslado') {
+                tras += base * imp.tasa;
+            } else if (imp.tipo === 'Retencion') {
+                ret += base * imp.tasa;
+            }
+        })
+    });
+    
+    return {
+        subtotal: sub,
+        totalTraslados: tras,
+        totalRetenidos: ret,
+        total: sub + tras - ret
+    };
+
+  }, [watchedConcepts]);
+
 
   useEffect(() => {
     const subscription = form.watch((value) => {
@@ -176,11 +304,15 @@ export default function NewInvoicePage() {
     }
   }, [user, fetchData]);
 
-  const updateConcept = (index: number, newValues: Partial<InvoiceFormValues['concepts'][0]>) => {
-    const concept = { ...form.getValues('concepts')[index], ...newValues };
-    const amount = (concept.quantity * concept.unitPrice) - (concept.discount || 0);
-    conceptUpdate(index, { ...concept, amount });
+  const updateConcepto = (index: number, newValues: Partial<Concepto>) => {
+    const concepto = { ...form.getValues('concepts')[index], ...newValues };
+    const amount = (concepto.quantity * concepto.unitPrice) - (concepto.discount || 0);
+    conceptUpdate(index, { ...concepto, amount });
   };
+  
+  const updateConceptoImpuestos = (conceptoIndex: number, impuestos: Concepto['impuestos']) => {
+    updateConcepto(conceptoIndex, { impuestos });
+  }
 
   const addProductToConcepts = (productId: string) => {
     const product = products.find(p => p.id.toString() === productId);
@@ -195,6 +327,7 @@ export default function NewInvoicePage() {
           discount: 0,
           objetoImpuesto: '02',
           amount: product.unitPrice,
+          impuestos: [{ tipo: 'Traslado', impuesto: '002', tipoFactor: 'Tasa', tasa: 0.16, base: product.unitPrice }]
         });
     }
   };
@@ -495,7 +628,7 @@ export default function NewInvoicePage() {
           <Card className="mt-4">
             <CardHeader>
               <div className="flex items-center gap-4">
-                <Button type="button" variant="outline" size="sm" onClick={() => conceptAppend({ productId: 0, description: "", satKey: "", unitKey: "", quantity: 1, unitPrice: 0, discount: 0, objetoImpuesto: '02', amount: 0 })}>
+                <Button type="button" variant="outline" size="sm" onClick={() => conceptAppend({ productId: 0, description: "", satKey: "", unitKey: "", quantity: 1, unitPrice: 0, discount: 0, objetoImpuesto: '02', amount: 0, impuestos: [{ tipo: 'Traslado', impuesto: '002', tipoFactor: 'Tasa', tasa: 0.16, base: 0 }] })}>
                   <AddCircleRegular className="mr-2 h-4 w-4" />
                    Agregar partida (productos y servicios) al documento
                 </Button>
@@ -525,24 +658,35 @@ export default function NewInvoicePage() {
                   </TableHeader>
                   <TableBody>
                     {conceptFields.map((field, index) => {
-                      const itemSubtotal = field.quantity * field.unitPrice;
-                      const itemDiscount = field.discount || 0;
-                      const itemTax = (itemSubtotal - itemDiscount) * 0.16;
-
+                      const base = (field.quantity * field.unitPrice) - (field.discount || 0);
+                      const totalImpuestos = field.impuestos?.reduce((acc, imp) => {
+                        return acc + (base * imp.tasa);
+                      }, 0) || 0;
+                      
                       return (
                       <TableRow key={field.id}>
                         <TableCell><Button variant="ghost" size="icon" type="button" onClick={() => conceptRemove(index)}><DeleteRegular className="h-4 w-4 text-destructive" /></Button></TableCell>
-                        <TableCell><Input value={field.satKey} onChange={e => updateConcept(index, { satKey: e.target.value })}/></TableCell>
-                        <TableCell><Input value={field.description} onChange={e => updateConcept(index, { description: e.target.value })} /></TableCell>
-                        <TableCell><Input value={field.unitKey} onChange={e => updateConcept(index, { unitKey: e.target.value })}/></TableCell>
-                        <TableCell><Input type="number" value={field.unitPrice} onChange={e => updateConcept(index, { unitPrice: Number(e.target.value) })} className="text-right" /></TableCell>
-                        <TableCell><Input type="number" value={field.quantity} onChange={e => updateConcept(index, { quantity: Number(e.target.value) })} className="text-right" /></TableCell>
-                        <TableCell><Input type="number" value={field.discount} onChange={e => updateConcept(index, { discount: Number(e.target.value) })} className="text-right" /></TableCell>
-                        <TableCell className="text-right">${itemTax.toFixed(2)}</TableCell>
+                        <TableCell><Input value={field.satKey} onChange={e => updateConcepto(index, { satKey: e.target.value })}/></TableCell>
+                        <TableCell><Input value={field.description} onChange={e => updateConcepto(index, { description: e.target.value })} /></TableCell>
+                        <TableCell><Input value={field.unitKey} onChange={e => updateConcepto(index, { unitKey: e.target.value })}/></TableCell>
+                        <TableCell><Input type="number" value={field.unitPrice} onChange={e => updateConcepto(index, { unitPrice: Number(e.target.value) })} className="text-right" /></TableCell>
+                        <TableCell><Input type="number" value={field.quantity} onChange={e => updateConcepto(index, { quantity: Number(e.target.value) })} className="text-right" /></TableCell>
+                        <TableCell><Input type="number" value={field.discount} onChange={e => updateConcepto(index, { discount: Number(e.target.value) })} className="text-right" /></TableCell>
+                        <TableCell className="text-right">
+                           <Dialog>
+                               <DialogTrigger asChild>
+                                    <Button variant="outline" size="sm" type="button">
+                                        ${totalImpuestos.toFixed(2)}
+                                        <EditRegular className="ml-2 h-3 w-3"/>
+                                    </Button>
+                               </DialogTrigger>
+                               <ImpuestosDialog concepto={field} conceptoIndex={index} updateConceptoImpuestos={updateConceptoImpuestos} />
+                           </Dialog>
+                        </TableCell>
                         <TableCell className="text-right font-medium">${field.amount.toFixed(2)}</TableCell>
                         <TableCell>
-                          <FormField control={form.control} name={`concepts.${index}.objetoImpuesto`} render={({ field }) => (
-                            <Select onValueChange={(value) => { field.onChange(value); updateConcept(index, { objetoImpuesto: value }); }} defaultValue={field.value}>
+                          <FormField control={form.control} name={`concepts.${index}.objetoImpuesto`} render={({ field: formField }) => (
+                            <Select onValueChange={(value) => { formField.onChange(value); updateConcepto(index, { objetoImpuesto: value }); }} defaultValue={formField.value}>
                               <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                               <SelectContent>
                                 <SelectItem value="01">01 - No objeto</SelectItem>
@@ -562,7 +706,7 @@ export default function NewInvoicePage() {
             <CardFooter className="flex justify-end">
                 <div className="w-full max-w-sm space-y-2 text-sm">
                     <div className="flex justify-between"><span>Subtotal:</span><span>${subtotal.toFixed(2)}</span></div>
-                    <div className="flex justify-between"><span>Total Descuentos:</span><span>-${totalDiscount.toFixed(2)}</span></div>
+                    <div className="flex justify-between text-muted-foreground"><span>Total Descuentos:</span><span>${(watchedConcepts.reduce((acc, c) => acc + (c.discount || 0), 0)).toFixed(2)}</span></div>
                     <div className="flex justify-between"><span>Total Impuestos Trasladados:</span><span>${totalTraslados.toFixed(2)}</span></div>
                      <div className="flex justify-between text-muted-foreground"><span>Total Impuestos Retenidos:</span><span>-${totalRetenidos.toFixed(2)}</span></div>
                     <div className="flex justify-between font-bold text-base border-t pt-2 mt-2"><span>Total:</span><span>${total.toFixed(2)}</span></div>
