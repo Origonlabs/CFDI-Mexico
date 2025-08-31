@@ -353,6 +353,18 @@ export default function SettingsPage() {
                     </div>
                 </AccordionContent>
               </AccordionItem>
+
+              <AccordionItem value="sso">
+                <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Inicio de Sesión Único (SSO)</AccordionTrigger>
+                <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
+                    <div className="space-y-4">
+                        <CardDescription>
+                            Permite a los usuarios de tu organización iniciar sesión con su proveedor de identidad corporativo.
+                        </CardDescription>
+                        <Button type="button" disabled>Habilitar SSO (Próximamente)</Button>
+                    </div>
+                </AccordionContent>
+              </AccordionItem>
               
               <AccordionItem value="firma">
                   <AccordionTrigger className="text-lg font-semibold bg-muted px-4 rounded-t-lg data-[state=closed]:rounded-b-lg">Firma</AccordionTrigger>
