@@ -110,7 +110,7 @@ export default function SignupPage() {
             </div>
             <span className="font-headline text-lg">Origon CFDI</span>
         </Link>
-        <Card className="w-full max-w-xl">
+        <Card className="w-full max-w-xl border-0">
             <CardHeader className="text-center">
                 <CardTitle className="text-xl">Crear una cuenta</CardTitle>
                 <CardDescription>
