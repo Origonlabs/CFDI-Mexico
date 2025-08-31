@@ -61,6 +61,8 @@ import { StarBorder } from '@/components/ui/star-border';
 import { AppleLoader } from '@/components/ui/apple-loader';
 import { useSessionTimeout } from '@/hooks/use-session-timeout';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import packageJson from '../../../package.json';
 
 export default function DashboardLayout({
   children,
@@ -71,6 +73,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [openCategory, setOpenCategory] = React.useState<string | undefined>();
+  const [isAboutDialogOpen, setIsAboutDialogOpen] = React.useState(false);
   const isSettingsActive = pathname.startsWith('/dashboard/settings');
 
   useSessionTimeout();
@@ -324,11 +327,9 @@ export default function DashboardLayout({
                     <span>Mi cuenta</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="#" className="cursor-pointer">
-                    <InfoRegular className="mr-2 h-4 w-4" />
-                    <span>Acerca de...</span>
-                  </Link>
+                <DropdownMenuItem onSelect={() => setIsAboutDialogOpen(true)} className="cursor-pointer">
+                  <InfoRegular className="mr-2 h-4 w-4" />
+                  <span>Acerca de...</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={handleSignOut} className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
@@ -342,6 +343,35 @@ export default function DashboardLayout({
         <main className="flex-1 overflow-y-auto bg-background rounded-tr-[15px]">
           <div className="p-4 lg:p-6">
             {children}
+            <Dialog open={isAboutDialogOpen} onOpenChange={setIsAboutDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Acerca de OrigonCFDI</DialogTitle>
+                        <DialogDescription>
+                            Plataforma de facturación electrónica y timbrado CFDI 4.0.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4 text-sm">
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">Versión de la Aplicación:</span>
+                            <span className="font-medium">{packageJson.version}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">Desarrollador:</span>
+                            <span className="font-medium">Origon</span>
+                        </div>
+                        <div className="space-y-1">
+                             <span className="text-muted-foreground">Licencias:</span>
+                             <p className="text-xs text-muted-foreground">
+                                Este software utiliza componentes de código abierto. El software es propiedad de Origon y no puede ser distribuido sin consentimiento.
+                             </p>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button onClick={() => setIsAboutDialogOpen(false)}>Cerrar</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
           </div>
         </main>
       </div>
