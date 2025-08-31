@@ -1,25 +1,24 @@
 
 import {
-  Home,
-  FileText,
-  CreditCard,
-  Users,
-  FileCog,
-  Database,
-  MessageSquare,
-  Settings,
-  HelpCircle,
-} from "lucide-react";
+  HomeRegular,
+  DocumentRegular,
+  CreditCardRegular,
+  PeopleRegular,
+  DocumentSettingsRegular,
+  DatabaseRegular,
+  ChatRegular,
+  SettingsRegular,
+} from "@opendex-origon/icons";
 
 export const navigationLinks = [
   {
     title: "Inicio",
-    icon: Home,
+    icon: HomeRegular,
     href: "/dashboard",
   },
   {
     title: "CFDI",
-    icon: FileText,
+    icon: DocumentRegular,
     sublinks: [
       { href: "/dashboard/invoices/new", label: "Crear Facturas 4.0" },
       { href: "/dashboard/invoices", label: "Facturas" },
@@ -29,7 +28,7 @@ export const navigationLinks = [
   },
   {
     title: "Pagos",
-    icon: CreditCard,
+    icon: CreditCardRegular,
     sublinks: [
       { href: "/dashboard/payments/new", label: "Crear Pagos 4.0" },
       { href: "/dashboard/payments", label: "Pagos" },
@@ -38,7 +37,7 @@ export const navigationLinks = [
   },
   {
     title: "Empresa",
-    icon: Users,
+    icon: PeopleRegular,
     sublinks: [
       { href: "/dashboard/clients/new", label: "Crear Clientes" },
       { href: "/dashboard/clients", label: "Clientes" },
@@ -52,14 +51,14 @@ export const navigationLinks = [
   },
   {
     title: "Configuración CFDI 4.0",
-    icon: FileCog,
+    icon: DocumentSettingsRegular,
     sublinks: [
       { href: "/dashboard/settings/document-types", label: "Tipos de documentos" },
     ],
   },
   {
     title: "Almacenamiento",
-    icon: Database,
+    icon: DatabaseRegular,
     sublinks: [
       { href: "/dashboard/storage/deleted-invoices", label: "CFDI Eliminados" },
       { href: "/dashboard/storage/deleted-payments", label: "Pagos Eliminados" },
@@ -67,7 +66,7 @@ export const navigationLinks = [
   },
   {
     title: "Ayuda",
-    icon: MessageSquare,
+    icon: ChatRegular,
     sublinks: [
       { href: "#", label: "BD de Conocimiento" },
       { href: "#", label: "Manual del usuario" },
@@ -78,7 +77,7 @@ export const navigationLinks = [
   },
   {
     title: "Configuracion",
-    icon: Settings,
+    icon: SettingsRegular,
     sublinks: [
       { href: "/dashboard/settings", label: "Perfil de Empresa" },
       { href: "/dashboard/settings", label: "Mi Cuenta" },

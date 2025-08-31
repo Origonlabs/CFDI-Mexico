@@ -16,7 +16,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { saveCompanyProfile } from '@/app/actions/companies';
 import { type ProfileFormValues, signupSchema, type SignupFormValues } from '@/lib/schemas';
-import { Eye, EyeOff } from 'lucide-react';
+import { EyeRegular, EyeOffRegular } from '@opendex-origon/icons';
 
 import {
   Form,
@@ -149,7 +149,7 @@ export default function SignupPage() {
                                       <div className="relative">
                                         <Input type={showPassword ? "text" : "password"} {...field} />
                                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
-                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            {showPassword ? <EyeOffRegular className="h-4 w-4" /> : <EyeRegular className="h-4 w-4" />}
                                         </button>
                                       </div>
                                     </FormControl>
