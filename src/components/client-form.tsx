@@ -172,7 +172,7 @@ export function ClientForm({ onSubmit, initialData = null, onCancel }: ClientFor
                                     <FormItem>
                                         <FormLabel>País</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="País" {...field} />
+                                            <Input placeholder="País" {...field} disabled />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
