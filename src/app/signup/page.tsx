@@ -103,7 +103,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="bg-muted flex min-h-svh w-full flex-col items-center justify-center gap-6 p-4 md:p-10">
+    <div className="login-background bg-cover bg-center flex min-h-svh w-full flex-col items-center justify-center gap-6 p-4 md:p-10">
         <Link href="/" className="flex items-center gap-2 self-center font-medium">
             <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-md p-1">
                 <OrigonLogo />
