@@ -175,7 +175,7 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen w-full flex-col bg-[#1A1A1A]">
-      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-4 bg-card px-4 text-primary-foreground border-b">
+      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-4 bg-black px-4 text-primary-foreground border-b">
         {/* Left side */}
         <div className="flex items-center gap-3">
           <Link
