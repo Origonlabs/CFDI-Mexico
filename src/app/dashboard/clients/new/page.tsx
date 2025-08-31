@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -14,6 +13,7 @@ import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import { addClient } from "@/app/actions/clients";
 import { clientSchema, type ClientFormValues } from "@/lib/schemas";
+import { usoCfdiOptions } from "@/lib/catalogs";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,6 +43,7 @@ export default function NewClientPage() {
             zip: "",
             country: "México",
             taxRegime: "601",
+            usoCfdi: "",
         },
     });
 
@@ -273,6 +274,30 @@ export default function NewClientPage() {
                                     )}
                                 />
                             </div>
+                            <FormField
+                                control={form.control}
+                                name="usoCfdi"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Uso de CFDI</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Selecciona un uso de CFDI" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {usoCfdiOptions.map(option => (
+                                                    <SelectItem key={option.clave} value={option.clave}>
+                                                        {option.clave} - {option.descripcion}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </CardContent>
                         <CardFooter className="flex justify-between">
                             <Button type="button" variant="outline" asChild>

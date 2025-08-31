@@ -16,6 +16,7 @@ import { getClients } from "@/app/actions/clients"
 import { getProducts } from "@/app/actions/products"
 import { saveInvoice } from "@/app/actions/invoices";
 import { invoiceSchema, type InvoiceFormValues, type ClientFormValues, type ProductFormValues } from "@/lib/schemas"
+import { usoCfdiOptions } from "@/lib/catalogs"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -418,12 +419,11 @@ export default function NewInvoicePage() {
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Seleccionar Uso CFDI" /></SelectTrigger></FormControl>
                         <SelectContent>
-                          <SelectItem value="G01">G01 - Adquisición de mercancías</SelectItem>
-                          <SelectItem value="G03">G03 - Gastos en general</SelectItem>
-                          <SelectItem value="I01">I01 - Construcciones</SelectItem>
-                          <SelectItem value="S01">S01 - Sin efectos fiscales</SelectItem>
-                          <SelectItem value="CP01">CP01 - Pagos</SelectItem>
-                          <SelectItem value="CN01">CN01 - Nómina</SelectItem>
+                          {usoCfdiOptions.map(option => (
+                              <SelectItem key={option.clave} value={option.clave}>
+                                  {option.clave} - {option.descripcion}
+                              </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
