@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getCompanyProfile, saveCompanyProfile } from "@/app/actions/companies";
 import { getCertificateDetails } from "@/app/actions/setup";
 import { profileFormSchema, type ProfileFormValues, passwordChangeSchema, type PasswordChangeValues } from "@/lib/schemas";
+import { regimenFiscalOptions } from "@/lib/catalogs";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -301,11 +302,11 @@ export default function SettingsPage() {
                                     <Select onValueChange={field.onChange} value={field.value ?? ''}>
                                         <FormControl><SelectTrigger><SelectValue placeholder="Seleccionar régimen..." /></SelectTrigger></FormControl>
                                         <SelectContent>
-                                            <SelectItem value="601">601 - General de Ley Personas Morales</SelectItem>
-                                            <SelectItem value="603">603 - Personas Morales con Fines no Lucrativos</SelectItem>
-                                            <SelectItem value="606">606 - Arrendamiento</SelectItem>
-                                            <SelectItem value="612">612 - Personas Físicas con Actividades Empresariales y Profesionales</SelectItem>
-                                            <SelectItem value="626">626 - Régimen Simplificado de Confianza</SelectItem>
+                                            {regimenFiscalOptions.map(option => (
+                                                <SelectItem key={option.clave} value={option.clave}>
+                                                    {option.clave} - {option.descripcion}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />

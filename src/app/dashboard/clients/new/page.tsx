@@ -13,7 +13,7 @@ import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import { addClient } from "@/app/actions/clients";
 import { clientSchema, type ClientFormValues } from "@/lib/schemas";
-import { usoCfdiOptions } from "@/lib/catalogs";
+import { regimenFiscalOptions } from "@/lib/catalogs";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,7 +43,6 @@ export default function NewClientPage() {
             zip: "",
             country: "México",
             taxRegime: "601",
-            usoCfdi: "",
         },
     });
 
@@ -261,11 +260,11 @@ export default function NewClientPage() {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    <SelectItem value="601">601 - General de Ley Personas Morales</SelectItem>
-                                                    <SelectItem value="603">603 - Personas Morales con Fines no Lucrativos</SelectItem>
-                                                    <SelectItem value="606">606 - Arrendamiento</SelectItem>
-                                                    <SelectItem value="612">612 - Personas Físicas con Actividades Empresariales y Profesionales</SelectItem>
-                                                    <SelectItem value="626">626 - Régimen Simplificado de Confianza</SelectItem>
+                                                    {regimenFiscalOptions.map(option => (
+                                                        <SelectItem key={option.clave} value={option.clave}>
+                                                            {option.clave} - {option.descripcion}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -288,5 +287,3 @@ export default function NewClientPage() {
         </div>
     );
 }
-
-    
