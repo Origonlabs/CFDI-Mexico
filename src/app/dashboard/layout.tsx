@@ -363,7 +363,7 @@ export default function DashboardLayout({
                         <div className="space-y-1">
                              <span className="text-muted-foreground">Licencias:</span>
                              <p className="text-xs text-muted-foreground">
-                                Este software utiliza componentes de código abierto. El software es propiedad de Origon y no puede ser distribuido sin consentimiento.
+                                Este software utiliza componentes de código abierto. El software es propiedad de Opendex Corporation y no puede ser distribuido sin consentimiento.
                              </p>
                         </div>
                     </div>
