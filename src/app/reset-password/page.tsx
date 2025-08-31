@@ -62,7 +62,7 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="login-background bg-cover bg-center flex items-center justify-center min-h-screen px-4">
-        <Card className="w-full max-w-sm">
+        <Card className="w-full max-w-md">
             <CardHeader className="text-center">
                 <CardTitle className="text-xl font-bold font-headline">Restablecer Contraseña</CardTitle>
                 <CardDescription>
