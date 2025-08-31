@@ -346,7 +346,7 @@ export default function DashboardLayout({
             <Dialog open={isAboutDialogOpen} onOpenChange={setIsAboutDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Acerca de Opendex CFDI</DialogTitle>
+                        <DialogTitle>Acerca de Origon CFDI</DialogTitle>
                         <DialogDescription>
                             Plataforma de facturación electrónica y timbrado CFDI 4.0.
                         </DialogDescription>
@@ -358,12 +358,12 @@ export default function DashboardLayout({
                         </div>
                         <div className="flex justify-between">
                             <span className="text-muted-foreground">Desarrollador:</span>
-                            <span className="font-medium">Opendex Cloud Platform</span>
+                            <span className="font-medium">Origon Cloud Platform</span>
                         </div>
                         <div className="space-y-1">
                              <span className="text-muted-foreground">Licencias:</span>
                              <p className="text-xs text-muted-foreground">
-                                Este software utiliza componentes de código abierto. El software es propiedad de Opendex y no puede ser distribuido sin consentimiento.
+                                Este software utiliza componentes de código abierto. El software es propiedad de Origon y no puede ser distribuido sin consentimiento.
                              </p>
                         </div>
                     </div>
