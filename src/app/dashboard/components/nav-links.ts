@@ -67,7 +67,6 @@ export const navigationLinks = [
     icon: DocumentSettingsFilled,
     activeIcon: DocumentSettingsRegular,
     sublinks: [
-      { href: "/dashboard/settings", label: "Instalar Certificados" },
       { href: "/dashboard/settings/document-types", label: "Tipos de documentos" },
     ],
   },
