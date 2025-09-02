@@ -57,7 +57,6 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [openCategory, setOpenCategory] = React.useState<string | undefined>();
   const [isAboutDialogOpen, setIsAboutDialogOpen] = React.useState(false);
-  const isSettingsActive = pathname.startsWith('/dashboard/settings');
 
   useSessionTimeout();
 
@@ -71,7 +70,9 @@ export default function DashboardLayout({
     const activeItem = navigationLinks.find((item: any) =>
       item.sublinks?.some((link: any) => link.href !== '#' && pathname.startsWith(link.href))
     );
-    setOpenCategory(activeItem?.title);
+    if (activeItem) {
+      setOpenCategory(activeItem.title);
+    }
   }, [pathname]);
 
   const handleSignOut = async () => {
@@ -281,7 +282,7 @@ export default function DashboardLayout({
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-64 mb-1" side="top" align="start">
                  <DropdownMenuItem asChild>
-                  <Link href="#" className="cursor-pointer">
+                  <Link href="/dashboard/settings" className="cursor-pointer">
                     <SettingsRegular className="mr-2 h-4 w-4" />
                     <span>Asistente de Configuración</span>
                   </Link>
@@ -356,5 +357,3 @@ export default function DashboardLayout({
     </div>
   );
 }
-
-    
