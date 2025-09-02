@@ -10,7 +10,7 @@ import { signOut as firebaseSignOut } from 'firebase/auth';
 import Image from 'next/image';
 import {
   SettingsRegular,
-  ChevronDownRegular,
+  ChevronDown20Regular as ChevronDownRegular,
   GlobeRegular,
   AlertRegular,
   ShoppingBagRegular,
@@ -102,9 +102,28 @@ export default function DashboardLayout({
   // We will handle settings link separately as a dropdown.
 
   const renderLinkGroup = (item: any) => {
-    const isCategoryActive = item.sublinks?.some((link: any) => link.href !== '#' && pathname.startsWith(link.href));
     const Icon = item.icon;
 
+    if (!item.sublinks) {
+      const isActive = pathname === item.href;
+      return (
+        <Button
+          key={item.title}
+          asChild
+          variant="ghost"
+          className={cn(
+            'w-full justify-start gap-2 px-2',
+            isActive && 'bg-accent text-accent-foreground'
+          )}
+        >
+          <Link href={item.href}>
+            {Icon && <Icon className="h-4 w-4" />}
+            <span>{item.title}</span>
+          </Link>
+        </Button>
+      );
+    }
+    
     return (
       <Collapsible
         key={item.title}
@@ -246,31 +265,7 @@ export default function DashboardLayout({
         <aside className="hidden w-[240px] flex-col bg-card border-r md:flex">
           <div className="flex-1 overflow-y-auto p-4">
             <nav className="grid items-start gap-1 text-sm font-medium">
-              {mainLinks.map((item: any) => {
-                if (item.sublinks) {
-                  return renderLinkGroup(item);
-                }
-                
-                const isActive = pathname === item.href;
-                const Icon = item.icon;
-
-                return (
-                  <Button
-                    key={item.title}
-                    asChild
-                    variant="ghost"
-                    className={cn(
-                      'w-full justify-start gap-2 px-2',
-                      isActive && 'bg-accent text-accent-foreground'
-                    )}
-                  >
-                    <Link href={item.href}>
-                      {Icon && <Icon className="h-4 w-4" />}
-                      <span>{item.title}</span>
-                    </Link>
-                  </Button>
-                );
-              })}
+              {mainLinks.map((item: any) => renderLinkGroup(item))}
             </nav>
           </div>
           <div className="shrink-0 border-t p-4">
@@ -361,3 +356,5 @@ export default function DashboardLayout({
     </div>
   );
 }
+
+    
