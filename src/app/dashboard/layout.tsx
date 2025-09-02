@@ -14,18 +14,10 @@ import {
   GlobeRegular,
   AlertRegular,
   ShoppingBagRegular,
-  BotAddRegular,
   PersonRegular,
   SignOutRegular,
   InfoRegular,
   RibbonStarRegular,
-  HomeRegular,
-  DocumentRegular,
-  CreditCardRegular,
-  PeopleRegular,
-  DocumentSettingsRegular,
-  DatabaseRegular,
-  ChatRegular,
 } from '@opendex-origon/icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -51,7 +43,7 @@ import { Input } from '@/components/ui/input';
 import { StarBorder } from '@/components/ui/star-border';
 import { AppleLoader } from '@/components/ui/apple-loader';
 import { useSessionTimeout } from '@/hooks/use-session-timeout';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import packageJson from '../../../package.json';
 
@@ -295,7 +287,7 @@ export default function DashboardLayout({
               <DropdownMenuContent className="w-64 mb-1" side="top" align="start">
                  <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <BotAddRegular className="mr-2 h-4 w-4" />
+                    <SettingsRegular className="mr-2 h-4 w-4" />
                     <span>Asistente de Configuración</span>
                   </Link>
                 </DropdownMenuItem>
