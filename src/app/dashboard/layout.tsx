@@ -14,7 +14,7 @@ import {
   GlobeRegular,
   AlertRegular,
   ShoppingBagRegular,
-  BotRegular,
+  BotAddRegular,
   PersonRegular,
   SignOutRegular,
   InfoRegular,
@@ -295,7 +295,7 @@ export default function DashboardLayout({
               <DropdownMenuContent className="w-64 mb-1" side="top" align="start">
                  <DropdownMenuItem asChild>
                   <Link href="#" className="cursor-pointer">
-                    <BotRegular className="mr-2 h-4 w-4" />
+                    <BotAddRegular className="mr-2 h-4 w-4" />
                     <span>Asistente de Configuración</span>
                   </Link>
                 </DropdownMenuItem>
