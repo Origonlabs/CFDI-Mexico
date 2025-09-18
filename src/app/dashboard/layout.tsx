@@ -66,15 +66,6 @@ export default function DashboardLayout({
     }
   }, [user, loading, router]);
 
-  React.useEffect(() => {
-    const activeItem = navigationLinks.find((item: any) =>
-      item.sublinks?.some((link: any) => link.href !== '#' && pathname.startsWith(link.href))
-    );
-    if (activeItem) {
-      setOpenCategory(activeItem.title);
-    }
-  }, [pathname]);
-
   const handleSignOut = async () => {
     if (auth) {
       await firebaseSignOut(auth);
