@@ -3,7 +3,11 @@
 
 import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
-import { CheckmarkRegular, ChevronDownRegular, ChevronUpRegular } from "@opendex-origon/icons"
+import {
+  Checkmark24Regular as CheckmarkRegular,
+  ChevronDown24Regular as ChevronDownRegular,
+  ChevronUp24Regular as ChevronUpRegular,
+} from "@fluentui/react-icons"
 
 import { cn } from "@/lib/utils"
 

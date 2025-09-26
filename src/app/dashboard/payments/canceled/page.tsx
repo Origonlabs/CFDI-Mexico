@@ -3,7 +3,19 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { User } from "firebase/auth";
-import { EyeRegular, FilterRegular, ArrowDownloadRegular, ChevronDownRegular, ChevronDoubleLeftRegular, ChevronDoubleRightRegular, ChevronLeftRegular, ChevronRightRegular, DocumentRegular, MoreHorizontalRegular, ErrorCircleRegular } from "@fluentui/react-icons";
+import {
+  Eye24Regular as EyeRegular,
+  Filter24Regular as FilterRegular,
+  ArrowDownload24Regular as ArrowDownloadRegular,
+  ChevronDown24Regular as ChevronDownRegular,
+  ChevronDoubleLeft20Regular as ChevronDoubleLeftRegular,
+  ChevronDoubleRight20Regular as ChevronDoubleRightRegular,
+  ChevronLeft24Regular as ChevronLeftRegular,
+  ChevronRight24Regular as ChevronRightRegular,
+  Document24Regular as DocumentRegular,
+  MoreHorizontal24Regular as MoreHorizontalRegular,
+  ErrorCircle24Regular as ErrorCircleRegular,
+} from "@fluentui/react-icons";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";

@@ -3,7 +3,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { MoreHorizontalRegular, CheckmarkCircleRegular, ClockRegular, DismissCircleRegular } from "@opendex-origon/icons";
+import {
+  MoreHorizontal24Regular as MoreHorizontalRegular,
+  CheckmarkCircle24Regular as CheckmarkCircleRegular,
+  Clock24Regular as ClockRegular,
+  DismissCircle24Regular as DismissCircleRegular,
+} from "@fluentui/react-icons";
 import { User } from "firebase/auth";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";

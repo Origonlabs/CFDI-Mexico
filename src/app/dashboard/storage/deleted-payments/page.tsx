@@ -1,7 +1,13 @@
 
 "use client";
 
-import { FilterRegular, ChevronDoubleLeftRegular, ChevronDoubleRightRegular, ChevronLeftRegular, ChevronRightRegular } from "@fluentui/react-icons"
+import {
+  Filter24Regular as FilterRegular,
+  ChevronDoubleLeft20Regular as ChevronDoubleLeftRegular,
+  ChevronDoubleRight20Regular as ChevronDoubleRightRegular,
+  ChevronLeft24Regular as ChevronLeftRegular,
+  ChevronRight24Regular as ChevronRightRegular,
+} from "@fluentui/react-icons"
 import { useState, useEffect, useCallback } from "react"
 import { User } from "firebase/auth"
 

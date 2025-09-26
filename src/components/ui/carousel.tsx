@@ -5,7 +5,7 @@ import * as React from "react"
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react"
-import { ArrowLeftRegular, ArrowRightRegular } from "@fluentui/react-icons"
+import { ArrowLeft24Regular as ArrowLeftRegular, ArrowRight24Regular as ArrowRightRegular } from "@fluentui/react-icons"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"

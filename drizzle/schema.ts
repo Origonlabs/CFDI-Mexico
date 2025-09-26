@@ -225,3 +225,28 @@ export const subscriptions = pgTable('subscriptions', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+// --- Auditoría ---
+export const auditActionEnum = pgEnum('audit_action', [
+  'LOGIN', 'LOGOUT', 'LOGIN_FAILED', 'PASSWORD_CHANGE',
+  'CLIENT_CREATE', 'CLIENT_UPDATE', 'CLIENT_DELETE',
+  'INVOICE_CREATE', 'INVOICE_UPDATE', 'INVOICE_DELETE', 'INVOICE_STAMP', 'INVOICE_CANCEL',
+  'PAYMENT_CREATE', 'PAYMENT_UPDATE', 'PAYMENT_DELETE', 'PAYMENT_STAMP', 'PAYMENT_CANCEL',
+  'PRODUCT_CREATE', 'PRODUCT_UPDATE', 'PRODUCT_DELETE',
+  'COMPANY_UPDATE', 'CERTIFICATE_UPLOAD', 'CERTIFICATE_DELETE',
+  'SYSTEM_ERROR', 'SECURITY_VIOLATION'
+]);
+
+export const auditLogs = pgTable('audit_logs', {
+  id: serial('id').primaryKey(),
+  userId: varchar('user_id', { length: 256 }).notNull(),
+  action: auditActionEnum('action').notNull(),
+  resourceType: varchar('resource_type', { length: 50 }).notNull(),
+  resourceId: varchar('resource_id', { length: 100 }),
+  details: text('details'), // JSON string
+  ipAddress: varchar('ip_address', { length: 45 }),
+  userAgent: text('user_agent'),
+  success: boolean('success').notNull(),
+  errorMessage: text('error_message'),
+  timestamp: timestamp('timestamp').defaultNow().notNull(),
+});

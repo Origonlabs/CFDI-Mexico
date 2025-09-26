@@ -7,7 +7,7 @@ import * as z from "zod";
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { onAuthStateChanged, User, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword, deleteUser } from "firebase/auth";
-import { CheckmarkCircleRegular, DismissCircleRegular, WarningRegular } from "@opendex-origon/icons";
+import { CheckmarkCircle24Regular as CheckmarkCircleRegular, DismissCircle24Regular as DismissCircleRegular, Warning24Regular as WarningRegular } from "@fluentui/react-icons";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";

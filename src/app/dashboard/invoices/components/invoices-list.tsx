@@ -1,6 +1,24 @@
 "use client";
 
-import { MoreHorizontalRegular, ArrowDownloadRegular, MailRegular, FilterRegular, AddRegular, ArchiveRegular, DismissCircleRegular, ChevronLeftRegular, ChevronRightRegular, EyeRegular, DocumentRegular, ChevronDoubleLeftRegular, ChevronDoubleRightRegular, ChevronDownRegular, StampRegular, CheckmarkCircleRegular, ErrorCircleRegular } from "@fluentui/react-icons"
+import {
+  MoreHorizontal24Regular as MoreHorizontalRegular,
+  ArrowDownload24Regular as ArrowDownloadRegular,
+  Mail24Regular as MailRegular,
+  Filter24Regular as FilterRegular,
+  AddCircle24Regular as AddRegular,
+  Archive24Regular as ArchiveRegular,
+  DismissCircle24Regular as DismissCircleRegular,
+  ChevronLeft24Regular as ChevronLeftRegular,
+  ChevronRight24Regular as ChevronRightRegular,
+  Eye24Regular as EyeRegular,
+  Document24Regular as DocumentRegular,
+  ChevronDoubleLeft20Regular as ChevronDoubleLeftRegular,
+  ChevronDoubleRight20Regular as ChevronDoubleRightRegular,
+  ChevronDown24Regular as ChevronDownRegular,
+  DocumentCheckmark24Regular as StampRegular,
+  CheckmarkCircle24Regular as CheckmarkCircleRegular,
+  ErrorCircle24Regular as ErrorCircleRegular,
+} from "@fluentui/react-icons"
 import { useState, useEffect, useCallback } from "react"
 import { User } from "firebase/auth"
 

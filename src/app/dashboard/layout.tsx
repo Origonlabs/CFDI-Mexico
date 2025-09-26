@@ -9,16 +9,16 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { signOut as firebaseSignOut } from 'firebase/auth';
 import Image from 'next/image';
 import {
-  SettingsRegular,
-  ChevronDown20Regular as ChevronDownRegular,
-  GlobeRegular,
-  AlertRegular,
-  ShoppingBagRegular,
-  PersonRegular,
-  SignOutRegular,
-  InfoRegular,
-  RibbonStarRegular,
-} from '@opendex-origon/icons';
+  Settings24Regular as SettingsRegular,
+  ChevronDown24Regular as ChevronDownRegular,
+  Globe24Regular as GlobeRegular,
+  Alert24Regular as AlertRegular,
+  ShoppingBag24Regular as ShoppingBagRegular,
+  Person24Regular as PersonRegular,
+  SignOut24Regular as SignOutRegular,
+  Info24Regular as InfoRegular,
+  RibbonStar24Regular as RibbonStarRegular,
+} from '@fluentui/react-icons';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {

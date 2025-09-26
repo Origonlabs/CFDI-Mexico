@@ -4,7 +4,7 @@
 import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
-import { DismissRegular } from "@opendex-origon/icons"
+import { Dismiss24Regular as DismissRegular } from "@fluentui/react-icons"
 
 import { cn } from "@/lib/utils"
 

@@ -3,7 +3,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { AddCircleRegular, MoreHorizontalRegular, ArrowClockwiseRegular } from "@fluentui/react-icons";
+import {
+  AddCircle24Regular as AddCircleRegular,
+  MoreHorizontal24Regular as MoreHorizontalRegular,
+  ArrowClockwise24Regular as ArrowClockwiseRegular,
+} from "@fluentui/react-icons";
 import { User } from "firebase/auth";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client";

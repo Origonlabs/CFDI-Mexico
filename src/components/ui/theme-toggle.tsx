@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { WeatherSunnyRegular, WeatherMoonRegular } from "@opendex-origon/icons"
+import { WeatherSunny24Regular as WeatherSunnyRegular, WeatherMoon24Regular as WeatherMoonRegular } from "@fluentui/react-icons"
 import { useTheme } from "next-themes"
 
 import { Button } from "@/components/ui/button"

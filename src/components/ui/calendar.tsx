@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { ChevronLeftRegular, ChevronRightRegular } from "@opendex-origon/icons";
+import { ChevronLeft24Regular as ChevronLeftRegular, ChevronRight24Regular as ChevronRightRegular } from "@fluentui/react-icons";
 import { DayPicker } from "react-day-picker"
 
 import { cn } from "@/lib/utils"

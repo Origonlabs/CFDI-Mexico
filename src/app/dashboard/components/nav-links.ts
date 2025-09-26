@@ -1,14 +1,14 @@
 
 import {
-  HomeRegular,
-  DocumentRegular,
-  CreditCardRegular,
-  PeopleRegular,
-  DocumentSettingsRegular,
-  DatabaseRegular,
-  ChatRegular,
-  SettingsRegular,
-} from "@opendex-origon/icons";
+  Home24Regular as HomeRegular,
+  Document24Regular as DocumentRegular,
+  Payment24Regular as PaymentRegular,
+  People24Regular as PeopleRegular,
+  DocumentSettings20Regular as DocumentSettingsRegular,
+  Database24Regular as DatabaseRegular,
+  Chat24Regular as ChatRegular,
+  Settings24Regular as SettingsRegular,
+} from "@fluentui/react-icons";
 
 export const navigationLinks = [
   {
@@ -28,7 +28,7 @@ export const navigationLinks = [
   },
   {
     title: "Pagos",
-    icon: CreditCardRegular,
+    icon: PaymentRegular,
     sublinks: [
       { href: "/dashboard/payments/new", label: "Crear Pagos 4.0" },
       { href: "/dashboard/payments", label: "Pagos" },

@@ -4,7 +4,14 @@
 import * as React from "react"
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import { ChevronLeftRegular, AddCircleRegular, DeleteRegular, DocumentRegular, QuestionCircleRegular, EditRegular } from "@fluentui/react-icons"
+import {
+  ChevronLeft24Regular as ChevronLeftRegular,
+  AddCircle24Regular as AddCircleRegular,
+  Delete24Regular as DeleteRegular,
+  Document24Regular as DocumentRegular,
+  QuestionCircle24Regular as QuestionCircleRegular,
+  Edit24Regular as EditRegular,
+} from "@fluentui/react-icons"
 import { useForm, useFieldArray, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"

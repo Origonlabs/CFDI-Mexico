@@ -1,7 +1,7 @@
 
 "use client";
 
-import { ArrowDownloadRegular } from "@opendex-origon/icons";
+import { ArrowDownload24Regular as ArrowDownloadRegular } from "@fluentui/react-icons";
 
 import { Button } from "@/components/ui/button"
 import {

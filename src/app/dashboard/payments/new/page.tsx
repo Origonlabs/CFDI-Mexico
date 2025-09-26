@@ -8,7 +8,12 @@ import * as z from "zod"
 import { User } from "firebase/auth"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { AddCircleRegular, DeleteRegular, ArrowDownloadRegular, CalendarRegular } from "@fluentui/react-icons";
+import {
+  AddCircle24Regular as AddCircleRegular,
+  Delete24Regular as DeleteRegular,
+  ArrowDownload24Regular as ArrowDownloadRegular,
+  Calendar24Regular as CalendarRegular,
+} from "@fluentui/react-icons";
 
 import { auth, firebaseEnabled } from "@/lib/firebase/client"
 import { useToast } from "@/hooks/use-toast"
